@@ -1,0 +1,29 @@
+.cardClickable {
+cursor: pointer;
+  }
+
+.corner-label-container {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+}
+
+.corner-label {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 4px;
+  background-color: #7237C5;
+}
+
+.corner-label-text {
+  font-size: 15px;
+  color: white;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-family: "Lapsus";
+}

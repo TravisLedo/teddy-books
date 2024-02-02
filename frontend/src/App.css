@@ -1,0 +1,18 @@
+@font-face{
+font-family: "Gwibble"; 
+  src: local("Gwibble"),
+    url("./assets/fonts/Gwibble.ttf") format("truetype");
+}
+
+@font-face{
+  font-family: "Lapsus"; 
+    src: local("Lapsus"),
+      url("./assets/fonts/LapsusPro-Bold.otf") format("opentype");
+  }
+  
+
+.App {
+  text-align: center;
+  min-height: "100%";
+}
+
