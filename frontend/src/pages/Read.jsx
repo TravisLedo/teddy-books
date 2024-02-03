@@ -14,6 +14,7 @@ import {
 import Spinner from "react-bootstrap/Spinner";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import PagePairs from "../components/PagePairs/PagePairs";
 
 function Read(props) {
   const audioPlayerRef = useRef();
@@ -79,162 +80,13 @@ function Read(props) {
   }
 
   const generatePages = bookImageSources.map((book, index) => (
-    <div
-      key={book._id + index}
-      style={{
-        width: "100%",
-        height: "70vh",
-        margin: "auto",
-      }}
-    >
-      {props.windowSize.width > props.windowSize.height ? (
-        <div
-          style={{
-            height: "100%",
-            margin: "auto",
-            padding: 10
-          }}
-        >
-          <Row
-            style={{
-              height: "100%",
-              margin: "auto",
-            }}
-          >
-            <Col
-              style={{
-                margin: 0,
-                padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
-                borderWidth: 1,
-                borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                display: "flex",
-                backgroundColor: "white",
-              }}
-            >
-              <Image
-                rounded
-                src={bookImageSources[index].leftImage}
-                style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
-                }}
-              />
-            </Col>
-            <Col
-              style={{
-                margin: 0,
-                padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
-                borderWidth: 1,
-                borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                backgroundColor: "white",
-                display: "flex",
-              }}
-            >
-              <Image
-                rounded
-                src={bookImageSources[index].rightImage}
-                style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
-                }}
-              />
-            </Col>
-          </Row>
-        </div>
-      ) : (
-        <div
-          style={{
-            width: "100%",
-            height: "70vh",
-            margin: "auto",
-            padding: 10
-          }}
-        >
-          <Row
-            style={{
-              width: "100%",
-              height: "50%",
-              margin: "auto",
-            }}
-          >
-            <Col
-              style={{
-                margin: 0,
-                padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
-                borderWidth: 1,
-                borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                display: "flex",
-                backgroundColor: "white",
-              }}
-            >
-              <Image
-                rounded
-                src={bookImageSources[index].leftImage}
-                style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
-                }}
-              />
-            </Col>
-          </Row>
-          <Row
-            style={{
-              width: "100%",
-              height: "50%",
-              margin: "auto",
-            }}
-          >
-            <Col
-              style={{
-                margin: 0,
-                padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
-                borderWidth: 1,
-                borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                backgroundColor: "white",
-                display: "flex",
-              }}
-            >
-              <Image
-                rounded
-                src={bookImageSources[index].rightImage}
-                style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
-                }}
-              />
-            </Col>
-          </Row>
-        </div>
-      )}
-    </div>
+    <PagePairs
+      key={book._id + props.index}
+      book={book}
+      index={index}
+      bookImageSources={bookImageSources}
+      windowSize={props.windowSize}
+    ></PagePairs>
   ));
 
   const back = () => {
@@ -306,44 +158,83 @@ function Read(props) {
               marginTop: "10px",
             }}
           >
-            <div className="">
-              <div
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                }}
-              >
+            <Row
+              style={{
+                width: "100%",
+                padding: 0,
+                marginTop: 10,
+              }}
+            >
+              <Col>
                 <div
                   style={{
-                    width: "100%",
-                    margin: "auto",
-                    cursor: "grab",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    verticalAlign: "middle",
+                    objectFit: "contain",
                   }}
                 >
-                  <Carousel
-                    showThumbs={false}
-                    showArrows={false}
-                    showStatus={false}
-                    emulateTouch={true}
-                    showIndicators={false}
-                    autoPlay={false}
-                    onChange={(e) => handlePageChanged(e)}
+                  <div
+                    style={{
+                      width: "100%",
+                      margin: "auto",
+                      cursor: "grab",
+                    }}
                   >
-                    {generatePages}
-                  </Carousel>
+                    <Carousel
+                      showThumbs={false}
+                      showArrows={false}
+                      showStatus={false}
+                      emulateTouch={true}
+                      showIndicators={false}
+                      autoPlay={false}
+                      onChange={(e) => handlePageChanged(e)}
+                    >
+                      {generatePages}
+                    </Carousel>
+                  </div>
                 </div>
+              </Col>
+            </Row>
+            <Row
+              style={{
+                width: "100%",
+                padding: 0,
+                marginTop: 10,
+              }}
+            >
+              <Col
+                style={{
+                  padding: 0,
+                  margin: "auto",
+                }}
+              >
+                <div style={{ width: 200, margin: "auto" }}>
+                  <ProgressBar
+                    now={
+                      ((currentCarouselPage + 1) / bookImageSources.length) *
+                      100
+                    }
+                    visuallyHidden
+                  />
+                </div>
+              </Col>
+            </Row>
+            <Row
+              style={{
+                width: props.windowSize.width * 0.8,
+                padding: 0,
+                margin: "auto",
+                marginTop: 10,
+              }}
+            >
+              <div>
+                <Button variant="outline-primary">Primary</Button>
+                <Button variant="outline-primary">Primary</Button>
+                <Button variant="outline-primary">Primary</Button>
+                <Button variant="outline-primary">Primary</Button>
               </div>
-            </div>
-          </div>
-          <div style={{ width: "50%", margin: "auto" }}>
-            <ProgressBar
-              now={(currentCarouselPage / setBookImageSources.length) * 10}
-              visuallyHidden
-            />
-            <Button variant="outline-primary">Primary</Button>
-            <Button variant="outline-primary">Primary</Button>
+            </Row>
           </div>
         </div>
       ) : null}

@@ -1,6 +1,6 @@
 import background from "../assets/images/blue.png";
 import React, { useState, useEffect } from "react";
-import BookCard from "../components/bookCard";
+import BookCard from "../components/bookCard/bookCard";
 import Row from "react-bootstrap/Row";
 import { getAllBooks } from "../services/apiService";
 import Spinner from "react-bootstrap/Spinner";
@@ -31,7 +31,6 @@ function Books() {
         backgroundAttachment: "fixed",
         width: "100%",
         justifyContent: "center",
-
       }}
     >
       {booksData.length < 1 ? (
@@ -46,23 +45,26 @@ function Books() {
           <Spinner animation="border" role="status"></Spinner>
         </div>
       ) : (
-        <div style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-         // backgroundImage: `url(${background})`,
-        }}>
-           {booksData.length > 0 ? (
-          <Row
-            className="g-5 align-self-center pt-3 pb-3 w-100"
-            style={{
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-          >
-            {booksData.map((book) => (
-              <BookCard book={book} key={book._id}></BookCard>
-            ))}
-          </Row>) : null}
+        <div
+          style={{
+            marginLeft: "auto",
+            marginRight: "auto",
+            // backgroundImage: `url(${background})`,
+          }}
+        >
+          {booksData.length > 0 ? (
+            <Row
+              className="g-5 align-self-center pt-3 pb-3 w-100"
+              style={{
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              {booksData.map((book) => (
+                <BookCard book={book} key={book._id}></BookCard>
+              ))}
+            </Row>
+          ) : null}
         </div>
       )}
     </div>
