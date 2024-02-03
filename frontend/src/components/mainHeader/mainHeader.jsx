@@ -1,3 +1,5 @@
+import Nav from "react-bootstrap/Nav";
+
 export default function MainHeader(props) {
   return (
     <div
@@ -20,19 +22,28 @@ export default function MainHeader(props) {
         boxShadow: "1px 5px 5px  rgb(0 0 0 / 50%)",
       }}
     >
-      <img
+      <Nav.Link
+        href="/"
         style={{
           justifyContent: "center",
           alignSelf: "center",
-          maxWidth: "75%",
-          maxHeight: "100%",
-          paddingBottom: "10px",
-          paddingTop: "10px",
+          maxWidth: "90%",
+          height: "100%",
           objectFit: "contain",
         }}
-        src={require("../../assets/images/logo.png")}
-        alt="logo"
-      />
+      >
+        <img
+          style={{
+            justifyContent: "center",
+            alignSelf: "center",
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+          }}
+          src={require("../../assets/images/logo.png")}
+          alt="logo"
+        />
+      </Nav.Link>
     </div>
   );
 }

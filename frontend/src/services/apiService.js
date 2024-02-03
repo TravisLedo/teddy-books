@@ -35,12 +35,13 @@ export const generateImageLink = (book, pageNumber) => {
   );
 };
 
-export const getAudioForPage = async (book, page) => {
+export const getAudioForPage = async (book, leftPage, rightPage) => {
   try {
     const response = await apiService.post("/books/witai/speak", {
       book: book,
-      page: page+1,
-      voiceSelected: "Charlie",
+      leftPage: leftPage,
+      rightPage: rightPage,
+      voiceSelected: "Rebecca",
     });
     return response;
   } catch (error) {

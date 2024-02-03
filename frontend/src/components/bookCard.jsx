@@ -19,6 +19,7 @@ function BookCard(props) {
             margin: "auto",
             width: "500px",
             height: "500px",
+            maxWidth: "95%",
             borderColor: "black",
             borderStyle: "solid",
             borderWidth: 1,
@@ -36,12 +37,8 @@ function BookCard(props) {
               margin: "auto",
             }}
           />
-          <div className="corner-label-container">
-            <div className="corner-label">
-              <b className="corner-label-text">
-                {" " + props.book.title + " "}
-              </b>
-            </div>
+          <div className="corner-label">
+            <b className="corner-label-text">{" " + props.book.title + " "}</b>
           </div>
         </Card>
       </Link>

@@ -2,13 +2,6 @@
 cursor: pointer;
   }
 
-.corner-label-container {
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  right: 0;
-}
-
 .corner-label {
     position: absolute;
     bottom: 0;

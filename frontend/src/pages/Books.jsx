@@ -2,8 +2,8 @@ import background from "../assets/images/blue.png";
 import React, { useState, useEffect } from "react";
 import BookCard from "../components/bookCard";
 import Row from "react-bootstrap/Row";
-import MainHeader from "../components/mainHeader/mainHeader";
 import { getAllBooks } from "../services/apiService";
+import Spinner from "react-bootstrap/Spinner";
 
 function Books() {
   const [booksData, setBooksData] = useState([]);
@@ -24,28 +24,47 @@ function Books() {
   return (
     <div
       style={{
-        backgroundImage: `url(${background})`,
         backgroundPosition: "center",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        height: "100%",
+        height: "90%",
         backgroundAttachment: "fixed",
         width: "100%",
         justifyContent: "center",
+
       }}
     >
-      <MainHeader></MainHeader>
-      <Row
-        className="g-5 align-self-center pt-3 pb-3 w-100"
-        style={{
+      {booksData.length < 1 ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <Spinner animation="border" role="status"></Spinner>
+        </div>
+      ) : (
+        <div style={{
           marginLeft: "auto",
           marginRight: "auto",
-        }}
-      >
-        {booksData.map((book) => (
-          <BookCard book={book} key={book._id}></BookCard>
-        ))}
-      </Row>
+         // backgroundImage: `url(${background})`,
+        }}>
+           {booksData.length > 0 ? (
+          <Row
+            className="g-5 align-self-center pt-3 pb-3 w-100"
+            style={{
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            {booksData.map((book) => (
+              <BookCard book={book} key={book._id}></BookCard>
+            ))}
+          </Row>) : null}
+        </div>
+      )}
     </div>
   );
 }

@@ -6,32 +6,38 @@
     user-select: none;
     touch-action: none;
     background-color: white;
+
 }
 
+.title-label-text {
+  background-color: #7237C5;
+  font-size: 2vw;
+  color: white;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 4px;
+  font-family: "Lapsus";
+}
 
-
-.loader {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: #fff;
-    box-shadow: 32px 0 #fff, -32px 0 #fff;
-    position: relative;
-    animation: flash 0.5s ease-out infinite alternate;
-  }
-  
-  @keyframes flash {
-    0% {
-      background-color: #FFF2;
-      box-shadow: 32px 0 #FFF2, -32px 0 #FFF;
-    }
-    50% {
-      background-color: #FFF;
-      box-shadow: 32px 0 #FFF2, -32px 0 #FFF2;
-    }
-    100% {
-      background-color: #FFF2;
-      box-shadow: 32px 0 #FFF, -32px 0 #FFF2;
-    }
-  }
-        
+.overlay-screen{
+  background-color: black;
+  cursor: pointer;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.25);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  font-family: "Lapsus";
+  font-size: 5vw;
+  color: white;
+  text-align: center;
+  display: grid;
+	align-items: center;
+}

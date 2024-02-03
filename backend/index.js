@@ -74,10 +74,27 @@ app.post("/books/witai/speak", async (req, res) => {
     responseType: "stream",
   };
 
+  console.log(req.body.leftPage + ", " + req.body.rightPage);
   try {
-    const pageText = req.body.book.texts.find((obj) => obj.page == req.body.page);
+    const leftPageText = req.body.book.texts.find(
+      (obj) => obj.page == req.body.leftPage
+    );
 
-    if (pageText) {
+    const rightPageText = req.body.book.texts.find(
+      (obj) => obj.page == req.body.rightPage
+    );
+
+    let finalText = null;
+
+    if (leftPageText && rightPageText) {
+      finalText = leftPageText.text + " " + rightPageText.text;
+    } else if (leftPageText && !rightPageText) {
+      finalText = leftPageText.text;
+    } else if (!leftPageText && rightPageText) {
+      finalText = rightPageText.text;
+    }
+
+    if (finalText) {
       const DIR_PATH = "./public/";
       const FILE_NAME = Date.now().toString() + "_" + uuidv4() + ".mp3";
       const FILE_PATH = DIR_PATH + FILE_NAME;
@@ -85,10 +102,10 @@ app.post("/books/witai/speak", async (req, res) => {
       let response = await axios.post(
         "https://api.wit.ai/synthesize",
         {
-          q: pageText.text,
+          q: finalText,
           voice: req.body.voiceSelected,
           style: "soft",
-          // speed: 150,
+          speed: 100,
           // pitch: 110,
         },
         config
@@ -113,6 +130,7 @@ schedule.scheduleJob("*/1 * * * *", function () {
   deleteOldFiles("./public").catch(console.error);
 });
 
+//todo: instead of delete by time, maybe have the frontend send a message with the file name once it was able to load and that triggers a delete
 async function deleteOldFiles(path) {
   const dir = await fs.promises.opendir(path);
   for await (const dirent of dir) {
