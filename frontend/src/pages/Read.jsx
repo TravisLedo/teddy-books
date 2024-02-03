@@ -162,6 +162,7 @@ function Read(props) {
               style={{
                 width: "100%",
                 padding: 0,
+                margin: "auto",
                 marginTop: 10,
               }}
             >
