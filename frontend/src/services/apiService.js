@@ -36,12 +36,27 @@ export const generateImageLink = (book, pageNumber) => {
 };
 
 export const getAudioForPage = async (book, leftPage, rightPage) => {
+  console.log("test");
   try {
     const response = await apiService.post("/books/witai/speak", {
       book: book,
       leftPage: leftPage,
       rightPage: rightPage,
       voiceSelected: "Rebecca",
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+
+    throw error;
+  }
+};
+
+export const removeTempAudioFromServer = async (file) => {
+  console.log("test " + file);
+  try {
+    const response = await apiService.post("/books/removeaudio", {
+      file: file,
     });
     return response;
   } catch (error) {

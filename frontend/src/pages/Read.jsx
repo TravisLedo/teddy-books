@@ -9,6 +9,7 @@ import {
   getBookById,
   generateImageLink,
   getAudioForPage,
+  removeTempAudioFromServer,
 } from "../services/apiService";
 import Spinner from "react-bootstrap/Spinner";
 import { Carousel } from "react-responsive-carousel";
@@ -25,6 +26,7 @@ function Read() {
   const [started, setStarted] = useState(false);
 
   const handlePageChanged = async (page) => {
+    setAudioSource(null);
     //todo: make this take in 2 pages and on the backend, merge the texts. to output an audio file.
     let leftPage = 0;
     let rightPage = 0;
@@ -37,8 +39,12 @@ function Read() {
       rightPage = leftPage + 1;
     }
 
-    const audio = await getAudioForPage(book, leftPage, rightPage);
-    setAudioSource(process.env.REACT_APP_URL + "/" + audio.data);
+    try {
+      const audio = await getAudioForPage(book, leftPage, rightPage);
+      setAudioSource(process.env.REACT_APP_URL + "/" + audio.data);
+    } catch (error) {
+      console.log(error);
+    }
 
     //console.log(audioSource);
     setCurrentCarouselPage(page);
@@ -191,10 +197,13 @@ function Read() {
         </div>
       ) : (
         <audio
-          preload="metadata"
           autoPlay
           src={audioSource}
-          onPlay={(e) => console.log("onPlay")}
+          onPlay={(e) =>
+            removeTempAudioFromServer(
+              audioSource.replace(process.env.REACT_APP_URL + "/", "")
+            )
+          }
           ref={audioPlayerRef}
         />
       )}

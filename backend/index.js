@@ -66,6 +66,8 @@ app.post("/books/add", async (req, res) => {
 });
 
 app.post("/books/witai/speak", async (req, res) => {
+  console.log("test speak");
+
   const config = {
     headers: {
       Authorization: `Bearer ${process.env.WIT_AI_TOKEN}`,
@@ -75,6 +77,7 @@ app.post("/books/witai/speak", async (req, res) => {
   };
 
   console.log(req.body.leftPage + ", " + req.body.rightPage);
+
   try {
     const leftPageText = req.body.book.texts.find(
       (obj) => obj.page == req.body.leftPage
@@ -129,18 +132,37 @@ app.post("/books/witai/speak", async (req, res) => {
   }
 });
 
+//After frontend laods the audio to the browser, file will be requested to be removed by calling this endpoint.
+app.post("/books/removeaudio", async (req, res) => {
+  const DIR_PATH = "./public";
+  try {
+    fs.unlink(DIR_PATH + "/" + req.body.file, (err) => {
+      if (err) {
+        throw err;
+      }
+      console.log("Deleted file successfully.");
+      res.status(200).send("Temp fie removed");
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(201).send(error);
+  }
+});
+
+//Remove any files that may be missed due to user interupting requests to delete.
+//Files older than 1 minute will be removed.
+//Check runs every minute
 schedule.scheduleJob("*/1 * * * *", function () {
   console.log("clearing old files.");
   deleteOldFiles("./public").catch(console.error);
 });
 
-//todo: instead of delete by time, maybe have the frontend send a message with the file name once it was able to load and that triggers a delete
 async function deleteOldFiles(path) {
   const dir = await fs.promises.opendir(path);
   for await (const dirent of dir) {
     const fileDate = new Date(fs.statSync(path + "/" + dirent.name).birthtime);
-    const fiveMinutes = 1000 * 60 * 5;
-    const anHourAgo = Date.now() - fiveMinutes;
+    const oneMinute = 1000 * 60 * 1;
+    const anHourAgo = Date.now() - oneMinute;
 
     if (fileDate < anHourAgo) {
       fs.unlink(path + "/" + dirent.name, (err) => {
