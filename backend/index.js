@@ -95,9 +95,9 @@ app.post("/books/witai/speak", async (req, res) => {
     }
 
     if (finalText) {
-      const DIR_PATH = "./public/";
+      const DIR_PATH = "./public";
       const FILE_NAME = Date.now().toString() + "_" + uuidv4() + ".mp3";
-      const FILE_PATH = DIR_PATH + FILE_NAME;
+      const FILE_PATH = DIR_PATH + "/" + FILE_NAME;
 
       let response = await axios.post(
         "https://api.wit.ai/synthesize",
@@ -110,6 +110,10 @@ app.post("/books/witai/speak", async (req, res) => {
         },
         config
       );
+
+      if (!fs.existsSync(DIR_PATH)) {
+        fs.mkdirSync(DIR_PATH);
+      }
 
       let stream = fs.createWriteStream(FILE_PATH);
       response.data.pipe(stream).on("finish", function done() {
