@@ -1,8 +1,8 @@
 import React from "react";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useWindowSize, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Image from "react-bootstrap/Image";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, ProgressBar, Button } from "react-bootstrap";
 
 import "./Read.css";
 import {
@@ -15,7 +15,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-function Read() {
+function Read(props) {
   const audioPlayerRef = useRef();
   const { bookId } = useParams();
   const [book, setBook] = useState();
@@ -82,71 +82,158 @@ function Read() {
     <div
       key={book._id + index}
       style={{
-        width: "90%",
+        width: "100%",
+        height: "70vh",
         margin: "auto",
       }}
     >
-      <Row
-        style={{
-          width: "90%",
-          height: "70vh",
-          margin: "auto",
-          padding: 10,
-        }}
-      >
-        <Col
+      {props.windowSize.width > props.windowSize.height ? (
+        <div
           style={{
-            margin: 0,
-            padding: 0,
-            borderColor: "black",
-            borderStyle: "solid",
-            borderWidth: 1,
-            borderRadius: 5,
-            boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
             height: "100%",
-            display: "flex",
-            backgroundColor: "white",
+            margin: "auto",
+            padding: 10
           }}
         >
-          <Image
-            rounded
-            src={bookImageSources[index].leftImage}
+          <Row
             style={{
-              maxWidth: "99%",
-              verticalAlign: "middle",
-              objectFit: "contain",
+              height: "100%",
               margin: "auto",
-              maxHeight: "99%",
             }}
-          />
-        </Col>
-        <Col
+          >
+            <Col
+              style={{
+                margin: 0,
+                padding: 0,
+                borderColor: "black",
+                borderStyle: "solid",
+                borderWidth: 1,
+                borderRadius: 5,
+                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
+                height: "100%",
+                display: "flex",
+                backgroundColor: "white",
+              }}
+            >
+              <Image
+                rounded
+                src={bookImageSources[index].leftImage}
+                style={{
+                  maxWidth: "99%",
+                  verticalAlign: "middle",
+                  objectFit: "contain",
+                  margin: "auto",
+                  maxHeight: "99%",
+                }}
+              />
+            </Col>
+            <Col
+              style={{
+                margin: 0,
+                padding: 0,
+                borderColor: "black",
+                borderStyle: "solid",
+                borderWidth: 1,
+                borderRadius: 5,
+                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
+                height: "100%",
+                backgroundColor: "white",
+                display: "flex",
+              }}
+            >
+              <Image
+                rounded
+                src={bookImageSources[index].rightImage}
+                style={{
+                  maxWidth: "99%",
+                  verticalAlign: "middle",
+                  objectFit: "contain",
+                  margin: "auto",
+                  maxHeight: "99%",
+                }}
+              />
+            </Col>
+          </Row>
+        </div>
+      ) : (
+        <div
           style={{
-            margin: 0,
-            padding: 0,
-            borderColor: "black",
-            borderStyle: "solid",
-            borderWidth: 1,
-            borderRadius: 5,
-            boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-            height: "100%",
-            backgroundColor: "white",
-            display: "flex",
+            width: "100%",
+            height: "70vh",
+            margin: "auto",
+            padding: 10
           }}
         >
-          <Image
-            rounded
-            src={bookImageSources[index].rightImage}
+          <Row
             style={{
-              maxWidth: "99%",
-              verticalAlign: "middle",
-              objectFit: "contain",
+              width: "100%",
+              height: "50%",
               margin: "auto",
-              maxHeight: "99%",
             }}
-          />
-        </Col>
-      </Row>
+          >
+            <Col
+              style={{
+                margin: 0,
+                padding: 0,
+                borderColor: "black",
+                borderStyle: "solid",
+                borderWidth: 1,
+                borderRadius: 5,
+                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
+                height: "100%",
+                display: "flex",
+                backgroundColor: "white",
+              }}
+            >
+              <Image
+                rounded
+                src={bookImageSources[index].leftImage}
+                style={{
+                  maxWidth: "99%",
+                  verticalAlign: "middle",
+                  objectFit: "contain",
+                  margin: "auto",
+                  maxHeight: "99%",
+                }}
+              />
+            </Col>
+          </Row>
+          <Row
+            style={{
+              width: "100%",
+              height: "50%",
+              margin: "auto",
+            }}
+          >
+            <Col
+              style={{
+                margin: 0,
+                padding: 0,
+                borderColor: "black",
+                borderStyle: "solid",
+                borderWidth: 1,
+                borderRadius: 5,
+                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
+                height: "100%",
+                backgroundColor: "white",
+                display: "flex",
+              }}
+            >
+              <Image
+                rounded
+                src={bookImageSources[index].rightImage}
+                style={{
+                  maxWidth: "99%",
+                  verticalAlign: "middle",
+                  objectFit: "contain",
+                  margin: "auto",
+                  maxHeight: "99%",
+                }}
+              />
+            </Col>
+          </Row>
+        </div>
+      )}
     </div>
   ));
 
@@ -170,7 +257,7 @@ function Read() {
   }, [book]);
 
   return (
-    <div>
+    <div className="page">
       {!started ? (
         <div
           className="overlay-screen"
@@ -228,10 +315,6 @@ function Read() {
                   objectFit: "contain",
                 }}
               >
-                <b className="title-label-text" style={{}}>
-                  {" " + book.title + " "}
-                </b>
-
                 <div
                   style={{
                     width: "100%",
@@ -254,8 +337,14 @@ function Read() {
               </div>
             </div>
           </div>
-          <button onClick={back}>Back</button>
-          <button onClick={next}>Next</button>
+          <div style={{ width: "50%", margin: "auto" }}>
+            <ProgressBar
+              now={(currentCarouselPage / setBookImageSources.length) * 10}
+              visuallyHidden
+            />
+            <Button variant="outline-primary">Primary</Button>
+            <Button variant="outline-primary">Primary</Button>
+          </div>
         </div>
       ) : null}
     </div>

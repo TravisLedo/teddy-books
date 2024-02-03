@@ -13,7 +13,7 @@ font-family: "Gwibble";
 
 .App {
   text-align: center;
-  min-height: "100vh";
+  min-height: 100vh;
   background-color: #F2F2F2;
 }
 

@@ -13,7 +13,7 @@ export default function MainHeader(props) {
         position: "sticky",
         top: 0,
         zIndex: 99,
-        height: "10vh",
+        height: "5vh",
         width: "100%",
         backgroundColor: "#FFF",
         borderColor: "black",
