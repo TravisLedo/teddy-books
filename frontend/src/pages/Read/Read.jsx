@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useWindowSize, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Image from "react-bootstrap/Image";
 import { Row, Col, ProgressBar, Button } from "react-bootstrap";
@@ -10,11 +10,11 @@ import {
   generateImageLink,
   getAudioForPage,
   removeTempAudioFromServer,
-} from "../services/apiService";
+} from "../../services/apiService";
 import Spinner from "react-bootstrap/Spinner";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import PagePairs from "../components/PagePairs/PagePairs";
+import PagePairs from "../../components/PagePairs/PagePairs";
 
 function Read(props) {
   const audioPlayerRef = useRef();
@@ -85,7 +85,7 @@ function Read(props) {
       book={book}
       index={index}
       bookImageSources={bookImageSources}
-      windowSize={props.windowSize}
+      currentWindowSize={props.currentWindowSize}
     ></PagePairs>
   ));
 
@@ -223,7 +223,7 @@ function Read(props) {
             </Row>
             <Row
               style={{
-                width: props.windowSize.width * 0.8,
+                width: props.currentWindowSize.width * 0.8,
                 padding: 0,
                 margin: "auto",
                 marginTop: 10,

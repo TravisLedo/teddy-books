@@ -47,16 +47,16 @@ app.get("/books/:id", async (req, res) => {
 
 app.post("/books/add", async (req, res) => {
   console.log("Adding new book to database.");
+  console.log(req.body);
   try {
     const book = new Book({
       title: req.body.title,
-      folder: req.body.folder,
+      folder: generateFolderNameFromTitle(req.body.title), //generate this
       author: req.body.author,
       pages: req.body.pages,
-      texts: req.body.texts,
+      text: req.body.text,
     });
     await book.save();
-
     res.status(200).send(book);
   } catch (error) {
     console.log(error);
@@ -65,9 +65,26 @@ app.post("/books/add", async (req, res) => {
   }
 });
 
-app.post("/books/witai/speak", async (req, res) => {
-  console.log("test speak");
+app.put("/books/update", async (req, res) => {
+  console.log("Updating book " + req.body.bookData._id + " in the database.");
+  try {
+    const newBookValues = {
+      title: req.body.bookData.title,
+      folder: generateFolderNameFromTitle(req.body.bookData.title), //generate this
+      author: req.body.bookData.author,
+      pages: req.body.bookData.pages,
+      text: req.body.bookData.text,
+    };
+    await Book.findByIdAndUpdate(req.body.bookData._id, newBookValues);
+    res.status(200).send(newBookValues);
+  } catch (error) {
+    console.log(error);
 
+    res.status(500).send(error);
+  }
+});
+
+app.post("/books/witai/speak", async (req, res) => {
   const config = {
     headers: {
       Authorization: `Bearer ${process.env.WIT_AI_TOKEN}`,
@@ -76,33 +93,17 @@ app.post("/books/witai/speak", async (req, res) => {
     responseType: "stream",
   };
 
-  console.log(req.body.leftPage + ", " + req.body.rightPage);
-
   try {
-    const leftPageText = req.body.book.texts.find(
-      (obj) => obj.page == req.body.leftPage
-    );
-
-    const rightPageText = req.body.book.texts.find(
-      (obj) => obj.page == req.body.rightPage
-    );
-
-    let finalText = null;
-
-    if (leftPageText && rightPageText) {
-      finalText = leftPageText.text + " " + rightPageText.text;
-    } else if (leftPageText && !rightPageText) {
-      finalText = leftPageText.text;
-    } else if (!leftPageText && rightPageText) {
-      finalText = rightPageText.text;
-    }
+    const finalText =
+      parsePageText(req.body.leftPage, req.body.book.text) +
+      parsePageText(req.body.rightPage, req.body.book.text);
 
     if (finalText) {
       const DIR_PATH = "./public";
       const FILE_NAME = Date.now().toString() + "_" + uuidv4() + ".mp3";
       const FILE_PATH = DIR_PATH + "/" + FILE_NAME;
 
-      let response = await axios.post(
+      const response = await axios.post(
         "https://api.wit.ai/synthesize",
         {
           q: finalText,
@@ -118,7 +119,7 @@ app.post("/books/witai/speak", async (req, res) => {
         fs.mkdirSync(DIR_PATH);
       }
 
-      let stream = fs.createWriteStream(FILE_PATH);
+      const stream = fs.createWriteStream(FILE_PATH);
       response.data.pipe(stream).on("finish", function done() {
         console.log("Saved audio to " + FILE_PATH);
         res.status(200).send(FILE_NAME);
@@ -140,7 +141,6 @@ app.post("/books/removeaudio", async (req, res) => {
       if (err) {
         throw err;
       }
-      console.log("Deleted file successfully.");
       res.status(200).send("Temp fie removed");
     });
   } catch (error) {
@@ -153,7 +153,6 @@ app.post("/books/removeaudio", async (req, res) => {
 //Files older than 1 minute will be removed.
 //Check runs every minute
 schedule.scheduleJob("*/1 * * * *", function () {
-  console.log("clearing old files.");
   deleteOldFiles("./public").catch(console.error);
 });
 
@@ -176,3 +175,18 @@ async function deleteOldFiles(path) {
     }
   }
 }
+
+const parsePageText = (page, fullText) => {
+  let parsedText;
+  const pageText = fullText.split("{{" + page + "}}")[1];
+  if (pageText) {
+    parsedText = pageText.split("{{")[0];
+  } else {
+    parsedText = "";
+  }
+  return parsedText;
+};
+
+const generateFolderNameFromTitle = (title) => {
+  return title.trim().replaceAll(" ", "_").toLowerCase();
+};

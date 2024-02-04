@@ -10,7 +10,7 @@ export default function PagePairs(props) {
         margin: "auto",
       }}
     >
-      {props.windowSize.width > props.windowSize.height ? (
+      {props.currentWindowSize.width > props.currentWindowSize.height ? (
         <div
           style={{
             height: "100%",

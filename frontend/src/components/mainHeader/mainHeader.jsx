@@ -1,4 +1,5 @@
 import Nav from "react-bootstrap/Nav";
+import { Row, Col, ProgressBar, Button } from "react-bootstrap";
 
 export default function MainHeader(props) {
   return (
@@ -43,6 +44,9 @@ export default function MainHeader(props) {
           src={require("../../assets/images/logo.png")}
           alt="logo"
         />
+      </Nav.Link>
+      <Nav.Link href="/admin" style={{ display: "flex" }}>
+        <Button>Admin</Button>
       </Nav.Link>
     </div>
   );

@@ -14,9 +14,28 @@ export const getAllBooks = async () => {
   }
 };
 
-export const getBookById = async (bookId) => {
+export const getBookById = async (_id) => {
   try {
-    const response = await apiService.get("/books/" + bookId);
+    const response = await apiService.get("/books/" + _id);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addNewBook = async (bookData) => {
+  try {
+    const response = await apiService.post("/books/add", bookData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateBookById = async (bookData) => {
+  console.log(JSON.stringify(bookData));
+  try {
+    const response = await apiService.put("/books/update", { bookData });
     return response.data;
   } catch (error) {
     throw error;
@@ -36,7 +55,6 @@ export const generateImageLink = (book, pageNumber) => {
 };
 
 export const getAudioForPage = async (book, leftPage, rightPage) => {
-  console.log("test");
   try {
     const response = await apiService.post("/books/witai/speak", {
       book: book,
@@ -53,7 +71,6 @@ export const getAudioForPage = async (book, leftPage, rightPage) => {
 };
 
 export const removeTempAudioFromServer = async (file) => {
-  console.log("test " + file);
   try {
     const response = await apiService.post("/books/removeaudio", {
       file: file,
