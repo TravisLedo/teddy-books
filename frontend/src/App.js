@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainHeader from "./components/mainHeader/mainHeader";
 import { useEffect } from "react";
 import { useState } from "react";
-import Admin from "./pages/Read/Admin/Admin";
+import Admin from "./pages/Admin/Admin";
 
 function App() {
   const [currentWindowSize, setCurrentWindowSize] = useState({

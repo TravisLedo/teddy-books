@@ -138,11 +138,13 @@ function Read(props) {
         <audio
           autoPlay
           src={audioSource}
-          onPlay={(e) =>
-            removeTempAudioFromServer(
-              audioSource.replace(process.env.REACT_APP_URL + "/", "")
-            )
-          }
+          onPlay={(e) => {
+            try {
+              removeTempAudioFromServer(
+                audioSource.replace(process.env.REACT_APP_URL + "/", "")
+              );
+            } catch (error) {}
+          }}
           ref={audioPlayerRef}
         />
       )}

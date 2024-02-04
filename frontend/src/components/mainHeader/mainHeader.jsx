@@ -28,7 +28,7 @@ export default function MainHeader(props) {
         style={{
           justifyContent: "center",
           alignSelf: "center",
-          maxWidth: "90%",
+          maxWidth: "60%",
           height: "100%",
           objectFit: "contain",
         }}
@@ -45,7 +45,7 @@ export default function MainHeader(props) {
           alt="logo"
         />
       </Nav.Link>
-      <Nav.Link href="/admin" style={{ display: "flex" }}>
+      <Nav.Link href="/admin" style={{ position:"absolute", right:10 }}>
         <Button>Admin</Button>
       </Nav.Link>
     </div>

@@ -108,8 +108,8 @@ app.post("/books/witai/speak", async (req, res) => {
         {
           q: finalText,
           voice: req.body.voiceSelected,
-          style: "soft",
-          speed: 100,
+          //style: "soft",
+          //speed: 100,
           // pitch: 110,
         },
         config

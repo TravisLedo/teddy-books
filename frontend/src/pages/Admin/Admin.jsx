@@ -1,11 +1,11 @@
 import React from "react";
 import { useState, useEffect, useWindowSize, useRef } from "react";
-import { addNewBook, getAllBooks } from "../../../services/apiService";
+import { addNewBook, getAllBooks } from "../../services/apiService";
 import Accordion from "react-bootstrap/Accordion";
-import BookAccordion from "../../../components/BookAccordion/BookAccordion";
+import BookAccordion from "../../components/BookAccordion/BookAccordion";
 import { Row, Col, ProgressBar, Button } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
-import AddBookModal from "../../../components/AddBookModal/AddBookModal";
+import AddBookModal from "../../components/AddBookModal/AddBookModal";
 
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
