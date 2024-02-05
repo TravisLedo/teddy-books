@@ -1,9 +1,8 @@
-import { React, useState } from "react";
-import Accordion from "react-bootstrap/Accordion";
-import { Row, Col, ProgressBar, Button } from "react-bootstrap";
-import Form from "react-bootstrap/Form";
-import { updateBookById } from "../../services/apiService";
-import BookBody from "../BookBody/BookBody";
+import {React, useState} from 'react';
+import Accordion from 'react-bootstrap/Accordion';
+import {Button, Image, Card} from 'react-bootstrap';
+import {generateImageLink, updateBookById} from '../../services/apiService';
+import BookBody from '../BookBody/BookBody';
 
 function BookAccordion(props) {
   const [editing, setEditing] = useState(false);
@@ -42,6 +41,33 @@ function BookAccordion(props) {
     <Accordion.Item eventKey={props.book._id} on>
       <Accordion.Header>{props.book.title}</Accordion.Header>
       <Accordion.Body>
+        <Card
+          className="justify-content-center card-clickable"
+          style={{
+            margin: 'auto',
+            width: '200px',
+            height: '200px',
+            maxWidth: '95%',
+            borderColor: 'black',
+            borderStyle: 'solid',
+            borderWidth: 1,
+            boxShadow: '1px 5px 5px rgb(0 0 0 / 50%)',
+          }}
+        >
+          <Image
+            rounded
+            src={generateImageLink(props.book, 1)}
+            style={{
+              maxWidth: '99%',
+              maxHeight: '99%',
+              objectFit: 'contain',
+              margin: 'auto',
+            }}
+          />
+          <div className="corner-label">
+            <b className="corner-label-text">{' ' + props.book.title + ' '}</b>
+          </div>
+        </Card>
         {editing ? (
           <div>
             <Button

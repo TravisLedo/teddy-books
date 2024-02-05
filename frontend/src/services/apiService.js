@@ -1,5 +1,5 @@
 // apiService.js
-import axios from "axios";
+import axios from 'axios';
 
 const apiService = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -7,7 +7,7 @@ const apiService = axios.create({
 
 export const getAllBooks = async () => {
   try {
-    const response = await apiService.get("/books/all");
+    const response = await apiService.get('/books/all');
     return response.data;
   } catch (error) {
     throw error;
@@ -16,7 +16,7 @@ export const getAllBooks = async () => {
 
 export const getBookById = async (_id) => {
   try {
-    const response = await apiService.get("/books/" + _id);
+    const response = await apiService.get('/books/' + _id);
     return response.data;
   } catch (error) {
     throw error;
@@ -25,7 +25,7 @@ export const getBookById = async (_id) => {
 
 export const addNewBook = async (bookData) => {
   try {
-    const response = await apiService.post("/books/add", bookData);
+    const response = await apiService.post('/books/add', bookData);
     return response.data;
   } catch (error) {
     throw error;
@@ -35,7 +35,7 @@ export const addNewBook = async (bookData) => {
 export const updateBookById = async (bookData) => {
   console.log(JSON.stringify(bookData));
   try {
-    const response = await apiService.put("/books/update", { bookData });
+    const response = await apiService.put('/books/update', {bookData});
     return response.data;
   } catch (error) {
     throw error;
@@ -45,22 +45,27 @@ export const updateBookById = async (bookData) => {
 export const generateImageLink = (book, pageNumber) => {
   return (
     process.env.REACT_APP_IMAGE_BASE_URL +
-    "%2F" +
+    '%2F' +
     book.folder +
-    "%2Fpages%2F" +
+    '%2Fpages%2F' +
     pageNumber +
-    ".png?alt=media&token=" +
+    '.png?alt=media&token=' +
     process.env.REACT_APP_STORAGE_TOKEN
   );
 };
 
-export const getAudioForPage = async (book, leftPage, rightPage) => {
+export const getAudioForPage = async (
+    book,
+    leftPage,
+    rightPage,
+    voiceSelection,
+) => {
   try {
-    const response = await apiService.post("/books/witai/speak", {
+    const response = await apiService.post('/books/witai/speak', {
       book: book,
       leftPage: leftPage,
       rightPage: rightPage,
-      voiceSelected: "Whimsical", //cartoon Kid, Cartoon Baby, Rubie, Connor, Whimsical
+      voiceSelected: voiceSelection,
     });
     return response;
   } catch (error) {
@@ -72,8 +77,8 @@ export const getAudioForPage = async (book, leftPage, rightPage) => {
 
 export const removeTempAudioFromServer = async (audioSource) => {
   try {
-    const file = audioSource.replace(process.env.REACT_APP_URL + "/", "");
-    const response = await apiService.post("/books/removeaudio", {
+    const file = audioSource.replace(process.env.REACT_APP_URL + '/', '');
+    const response = await apiService.post('/books/removeaudio', {
       file: file,
     });
     return response;

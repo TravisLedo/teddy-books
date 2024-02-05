@@ -1,13 +1,12 @@
-import "./App.css";
-import Books from "./pages/Books";
-import Read from "./pages/Read/Read";
-import Error from "./pages/Error";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MainHeader from "./components/mainHeader/mainHeader";
-import { useEffect } from "react";
-import { useState } from "react";
-import Admin from "./pages/Admin/Admin";
+import './App.css';
+import Books from './pages/Books';
+import Read from './pages/Read/Read';
+import Error from './pages/Error';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import MainHeader from './components/mainHeader/mainHeader';
+import {React, useEffect, useState} from 'react';
+import Admin from './pages/Admin/Admin';
 
 function App() {
   const [currentWindowSize, setCurrentWindowSize] = useState({
@@ -23,7 +22,7 @@ function App() {
   };
 
   useEffect(() => {
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
   }, []);
 
   return (

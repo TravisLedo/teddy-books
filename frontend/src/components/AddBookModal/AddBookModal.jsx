@@ -1,16 +1,13 @@
-import { React, useState } from "react";
-import Accordion from "react-bootstrap/Accordion";
-import { Row, Col, ProgressBar, Button } from "react-bootstrap";
-import Form from "react-bootstrap/Form";
-import { updateBookById } from "../../services/apiService";
-import Modal from "react-bootstrap/Modal";
-import BookBody from "../../components/BookBody/BookBody";
+import {React, useState} from 'react';
+import {Button} from 'react-bootstrap';
+import Modal from 'react-bootstrap/Modal';
+import BookBody from '../../components/BookBody/BookBody';
 
 function AddBookModal(props) {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
   const [pages, setPages] = useState(2);
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
 
   const handleSave = () => {
     const newBookData = {

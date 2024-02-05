@@ -1,41 +1,43 @@
-import Nav from "react-bootstrap/Nav";
-import Image from "react-bootstrap/Image";
-import { Row, Col, ProgressBar, Button } from "react-bootstrap";
+import Image from 'react-bootstrap/Image';
+import {Row, Col} from 'react-bootstrap';
+import React from 'react';
+
+import './PagePairs.css';
 export default function PagePairs(props) {
   return (
     <div
       style={{
-        width: "100%",
-        height: "70vh",
-        margin: "auto",
+        width: '100%',
+        height: '70vh',
+        margin: 'auto',
       }}
     >
       {props.currentWindowSize.width > props.currentWindowSize.height ? (
         <div
           style={{
-            height: "100%",
-            margin: "auto",
+            height: '100%',
+            margin: 'auto',
             padding: 10,
           }}
         >
           <Row
             style={{
-              height: "100%",
-              margin: "auto",
+              height: '100%',
+              margin: 'auto',
             }}
           >
             <Col
               style={{
                 margin: 0,
                 padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
+                borderColor: 'black',
+                borderStyle: 'solid',
                 borderWidth: 1,
                 borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                display: "flex",
-                backgroundColor: "white",
+                boxShadow: '1px 5px 5px rgb(0 0 0 / 50%)',
+                height: '100%',
+                display: 'flex',
+                backgroundColor: 'white',
               }}
             >
               <Image
@@ -43,11 +45,11 @@ export default function PagePairs(props) {
                 src={props.bookImageSources[props.index].leftImage}
                 alt=""
                 style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
+                  maxWidth: '99%',
+                  verticalAlign: 'middle',
+                  objectFit: 'contain',
+                  margin: 'auto',
+                  maxHeight: '99%',
                 }}
               />
             </Col>
@@ -55,14 +57,14 @@ export default function PagePairs(props) {
               style={{
                 margin: 0,
                 padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
+                borderColor: 'black',
+                borderStyle: 'solid',
                 borderWidth: 1,
                 borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                backgroundColor: "white",
-                display: "flex",
+                boxShadow: '1px 5px 5px rgb(0 0 0 / 50%)',
+                height: '100%',
+                backgroundColor: 'white',
+                display: 'flex',
               }}
             >
               <Image
@@ -70,11 +72,11 @@ export default function PagePairs(props) {
                 src={props.bookImageSources[props.index].rightImage}
                 alt=""
                 style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
+                  maxWidth: '99%',
+                  verticalAlign: 'middle',
+                  objectFit: 'contain',
+                  margin: 'auto',
+                  maxHeight: '99%',
                 }}
               />
             </Col>
@@ -83,31 +85,31 @@ export default function PagePairs(props) {
       ) : (
         <div
           style={{
-            width: "100%",
-            height: "70vh",
-            margin: "auto",
+            width: '100%',
+            height: '70vh',
+            margin: 'auto',
             padding: 10,
           }}
         >
           <Row
             style={{
-              width: "100%",
-              height: "50%",
-              margin: "auto",
+              width: '100%',
+              height: '50%',
+              margin: 'auto',
             }}
           >
             <Col
               style={{
                 margin: 0,
                 padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
+                borderColor: 'black',
+                borderStyle: 'solid',
                 borderWidth: 1,
                 borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                display: "flex",
-                backgroundColor: "white",
+                boxShadow: '1px 5px 5px rgb(0 0 0 / 50%)',
+                height: '100%',
+                display: 'flex',
+                backgroundColor: 'white',
               }}
             >
               <Image
@@ -115,34 +117,34 @@ export default function PagePairs(props) {
                 src={props.bookImageSources[props.index].leftImage}
                 alt=""
                 style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
+                  maxWidth: '99%',
+                  verticalAlign: 'middle',
+                  objectFit: 'contain',
+                  margin: 'auto',
+                  maxHeight: '99%',
                 }}
               />
             </Col>
           </Row>
           <Row
             style={{
-              width: "100%",
-              height: "50%",
-              margin: "auto",
+              width: '100%',
+              height: '50%',
+              margin: 'auto',
             }}
           >
             <Col
               style={{
                 margin: 0,
                 padding: 0,
-                borderColor: "black",
-                borderStyle: "solid",
+                borderColor: 'black',
+                borderStyle: 'solid',
                 borderWidth: 1,
                 borderRadius: 5,
-                boxShadow: "1px 5px 5px rgb(0 0 0 / 50%)",
-                height: "100%",
-                backgroundColor: "white",
-                display: "flex",
+                boxShadow: '1px 5px 5px rgb(0 0 0 / 50%)',
+                height: '100%',
+                backgroundColor: 'white',
+                display: 'flex',
               }}
             >
               <Image
@@ -150,11 +152,11 @@ export default function PagePairs(props) {
                 src={props.bookImageSources[props.index].rightImage}
                 alt=""
                 style={{
-                  maxWidth: "99%",
-                  verticalAlign: "middle",
-                  objectFit: "contain",
-                  margin: "auto",
-                  maxHeight: "99%",
+                  maxWidth: '99%',
+                  verticalAlign: 'middle',
+                  objectFit: 'contain',
+                  margin: 'auto',
+                  maxHeight: '99%',
                 }}
               />
             </Col>

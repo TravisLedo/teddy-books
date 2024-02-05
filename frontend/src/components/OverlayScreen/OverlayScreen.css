@@ -1,0 +1,18 @@
+.overlay-screen{
+    background-color: black;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.25);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    font-family: "Lapsus";
+    font-size: 5vw;
+    color: white;
+    text-align: center;
+    display: grid;
+    align-items: center;
+  }

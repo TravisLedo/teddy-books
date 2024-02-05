@@ -1,8 +1,5 @@
-import { React, useState } from "react";
-import Accordion from "react-bootstrap/Accordion";
-import { Row, Col, ProgressBar, Button } from "react-bootstrap";
-import Form from "react-bootstrap/Form";
-import { updateBookById } from "../../services/apiService";
+import {React} from 'react';
+import Form from 'react-bootstrap/Form';
 
 function BookBody(props) {
   return (

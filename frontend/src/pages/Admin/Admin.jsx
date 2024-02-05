@@ -1,11 +1,9 @@
-import React from "react";
-import { useState, useEffect, useWindowSize, useRef } from "react";
-import { addNewBook, getAllBooks } from "../../services/apiService";
-import Accordion from "react-bootstrap/Accordion";
-import BookAccordion from "../../components/BookAccordion/BookAccordion";
-import { Row, Col, ProgressBar, Button } from "react-bootstrap";
-import Modal from "react-bootstrap/Modal";
-import AddBookModal from "../../components/AddBookModal/AddBookModal";
+import {React, useState, useEffect} from 'react';
+import {addNewBook, getAllBooks} from '../../services/apiService';
+import Accordion from 'react-bootstrap/Accordion';
+import BookAccordion from '../../components/BookAccordion/BookAccordion';
+import {Button} from 'react-bootstrap';
+import AddBookModal from '../../components/AddBookModal/AddBookModal';
 
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
@@ -19,16 +17,17 @@ function Admin(props) {
       const result = await getAllBooks();
       setBooksData(result);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   };
 
   const addBook = async (newBookData) => {
     try {
-      const result = await addNewBook(newBookData);
+      await addNewBook(newBookData);
       handleClose();
+      // todo: show toast to say success and refresh
     } catch (error) {
-      console.error("Error saving new book.", error);
+      console.error('Error saving new book.', error);
     }
   };
 
@@ -38,13 +37,13 @@ function Admin(props) {
 
   return (
     <div>
-      <div style={{ width: "80%", margin: "auto" }}>
+      <div style={{width: '80%', margin: 'auto'}}>
         <div
           style={{
-            display: "flex",
-            justifyContent: "end",
-            alignItems: "end",
-            padding: "10px",
+            display: 'flex',
+            justifyContent: 'end',
+            alignItems: 'end',
+            padding: '10px',
           }}
         >
           <Button
