@@ -60,7 +60,7 @@ export const getAudioForPage = async (book, leftPage, rightPage) => {
       book: book,
       leftPage: leftPage,
       rightPage: rightPage,
-      voiceSelected: "Cartoon Kid",
+      voiceSelected: "Whimsical", //cartoon Kid, Cartoon Baby, Rubie, Connor, Whimsical
     });
     return response;
   } catch (error) {
@@ -72,7 +72,7 @@ export const getAudioForPage = async (book, leftPage, rightPage) => {
 
 export const removeTempAudioFromServer = async (audioSource) => {
   try {
-    const file = audioSource.replace(process.env.REACT_APP_URL + "/", "")
+    const file = audioSource.replace(process.env.REACT_APP_URL + "/", "");
     const response = await apiService.post("/books/removeaudio", {
       file: file,
     });

@@ -41,6 +41,7 @@ export default function PagePairs(props) {
               <Image
                 rounded
                 src={props.bookImageSources[props.index].leftImage}
+                alt=""
                 style={{
                   maxWidth: "99%",
                   verticalAlign: "middle",
@@ -67,6 +68,7 @@ export default function PagePairs(props) {
               <Image
                 rounded
                 src={props.bookImageSources[props.index].rightImage}
+                alt=""
                 style={{
                   maxWidth: "99%",
                   verticalAlign: "middle",
@@ -111,6 +113,7 @@ export default function PagePairs(props) {
               <Image
                 rounded
                 src={props.bookImageSources[props.index].leftImage}
+                alt=""
                 style={{
                   maxWidth: "99%",
                   verticalAlign: "middle",
@@ -145,6 +148,7 @@ export default function PagePairs(props) {
               <Image
                 rounded
                 src={props.bookImageSources[props.index].rightImage}
+                alt=""
                 style={{
                   maxWidth: "99%",
                   verticalAlign: "middle",
