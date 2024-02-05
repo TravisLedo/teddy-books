@@ -138,12 +138,8 @@ app.post('/books/witai/speak', async (req, res) => {
 app.post('/books/removeaudio', async (req, res) => {
   const DIR_PATH = './public';
   try {
-    fs.unlink(DIR_PATH + '/' + req.body.file, (err) => {
-      if (err) {
-        throw err;
-      }
-      res.status(200).send('Temp fie removed');
-    });
+    fs.unlink(DIR_PATH + '/' + req.body.file);
+    res.status(200).send('Temp fie removed');
   } catch (error) {
     console.log(error);
     res.status(201).send(error);

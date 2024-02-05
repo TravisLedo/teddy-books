@@ -1,6 +1,6 @@
 import {React, useState, useEffect, useRef} from 'react';
 import {useParams} from 'react-router-dom';
-import {Row, Col, ProgressBar, Button} from 'react-bootstrap';
+import {Row, Col, ProgressBar, Button, Image} from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 
 import './Read.css';
@@ -16,8 +16,17 @@ import PagePairs from '../../components/PagePairs/PagePairs';
 import OverlayScreen from '../../components/OverlayScreen/OverlayScreen';
 import {OverlayStatus} from '../../Enums/OverlayStatus';
 
+import leftArrow from '../../assets/images/arrow-previous.png';
+import rightArrow from '../../assets/images/arrow-next.png';
+import play from '../../assets/images/play.png';
+import pause from '../../assets/images/pause.png';
+import audio from '../../assets/images/audio.png';
+import audioDisabled from '../../assets/images/mute.png';
+
+
 function Read(props) {
   const audioPlayerRef = useRef();
+  const carouselRef = useRef();
   const {bookId} = useParams();
   const [book, setBook] = useState();
   const [bookImageSources, setBookImageSources] = useState([]);
@@ -25,8 +34,11 @@ function Read(props) {
   const [currentCarouselPage, setCurrentCarouselPage] = useState(0);
   const [audioSource, setAudioSource] = useState();
   const [started, setStarted] = useState(false);
-
   const [voiceSelection, setVoiceSelection] = useState('Whimsical');
+
+  const [userSettings, setUserSettings] =
+  useState({autoNextPage: true, audioOn: true});
+
 
   const handlePageChanged = async (page) => {
     setAudioSource(null);
@@ -55,6 +67,12 @@ function Read(props) {
 
     // console.log(audioSource);
     setCurrentCarouselPage(page);
+  };
+
+  const handleAutoNextPage= ()=>{
+    if (userSettings.autoNextPage) {
+      next(currentCarouselPage+1);
+    }
   };
 
   const generateImageSources = () => {
@@ -95,15 +113,41 @@ function Read(props) {
     ></PagePairs>
   ));
 
-  /*
+
   const back = () => {
-    // setSelected((selected) => Math.max(selected - 1, 0));
+    if (currentCarouselPage > 0) {
+      setCurrentCarouselPage(currentCarouselPage-1);
+    }
   };
 
   const next = () => {
-    // setSelected((selected) => Math.min(selected + 1, 2));
+    if (currentCarouselPage < book.pages-1) {
+      setCurrentCarouselPage(currentCarouselPage+1);
+    }
   };
-*/
+
+  const handleAutoNextPageToggle = () => {
+     userSettings.autoNextPage ?
+     setUserSettings({...userSettings, autoNextPage: false}):
+     setUserSettings({...userSettings, autoNextPage: true});
+
+     if (audioPlayerRef.current.ended) {
+       next();
+     }
+  };
+
+  const handleAudioOnToggle = () => {
+    if (userSettings.audioOn) {
+      audioPlayerRef.current.pause();
+    } else {
+      audioPlayerRef.current.play();
+    }
+    userSettings.audioOn ?
+    setUserSettings({...userSettings, audioOn: false}):
+    setUserSettings({...userSettings, audioOn: true});
+  };
+
+
   useEffect(() => {
     fetchData();
 
@@ -130,7 +174,10 @@ function Read(props) {
         ></OverlayScreen>
       ) : (
         <audio
-          autoPlay
+          autoPlay={userSettings.audioOn}
+          onEnded={()=>{
+            handleAutoNextPage();
+          }}
           src={audioSource}
           onPlay={(e) => {
             try {
@@ -179,6 +226,8 @@ function Read(props) {
                     }}
                   >
                     <Carousel
+                      selectedItem={currentCarouselPage}
+                      useRef={carouselRef}
                       showThumbs={false}
                       showArrows={false}
                       showStatus={false}
@@ -200,22 +249,16 @@ function Read(props) {
                 marginTop: 10,
               }}
             >
-              <Col
-                style={{
-                  padding: 0,
-                  margin: 'auto',
-                }}
-              >
-                <div style={{width: 200, margin: 'auto'}}>
-                  <ProgressBar
-                    now={
-                      ((currentCarouselPage + 1) / bookImageSources.length) *
+
+              <div style={{width: 200, margin: 'auto'}}>
+                <ProgressBar
+                  now={
+                    ((currentCarouselPage + 1) / bookImageSources.length) *
                       100
-                    }
-                    visuallyHidden
-                  />
-                </div>
-              </Col>
+                  }
+                  visuallyHidden
+                />
+              </div>
             </Row>
             <Row
               style={{
@@ -226,24 +269,56 @@ function Read(props) {
               }}
             >
               <div>
-                <Button variant="outline-primary">Primary</Button>
-                <Button variant="outline-primary">Primary</Button>
-                <Button variant="outline-primary">Primary</Button>
-                <Button variant="outline-primary">Primary</Button>
-                <Form.Select
-                  aria-label="Default select example"
-                  value={voiceSelection}
-                  onChange={(event) => {
-                    setVoiceSelection(event.target.value);
-                  }}
-                >
-                  <option>Select Voice</option>
-                  <option value="Whimsical">Whimsical</option>
-                  <option value="Cartoon Baby">Cartoon Baby</option>
-                  <option value="Cartoon Kid">Cartoon Kid</option>
-                  <option value="Rubie">Rubie</option>
-                  <option value="Connor">Connor</option>
-                </Form.Select>
+                <Button variant="outline-primary"
+                  onClick={()=>back()}
+                  className="control-button">
+                  <Image
+                    className="control-button-image"
+                    src={leftArrow}>
+                  </Image>
+                </Button>
+                <Button variant="outline-primary"
+                  disabled={!userSettings.audioOn}
+                  onClick={()=>handleAutoNextPageToggle()}
+                  className="control-button">
+                  <Image
+                    className="control-button-image"
+                    src={userSettings.autoNextPage && userSettings.audioOn ?
+                     pause : play}>
+                  </Image>
+                </Button>
+                <Button variant="outline-primary"
+                  onClick={()=>handleAudioOnToggle()}
+                  className="control-button">
+                  <Image
+                    className="control-button-image"
+                    src={userSettings.audioOn ? audioDisabled : audio}>
+                  </Image>
+                </Button>
+                <Button variant="outline-primary"
+                  onClick={()=>next()}
+                  className="control-button">
+                  <Image
+                    className="control-button-image"
+                    src={rightArrow}>
+                  </Image>
+                </Button>
+                <div className='voice-form'>
+                  <Form.Select
+                    aria-label="Default select example"
+                    value={voiceSelection}
+                    onChange={(event) => {
+                      setVoiceSelection(event.target.value);
+                    }}
+                  >
+                    <option>Select Voice</option>
+                    <option value="Whimsical">Whimsical</option>
+                    <option value="Cartoon Baby">Cartoon Baby</option>
+                    <option value="Cartoon Kid">Cartoon Kid</option>
+                    <option value="Rubie">Rubie</option>
+                    <option value="Connor">Connor</option>
+                  </Form.Select>
+                </div>
               </div>
             </Row>
           </div>
