@@ -1,8 +1,11 @@
-import {React, useState} from 'react';
-import Accordion from 'react-bootstrap/Accordion';
-import {Button, Image, Card} from 'react-bootstrap';
-import {generateImageLink, updateBookById} from '../../services/apiService';
-import BookBody from '../BookBody/BookBody';
+import { React, useState } from "react";
+import Accordion from "react-bootstrap/Accordion";
+import { Button, Image, Card } from "react-bootstrap";
+import { generateImageLink, updateBookById } from "../../services/apiService";
+import BookBody from "../BookBody/BookBody";
+import edit from "../../assets/images/edit.png";
+import check from "../../assets/images/check.png";
+import close from "../../assets/images/close.png";
 
 function BookAccordion(props) {
   const [editing, setEditing] = useState(false);
@@ -38,66 +41,71 @@ function BookAccordion(props) {
   };
 
   return (
-    <Accordion.Item eventKey={props.book._id} on>
+    <Accordion.Item eventKey={props.book._id}>
       <Accordion.Header>{props.book.title}</Accordion.Header>
       <Accordion.Body>
+
+      
+        {editing ? (
+          <div style={{width:'100%', display:'flex',justifyContent:'flex-end'}}>
+            
+            <Button
+            className="control-button"
+            variant="outline-secondary"
+            onClick={() => {
+              resetValues();
+            }}
+          >
+            <Image className="control-button-image" src={close}></Image>
+          </Button>
+          <Button
+            className="control-button"
+            variant="outline-secondary"
+            onClick={() => {
+              updateValues();
+            }}
+          >
+            <Image className="control-button-image" src={check}></Image>
+          </Button>
+          </div>
+        ) : (
+          <div style={{width:'100%', display:'flex',justifyContent:'flex-end'}}>
+
+          <Button
+            className="control-button"
+            variant="outline-secondary"
+            onClick={() => {
+              setEditing(true);
+            }}
+          >
+            <Image className="control-button-image" src={edit}></Image>
+          </Button>
+          </div>
+        )}
         <Card
-          className="justify-content-center card-clickable"
+          className="justify-content-center"
           style={{
             margin: 'auto',
-            width: '200px',
-            height: '200px',
-            maxWidth: '95%',
-            borderColor: 'black',
-            borderStyle: 'solid',
+            width: "200px",
+            height: "200px",
+            maxWidth: "95%",
+            borderColor: "black",
+            borderStyle: "solid",
             borderWidth: 1,
-            boxShadow: '1px 5px 5px rgb(0 0 0 / 50%)',
+            marginBottom: "10px",
           }}
         >
           <Image
             rounded
             src={generateImageLink(props.book, 1)}
             style={{
-              maxWidth: '99%',
-              maxHeight: '99%',
-              objectFit: 'contain',
-              margin: 'auto',
+              maxWidth: "99%",
+              maxHeight: "99%",
+              objectFit: "contain",
+              margin: "auto",
             }}
           />
-          <div className="corner-label">
-            <b className="corner-label-text">{' ' + props.book.title + ' '}</b>
-          </div>
         </Card>
-        {editing ? (
-          <div>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                resetValues();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="success"
-              onClick={() => {
-                updateValues();
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="primary"
-            onClick={() => {
-              setEditing(true);
-            }}
-          >
-            Edit
-          </Button>
-        )}
-
         <BookBody
           title={title}
           pages={pages}

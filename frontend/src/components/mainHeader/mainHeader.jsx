@@ -47,7 +47,7 @@ export default function MainHeader(props) {
         />
       </Nav.Link>
       <Nav.Link href="/admin" style={{position: 'absolute', right: 10}}>
-        <Button>Admin</Button>
+        <Button variant='outline-secondary'>Admin</Button>
       </Nav.Link>
     </div>
   );

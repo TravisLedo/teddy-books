@@ -26,7 +26,6 @@ mongoose
     .catch((e) => console.log(e));
 
 app.get('/books/all', async (req, res) => {
-  console.log('Fetching all books data.');
   try {
     const books = await Book.find({});
     res.status(200).send(books);
@@ -36,7 +35,6 @@ app.get('/books/all', async (req, res) => {
 });
 
 app.get('/books/:id', async (req, res) => {
-  console.log('Fetching book data by id ' + req.params.id + '.');
   try {
     const book = await Book.findById(req.params.id);
     res.status(200).send(book);
@@ -46,8 +44,6 @@ app.get('/books/:id', async (req, res) => {
 });
 
 app.post('/books/add', async (req, res) => {
-  console.log('Adding new book to database.');
-  console.log(req.body);
   try {
     const book = new Book({
       title: req.body.title,
@@ -59,14 +55,11 @@ app.post('/books/add', async (req, res) => {
     await book.save();
     res.status(200).send(book);
   } catch (error) {
-    console.log(error);
-
     res.status(500).send(error);
   }
 });
 
 app.put('/books/update', async (req, res) => {
-  console.log('Updating book ' + req.body.bookData._id + ' in the database.');
   try {
     const newBookValues = {
       title: req.body.bookData.title,
@@ -78,8 +71,6 @@ app.put('/books/update', async (req, res) => {
     await Book.findByIdAndUpdate(req.body.bookData._id, newBookValues);
     res.status(200).send(newBookValues);
   } catch (error) {
-    console.log(error);
-
     res.status(500).send(error);
   }
 });
@@ -99,7 +90,7 @@ app.post('/books/witai/speak', async (req, res) => {
       parsePageText(req.body.rightPage, req.body.book.text);
 
     if (finalText) {
-      const DIR_PATH = './public';
+      const DIR_PATH = './public/temp';
       const FILE_NAME = Date.now().toString() + '_' + uuidv4() + '.mp3';
       const FILE_PATH = DIR_PATH + '/' + FILE_NAME;
 
@@ -121,27 +112,28 @@ app.post('/books/witai/speak', async (req, res) => {
 
       const stream = fs.createWriteStream(FILE_PATH);
       response.data.pipe(stream).on('finish', function done() {
-        console.log('Saved audio to ' + FILE_PATH);
-        res.status(200).send(FILE_NAME);
+        res.status(200).send(FILE_PATH.replace('./public/', ''));
       });
     } else {
-      res.status(200).send('Page has no audio.');
+      res.status(200).send('empty.mp3');
     }
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
 
-// After frontend laods the audio to the browser,
-// file will be requested to be removed by calling this endpoint.
 app.post('/books/removeaudio', async (req, res) => {
   const DIR_PATH = './public';
   try {
-    fs.unlink(DIR_PATH + '/' + req.body.file);
-    res.status(200).send('Temp fie removed');
+    if (req.body.file.contains('temp')) {
+      fs.unlink(DIR_PATH + '/' + req.body.file, (err) => {
+        if (err) {
+        // throw err;
+        }
+      });
+      res.status(200).send('Temp fie removed');
+    }
   } catch (error) {
-    console.log(error);
     res.status(201).send(error);
   }
 });
@@ -150,7 +142,7 @@ app.post('/books/removeaudio', async (req, res) => {
 // Files older than 1 minute will be removed.
 // Check runs every minute
 schedule.scheduleJob('*/1 * * * *', function() {
-  deleteOldFiles('./public').catch(console.error);
+  deleteOldFiles('./public/temp').catch();
 });
 
 async function deleteOldFiles(path) {
@@ -165,10 +157,7 @@ async function deleteOldFiles(path) {
         if (err) {
           throw err;
         }
-        // console.log("Deleted file successfully.");
       });
-    } else {
-      // console.log("File is still new.");
     }
   }
 }

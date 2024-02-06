@@ -33,7 +33,6 @@ export const addNewBook = async (bookData) => {
 };
 
 export const updateBookById = async (bookData) => {
-  console.log(JSON.stringify(bookData));
   try {
     const response = await apiService.put('/books/update', {bookData});
     return response.data;
@@ -67,6 +66,7 @@ export const getAudioForPage = async (
       rightPage: rightPage,
       voiceSelected: voiceSelection,
     });
+    console.log(response);
     return response;
   } catch (error) {
     console.log(error);

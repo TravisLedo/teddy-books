@@ -23,5 +23,6 @@ module.exports = {
   rules: {
     'require-jsdoc': 0,
     'react/prop-types': 'off',
+    'max-len': 100
   },
 };

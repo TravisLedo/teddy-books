@@ -2,8 +2,10 @@ import {React, useState, useEffect} from 'react';
 import {addNewBook, getAllBooks} from '../../services/apiService';
 import Accordion from 'react-bootstrap/Accordion';
 import BookAccordion from '../../components/BookAccordion/BookAccordion';
-import {Button} from 'react-bootstrap';
 import AddBookModal from '../../components/AddBookModal/AddBookModal';
+import refresh from '../../assets/images/refresh.png';
+import add from '../../assets/images/add.png';
+import {Button, Image} from 'react-bootstrap';
 
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
@@ -41,22 +43,35 @@ function Admin(props) {
         <div
           style={{
             display: 'flex',
-            justifyContent: 'end',
+            justifyContent: 'space-between',
             alignItems: 'end',
             padding: '10px',
           }}
         >
-          <Button
-            variant="info"
+          <Button className='control-button'
+            variant="outline-secondary"
             onClick={() => {
               setBooksData([]);
               fetchData();
             }}
           >
-            Refresh
+             <Image
+                      className="control-button-image"
+                      src={refresh}>
+                    </Image>
           </Button>
-          <Button variant="success" onClick={handleShow}>
-            Add
+
+
+          <Button className='control-button'
+            variant="outline-secondary"
+            onClick={() =>
+             handleShow()
+            }
+          >
+             <Image
+                      className="control-button-image"
+                      src={add}>
+                    </Image>
           </Button>
         </div>
         {booksData.map((book) => (
