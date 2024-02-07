@@ -1,9 +1,11 @@
 import { React, useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Row, Col, ProgressBar, Button, Image } from "react-bootstrap";
-import Form from "react-bootstrap/Form";
-import Tooltip from "react-bootstrap/Tooltip";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import {
+  Row,
+  Col,
+
+} from "react-bootstrap";
+import ProgressBar from "@ramonak/react-progress-bar";
 
 import "./Read.css";
 import {
@@ -19,14 +21,7 @@ import OverlayScreen from "../../components/OverlayScreen/OverlayScreen";
 import { OverlayStatus } from "../../Enums/OverlayStatus";
 import { Voices } from "../../Enums/Voices";
 
-import leftArrow from "../../assets/images/arrow-previous.png";
-import rightArrow from "../../assets/images/arrow-next.png";
-import play from "../../assets/images/play.png";
-import playDisabled from "../../assets/images/play-disabled.png";
-import pause from "../../assets/images/pause.png";
-import pauseDisabled from "../../assets/images/pause-disabled.png";
-import audio from "../../assets/images/audio.png";
-import audioDisabled from "../../assets/images/mute.png";
+import ReadControlArea from "../../components/ReadControlArea/ReadControlArea";
 
 function Read(props) {
   const audioPlayerRef = useRef();
@@ -34,7 +29,6 @@ function Read(props) {
   const { bookId } = useParams();
   const [book, setBook] = useState();
   const [bookImageSources, setBookImageSources] = useState([]);
-
   const [currentCarouselPage, setCurrentCarouselPage] = useState(0);
   const [audioSource, setAudioSource] = useState();
   const [started, setStarted] = useState(false);
@@ -50,6 +44,7 @@ function Read(props) {
   const [timerDone, setTimerDone] = useState(false);
 
   const handlePageChanged = async (page) => {
+    audioPlayerRef.current.pause();
     setTimerDone(false);
     setCanChangePage(false);
     setAudioSource(null);
@@ -115,16 +110,6 @@ function Read(props) {
     }
   }
 
-  const generatePages = bookImageSources.map((book, index) => (
-    <PagePairs
-      key={book._id + props.index}
-      book={book}
-      index={index}
-      bookImageSources={bookImageSources}
-      currentWindowSize={props.currentWindowSize}
-    ></PagePairs>
-  ));
-
   const back = () => {
     if (currentCarouselPage > 0 && canChangePage) {
       setCurrentCarouselPage(currentCarouselPage - 1);
@@ -180,14 +165,34 @@ function Read(props) {
   }, [timerDone]);
 
   useEffect(() => {
-    if (timerDone && started && userSettings.audioOn) {
-      audioPlayerRef.current.play();
+    if (
+      timerDone &&
+      started &&
+      userSettings.audioOn &&
+      !audioPlayerRef.current.isPlaying
+    ) {
+      try {
+        audioPlayerRef.current.play();
+      } catch (error) {}
     }
   }, [userSettings.audioOn, timerDone, started]);
 
   useEffect(() => {
     handlePageChanged(currentCarouselPage);
   }, [voiceSelection]);
+
+  const generatePages = bookImageSources.map((book, index) => (
+    <PagePairs
+      key={book._id + props.index}
+      book={book}
+      index={index}
+      bookImageSources={bookImageSources}
+      currentWindowSize={props.currentWindowSize}
+      currentCarouselPage={currentCarouselPage}
+      next={next}
+      back={back}
+    ></PagePairs>
+  ));
 
   return (
     <div className="page">
@@ -250,26 +255,16 @@ function Read(props) {
                     style={{
                       width: "100%",
                       margin: "auto",
-                      cursor: "grab",
+                      //cursor: "grab",
                     }}
                   >
-                    <div style={{ width: 300, margin: "auto" }}>
-                      <ProgressBar
-                        now={
-                          ((currentCarouselPage + 1) /
-                            bookImageSources.length) *
-                          100
-                        }
-                        visuallyHidden
-                      />
-                    </div>
                     <Carousel
                       selectedItem={currentCarouselPage}
                       useRef={carouselRef}
                       showThumbs={false}
                       showArrows={false}
                       showStatus={false}
-                      emulateTouch={true}
+                      emulateTouch={false /*behaves strangely*/}
                       showIndicators={false}
                       autoPlay={false}
                       onChange={(e) => handlePageChanged(e)}
@@ -289,98 +284,35 @@ function Read(props) {
                 marginTop: 10,
               }}
             >
-              <div>
-                <div
-                  className="voice-form"
-                  style={{ marginBottom: 25, width: 200 }}
-                >
-                  <Form.Select
-                    aria-label="Default select example"
-                    disabled={!userSettings.audioOn}
-                    value={voiceSelection}
-                    onChange={(event) => setVoiceSelection(event.target.value)}
-                  >
-                    <option value={Voices.OLIVIA.voice}>
-                      {Voices.OLIVIA.alt}
-                    </option>
-                    <option value={Voices.JOE.voice}>{Voices.JOE.alt}</option>
-                    <option value={Voices.EMILY.voice}>
-                      {Voices.EMILY.alt}
-                    </option>
-                    <option value={Voices.MARK.voice}>{Voices.MARK.alt}</option>
-                    <option value={Voices.JESSICA.voice}>
-                      {Voices.JESSICA.alt}
-                    </option>
-                  </Form.Select>
-                </div>
-                <Button
-                  variant="outline-secondary"
-                  onClick={() => back()}
-                  className="control-button"
-                >
-                  <Image
-                    className="control-button-image"
-                    src={leftArrow}
-                  ></Image>
-                </Button>
-                <OverlayTrigger
-                  delay={{ hide: 450, show: 300 }}
-                  overlay={(props) => (
-                    <Tooltip {...props}>Toggle Voice</Tooltip>
-                  )}
-                  placement="top"
-                >
-                  <Button
-                    variant="outline-secondary"
-                    onClick={() => handleAudioOnToggle()}
-                    className="control-button"
-                  >
-                    <Image
-                      className="control-button-image"
-                      src={userSettings.audioOn ? audioDisabled : audio}
-                    ></Image>
-                  </Button>
-                </OverlayTrigger>
-
-                <OverlayTrigger
-                  delay={{ hide: 450, show: 300 }}
-                  overlay={(props) => (
-                    <Tooltip {...props}>Toggle Auto Next</Tooltip>
-                  )}
-                  placement="top"
-                >
-                  <Button
-                    variant="outline-secondary"
-                    disabled={!userSettings.audioOn}
-                    onClick={() => handleAutoNextPageToggle()}
-                    className="control-button"
-                  >
-                    <Image
-                      className="control-button-image"
-                      src={
-                        userSettings.autoNextPage && userSettings.audioOn
-                          ? pause
-                          : userSettings.autoNextPage && !userSettings.audioOn
-                          ? pauseDisabled
-                          : userSettings.autoNextPage && userSettings.audioOn
-                          ? playDisabled
-                          : play
-                      }
-                    ></Image>
-                  </Button>
-                </OverlayTrigger>
-
-                <Button
-                  variant="outline-secondary"
-                  onClick={() => next()}
-                  className="control-button"
-                >
-                  <Image
-                    className="control-button-image"
-                    src={rightArrow}
-                  ></Image>
-                </Button>
+              <div style={{ width: 300, margin: "auto" }}>
+                <ProgressBar
+                  bgColor="#7237C5"
+                  customLabel=" "
+                  completed={
+                    ((currentCarouselPage + 1) / bookImageSources.length) * 100
+                  }
+                  visuallyHidden
+                />
               </div>
+            </Row>
+
+            <Row
+              style={{
+                width: props.currentWindowSize.width * 0.8,
+                padding: 0,
+                margin: "auto",
+                marginTop: 30,
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <ReadControlArea
+                userSettings={userSettings}
+                voiceSelection={voiceSelection}
+                setVoiceSelection={setVoiceSelection}
+                handleAudioOnToggle={handleAudioOnToggle}
+                handleAutoNextPageToggle={handleAutoNextPageToggle}
+              ></ReadControlArea>
             </Row>
           </div>
         </div>

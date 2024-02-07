@@ -12,7 +12,6 @@ export default function MainHeader(props) {
         backgroundRepeat: 'no-repeat',
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'sticky',
         top: 0,
         zIndex: 99,
         height: '8vh',

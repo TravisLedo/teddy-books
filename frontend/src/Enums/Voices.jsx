@@ -3,5 +3,5 @@ export const Voices = {
   EMILY: {voice: 'Cartoon Baby', alt: 'Emily'},
   JOE: {voice: 'Cartoon Kid', alt: 'Joe'},
   JESSICA: {voice: 'Rubie', alt: 'Jessica'},
-  MARK: {voice: 'Connor', alt: 'Olivia'},
+  MARK: {voice: 'Connor', alt: 'Mark'},
 };
