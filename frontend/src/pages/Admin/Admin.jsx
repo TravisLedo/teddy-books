@@ -1,4 +1,4 @@
-import {React, useState, useEffect} from 'react';
+import {React, useState, useEffect, useContext} from 'react';
 import {addNewBook, getAllBooks} from '../../services/apiService';
 import Accordion from 'react-bootstrap/Accordion';
 import BookAccordion from '../../components/BookAccordion/BookAccordion';
@@ -6,10 +6,14 @@ import AddBookModal from '../../components/AddBookModal/AddBookModal';
 import refresh from '../../assets/images/refresh.png';
 import add from '../../assets/images/add.png';
 import {Button, Image} from 'react-bootstrap';
+import {AuthContext} from '../../contexts/Contexts';
+import {Navigate} from 'react-router-dom';
+import {getUserObjectFromJwt} from '../../services/localStorageService';
 
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const authContext = useContext(AuthContext);
 
   const handleClose = () => setShowAddModal(false);
   const handleShow = () => setShowAddModal(true);
@@ -19,7 +23,7 @@ function Admin(props) {
       const result = await getAllBooks();
       setBooksData(result);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.log('Error fetching data:', error);
     }
   };
 
@@ -29,7 +33,7 @@ function Admin(props) {
       handleClose();
       // todo: show toast to say success and refresh
     } catch (error) {
-      console.error('Error saving new book.', error);
+      console.log('Error saving new book.', error);
     }
   };
 
@@ -39,54 +43,52 @@ function Admin(props) {
 
   return (
     <div>
-      <div style={{width: '80%', margin: 'auto'}}>
+      {authContext.isLoggedIn && getUserObjectFromJwt(authContext.userToken).user.isAdmin ? <div style={{width: '80%', margin: 'auto'}}>
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'end',
             alignItems: 'end',
             padding: '10px',
           }}
         >
-          <Button className='control-button'
-            variant="outline-secondary"
-            onClick={() => {
-              setBooksData([]);
-              fetchData();
-            }}
-          >
-             <Image
-                      className="control-button-image"
-                      src={refresh}>
-                    </Image>
-          </Button>
-
-
-          <Button className='control-button'
-            variant="outline-secondary"
-            onClick={() =>
-             handleShow()
-            }
-          >
-             <Image
-                      className="control-button-image"
-                      src={add}>
-                    </Image>
-          </Button>
+          <h1>Admin</h1>
+          <div>
+            <Button
+              className="control-button"
+              variant="outline-secondary"
+              onClick={() => {
+                setBooksData([]);
+                fetchData();
+              }}
+            >
+              <Image className="control-button-image" src={refresh}></Image>
+            </Button>
+            <Button
+              className="control-button"
+              variant="outline-secondary"
+              onClick={() => handleShow()}
+            >
+              <Image className="control-button-image" src={add}></Image>
+            </Button>
+          </div>
         </div>
         {booksData.map((book) => (
           <Accordion defaultActiveKey="0" key={book._id}>
             <BookAccordion book={book}></BookAccordion>
           </Accordion>
         ))}
-      </div>
+        <AddBookModal
+          showAddModal={showAddModal}
+          handleClose={handleClose}
+          handleShow={handleShow}
+          addBook={addBook}
+        ></AddBookModal>
+      </div> : <Navigate to='/' replace={true}></Navigate>
 
-      <AddBookModal
-        showAddModal={showAddModal}
-        handleClose={handleClose}
-        handleShow={handleShow}
-        addBook={addBook}
-      ></AddBookModal>
+      }
+
+
     </div>
   );
 }

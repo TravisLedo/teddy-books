@@ -1,0 +1,17 @@
+.page-container{
+    width: 400px;
+    max-width: 100%;
+    min-height: 80vh;
+    margin: auto;
+    display: flex;
+    padding: 20px;
+    align-content: center;
+    justify-content: center;
+}
+
+
+.register-link{
+    padding: 50px;
+    color: #0accb9
+}
+

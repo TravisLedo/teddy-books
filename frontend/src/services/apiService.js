@@ -5,6 +5,25 @@ const apiService = axios.create({
   baseURL: process.env.REACT_APP_URL,
 });
 
+export const loginUser = async (userData) => {
+  try {
+    const response = await apiService.post('/user/login', userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addNewUser = async (userData) => {
+  try {
+    const response = await apiService.post('/user/add', userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export const getAllBooks = async () => {
   try {
     const response = await apiService.get('/books/all');

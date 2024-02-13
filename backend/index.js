@@ -1,18 +1,21 @@
 const port = 3001;
 const Book = require('./models/book');
+const User = require('./models/user');
+const RefreshToken = require('./models/refreshToken');
 const mongoose = require('mongoose');
 const express = require('express');
 const schedule = require('node-schedule');
 const fs = require('fs');
 const axios = require('axios');
 const {v4: uuidv4} = require('uuid');
-
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 app.use(cors());
 require('dotenv').config();
+const bycrypt = require('bcrypt');
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}.`);
@@ -43,7 +46,7 @@ app.get('/books/:id', async (req, res) => {
   }
 });
 
-app.post('/books/add', async (req, res) => {
+app.post('/books/add', authenthicateJwtToken, async (req, res) => {
   try {
     const book = new Book({
       title: req.body.title,
@@ -138,6 +141,45 @@ app.post('/books/removeaudio', async (req, res) => {
   }
 });
 
+app.post('/user/login', async (req, res) => {
+  try {
+    const user = await User.findOne({email: req.body.email});
+    const validPassword = await bycrypt.compare(req.body.password, user.password);
+
+    if (validPassword) {
+      const accessToken = generateAccessToken(user);
+      const refreshToken = new RefreshToken({token: generateRefreshToken(user)});
+      await refreshToken.save(refreshToken);
+      res.status(200).send(accessToken);
+    } else {
+      res.status(401).send('Login Failed.');
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
+app.post('/user/add', async (req, res) => {
+  try {
+    const hash = await bycrypt.hash(req.body.password, 10);
+    const user = new User({
+      email: req.body.email,
+      password: hash,
+      name: req.body.name,
+    });
+    const newUser = await user.save();
+    const accessToken = generateAccessToken(newUser);
+    const refreshToken = new RefreshToken({token: generateRefreshToken(newUser)});
+    await refreshToken.save(refreshToken);
+    res.status(200).send(accessToken);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+
 // Remove any files that may be missed due to interuptions.
 // Files older than 1 minute will be removed.
 // Check runs every minute
@@ -176,3 +218,27 @@ const parsePageText = (page, fullText) => {
 const generateFolderNameFromTitle = (title) => {
   return title.trim().replaceAll(' ', '_').toLowerCase();
 };
+
+function generateAccessToken(user) {
+  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '20s'});
+}
+
+
+function generateRefreshToken(user) {
+  console.log(user);
+  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '60s'});
+}
+
+function authenthicateJwtToken(req, res, next ) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+
+    req.user = user;
+    next();
+  });
+}
+

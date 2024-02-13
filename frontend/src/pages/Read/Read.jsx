@@ -1,32 +1,32 @@
-import { React, useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import {React, useState, useEffect, useRef} from 'react';
+import {useParams} from 'react-router-dom';
 import {
   Row,
   Col,
 
-} from "react-bootstrap";
-import ProgressBar from "@ramonak/react-progress-bar";
+} from 'react-bootstrap';
+import ProgressBar from '@ramonak/react-progress-bar';
 
-import "./Read.css";
+import './Read.css';
 import {
   getBookById,
   generateImageLink,
   getAudioForPage,
   removeTempAudioFromServer,
-} from "../../services/apiService";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import PagePairs from "../../components/PagePairs/PagePairs";
-import OverlayScreen from "../../components/OverlayScreen/OverlayScreen";
-import { OverlayStatus } from "../../Enums/OverlayStatus";
-import { Voices } from "../../Enums/Voices";
+} from '../../services/apiService';
+import {Carousel} from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import PagePairs from '../../components/PagePairs/PagePairs';
+import OverlayScreen from '../../components/OverlayScreen/OverlayScreen';
+import {OverlayStatus} from '../../Enums/OverlayStatus';
+import {Voices} from '../../Enums/Voices';
 
-import ReadControlArea from "../../components/ReadControlArea/ReadControlArea";
+import ReadControlArea from '../../components/ReadControlArea/ReadControlArea';
 
 function Read(props) {
   const audioPlayerRef = useRef();
   const carouselRef = useRef();
-  const { bookId } = useParams();
+  const {bookId} = useParams();
   const [book, setBook] = useState();
   const [bookImageSources, setBookImageSources] = useState([]);
   const [currentCarouselPage, setCurrentCarouselPage] = useState(0);
@@ -37,7 +37,7 @@ function Read(props) {
 
   const [userSettings, setUserSettings] = useState({
     autoNextPage: true,
-    audioOn: true,
+    audioEnabled: true,
   });
 
   const delayVoiceTime = 2000;
@@ -62,12 +62,12 @@ function Read(props) {
 
     try {
       const audio = await getAudioForPage(
-        book,
-        leftPage,
-        rightPage,
-        voiceSelection
+          book,
+          leftPage,
+          rightPage,
+          voiceSelection,
       );
-      setAudioSource(process.env.REACT_APP_URL + "/" + audio.data);
+      setAudioSource(process.env.REACT_APP_URL + '/' + audio.data);
       setCanChangePage(true);
     } catch (error) {
       console.log(error);
@@ -106,7 +106,7 @@ function Read(props) {
       setBook(result);
       // console.log("test 1 " + JSON.stringify(result));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   }
 
@@ -123,9 +123,9 @@ function Read(props) {
   };
 
   const handleAutoNextPageToggle = () => {
-    userSettings.autoNextPage
-      ? setUserSettings({ ...userSettings, autoNextPage: false })
-      : setUserSettings({ ...userSettings, autoNextPage: true });
+    userSettings.autoNextPage ?
+      setUserSettings({...userSettings, autoNextPage: false}) :
+      setUserSettings({...userSettings, autoNextPage: true});
 
     if (audioPlayerRef.current.ended) {
       next();
@@ -133,14 +133,14 @@ function Read(props) {
   };
 
   const handleAudioOnToggle = () => {
-    if (userSettings.audioOn) {
+    if (userSettings.audioEnabled) {
       audioPlayerRef.current.pause();
     } else {
       audioPlayerRef.current.play();
     }
-    userSettings.audioOn
-      ? setUserSettings({ ...userSettings, audioOn: false })
-      : setUserSettings({ ...userSettings, audioOn: true });
+    userSettings.audioEnabled ?
+      setUserSettings({...userSettings, audioEnabled: false}) :
+      setUserSettings({...userSettings, audioEnabled: true});
   };
 
   useEffect(() => {
@@ -157,7 +157,7 @@ function Read(props) {
   }, [book]);
 
   useEffect(() => {
-    setTimeout(function () {
+    setTimeout(function() {
       if (!timerDone) {
         setTimerDone(true);
       }
@@ -168,14 +168,14 @@ function Read(props) {
     if (
       timerDone &&
       started &&
-      userSettings.audioOn &&
+      userSettings.audioEnabled &&
       !audioPlayerRef.current.isPlaying
     ) {
       try {
         audioPlayerRef.current.play();
       } catch (error) {}
     }
-  }, [userSettings.audioOn, timerDone, started]);
+  }, [userSettings.audioEnabled, timerDone, started]);
 
   useEffect(() => {
     handlePageChanged(currentCarouselPage);
@@ -205,7 +205,7 @@ function Read(props) {
         onPlay={(e) => {
           try {
             removeTempAudioFromServer(
-              audioSource.replace(process.env.REACT_APP_URL + "/", "")
+                audioSource.replace(process.env.REACT_APP_URL + '/', ''),
             );
           } catch (error) {}
         }}
@@ -215,9 +215,9 @@ function Read(props) {
         <OverlayScreen
           setStarted={setStarted}
           status={
-            bookImageSources.length > 0
-              ? OverlayStatus.READY_CLICK
-              : OverlayStatus.LOADING
+            bookImageSources.length > 0 ?
+              OverlayStatus.READY_CLICK :
+              OverlayStatus.LOADING
           }
         ></OverlayScreen>
       ) : null}
@@ -226,36 +226,36 @@ function Read(props) {
         <div className="justify-content-center align-items-center">
           <div
             style={{
-              width: "100vw",
-              height: "80vh",
-              justifyContent: "center",
-              alignContent: "center",
-              marginTop: "10px",
+              width: '100vw',
+              height: '80vh',
+              justifyContent: 'center',
+              alignContent: 'center',
+              marginTop: '10px',
             }}
           >
             <Row
               style={{
-                width: "100%",
+                width: '100%',
                 padding: 0,
-                margin: "auto",
+                margin: 'auto',
                 marginTop: 10,
               }}
             >
               <Col>
                 <div
                   style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    verticalAlign: "middle",
-                    objectFit: "contain",
-                    position: "relative",
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    verticalAlign: 'middle',
+                    objectFit: 'contain',
+                    position: 'relative',
                   }}
                 >
                   <div
                     style={{
-                      width: "100%",
-                      margin: "auto",
-                      //cursor: "grab",
+                      width: '100%',
+                      margin: 'auto',
+                      // cursor: "grab",
                     }}
                   >
                     <Carousel
@@ -264,7 +264,7 @@ function Read(props) {
                       showThumbs={false}
                       showArrows={false}
                       showStatus={false}
-                      emulateTouch={false /*behaves strangely*/}
+                      emulateTouch={false /* behaves strangely*/}
                       showIndicators={false}
                       autoPlay={false}
                       onChange={(e) => handlePageChanged(e)}
@@ -280,11 +280,11 @@ function Read(props) {
               style={{
                 width: props.currentWindowSize.width * 0.8,
                 padding: 0,
-                margin: "auto",
+                margin: 'auto',
                 marginTop: 10,
               }}
             >
-              <div style={{ width: 300, margin: "auto" }}>
+              <div style={{width: 300, margin: 'auto'}}>
                 <ProgressBar
                   bgColor="#7237C5"
                   customLabel=" "
@@ -300,10 +300,10 @@ function Read(props) {
               style={{
                 width: props.currentWindowSize.width * 0.8,
                 padding: 0,
-                margin: "auto",
+                margin: 'auto',
                 marginTop: 30,
-                display: "flex",
-                justifyContent: "center",
+                display: 'flex',
+                justifyContent: 'center',
               }}
             >
               <ReadControlArea

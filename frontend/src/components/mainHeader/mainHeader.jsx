@@ -1,8 +1,12 @@
 import Nav from 'react-bootstrap/Nav';
 import {Button} from 'react-bootstrap';
-import {React} from 'react';
+import {React, useContext} from 'react';
+import {AuthContext} from '../../contexts/Contexts';
+import {getUserObjectFromJwt} from '../../services/localStorageService';
 
 export default function MainHeader(props) {
+  const authContext = useContext(AuthContext);
+
   return (
     <div
       style={{
@@ -19,10 +23,12 @@ export default function MainHeader(props) {
         backgroundColor: '#FFF',
         borderColor: 'black',
         borderStyle: 'solid',
-        borderWidth: 1,
+        border: 0,
+        borderBottomWidth: 1,
         boxShadow: '1px 5px 5px  rgb(0 0 0 / 50%)',
       }}
     >
+
       <Nav.Link
         href="/"
         style={{
@@ -45,9 +51,19 @@ export default function MainHeader(props) {
           alt="logo"
         />
       </Nav.Link>
-      <Nav.Link href="/admin" style={{position: 'absolute', right: 10}}>
-        <Button variant='outline-secondary'>Admin</Button>
-      </Nav.Link>
+      <div style={{position: 'absolute', right: 10, display: 'flex'}}>
+        {authContext.isloggedIn ? <div>{getUserObjectFromJwt(authContext.jwtToken).name}</div> :
+        <Nav.Link href="/login" >
+          <Button variant='outline-secondary'>Login</Button>
+        </Nav.Link>}
+
+        { authContext.isLoggedIn && authContext.isAdmin ? <Nav.Link href="/admin">
+          <Button variant='outline-secondary'>Admin</Button>
+        </Nav.Link> : null}
+
+      </div>
+
+
     </div>
   );
 }

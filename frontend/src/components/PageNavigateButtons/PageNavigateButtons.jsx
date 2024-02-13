@@ -1,9 +1,8 @@
-import Image from "react-bootstrap/Image";
-import { Row, Col } from "react-bootstrap";
-import { React, useState } from "react";
-import "./PageNavigateButtons.css";
-import leftArrow from "../../assets/images/arrow-previous.png";
-import rightArrow from "../../assets/images/arrow-next.png";
+import Image from 'react-bootstrap/Image';
+import {React, useState} from 'react';
+import './PageNavigateButtons.css';
+import leftArrow from '../../assets/images/arrow-previous.png';
+import rightArrow from '../../assets/images/arrow-next.png';
 
 export default function PageNavigateButtons(props) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -19,15 +18,15 @@ export default function PageNavigateButtons(props) {
         onMouseLeave={() => setShowLeftArrow(false)}
       >
         <div className="arrow-container-left">
-        <Image
-            hidden={!showLeftArrow || props.currentCarouselPage <= 0}
+          <Image
+            hidden={!showLeftArrow || props.currentCarouselPage < 1}
             className="arrow-image"
-              rounded
-              src={leftArrow}
-              alt=""
-            />
+            rounded
+            src={leftArrow}
+            alt=""
+          />
         </div>
-          
+
       </div>
       <div
         className="navigation-button"
@@ -37,13 +36,13 @@ export default function PageNavigateButtons(props) {
         onMouseLeave={() => setShowRightArrow(false)}
       >
         <div className="arrow-container-right"> <Image
-            hidden={!showRightArrow || props.currentCarouselPage >= props.bookImageSources.length-1}
-            className="arrow-image"
-              rounded
-              src={rightArrow}
-              alt=""
-            /></div>
-           
+          hidden={!showRightArrow || props.currentCarouselPage >= props.bookImageSources.length-1}
+          className="arrow-image"
+          rounded
+          src={rightArrow}
+          alt=""
+        /></div>
+
       </div>
     </div>
   );
