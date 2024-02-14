@@ -30,7 +30,7 @@ function Profile(props) {
         }}
       >
           Logout
-      </Button></div> : <Navigate to='/login' replace={true}></Navigate>}
+      </Button></div> : <Navigate to='/' replace={true}></Navigate>}
 
     </div>
   );

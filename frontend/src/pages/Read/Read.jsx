@@ -226,7 +226,7 @@ function Read(props) {
         <div className="justify-content-center align-items-center">
           <div
             style={{
-              width: '100vw',
+              width: '100%',
               height: '80vh',
               justifyContent: 'center',
               alignContent: 'center',

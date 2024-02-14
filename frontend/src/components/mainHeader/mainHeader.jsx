@@ -1,5 +1,5 @@
 import Nav from 'react-bootstrap/Nav';
-import {Button} from 'react-bootstrap';
+import {Button, Dropdown} from 'react-bootstrap';
 import {React, useContext} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
 import {getUserObjectFromJwt} from '../../services/localStorageService';
@@ -51,15 +51,23 @@ export default function MainHeader(props) {
           alt="logo"
         />
       </Nav.Link>
-      <div style={{position: 'absolute', right: 10, display: 'flex'}}>
-        {authContext.isLoggedIn? <div>{getUserObjectFromJwt(authContext.userToken).user.name}</div> :
+      <div style={{position: 'absolute', right: 20, display: 'flex'}}>
+        {authContext.isLoggedIn? <div>
+
+          <Dropdown>
+            <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
+              {getUserObjectFromJwt(authContext.userToken).user.name}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item href="/profile">Settings</Dropdown.Item>
+              { authContext.isLoggedIn && getUserObjectFromJwt(authContext.userToken).user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
+              <Dropdown.Item onClick={authContext.logout}>Log Out</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div> :
         <Nav.Link href="/login" >
           <Button variant='outline-secondary'>Login</Button>
         </Nav.Link>}
-
-        { authContext.isLoggedIn && getUserObjectFromJwt(authContext.userToken).user.isAdmin ? <Nav.Link href="/admin">
-          <Button variant='outline-secondary'>Admin</Button>
-        </Nav.Link> : null}
 
       </div>
 
