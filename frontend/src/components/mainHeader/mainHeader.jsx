@@ -52,12 +52,12 @@ export default function MainHeader(props) {
         />
       </Nav.Link>
       <div style={{position: 'absolute', right: 10, display: 'flex'}}>
-        {authContext.isloggedIn ? <div>{getUserObjectFromJwt(authContext.jwtToken).name}</div> :
+        {authContext.isLoggedIn? <div>{getUserObjectFromJwt(authContext.userToken).user.name}</div> :
         <Nav.Link href="/login" >
           <Button variant='outline-secondary'>Login</Button>
         </Nav.Link>}
 
-        { authContext.isLoggedIn && authContext.isAdmin ? <Nav.Link href="/admin">
+        { authContext.isLoggedIn && getUserObjectFromJwt(authContext.userToken).user.isAdmin ? <Nav.Link href="/admin">
           <Button variant='outline-secondary'>Admin</Button>
         </Nav.Link> : null}
 

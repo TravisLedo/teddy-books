@@ -9,5 +9,9 @@ export const setLocalUser = (userData) => {
 };
 
 export const getUserObjectFromJwt = (jwt) => {
-  return jwtDecode(jwt);
+  try {
+    return jwtDecode(jwt);
+  } catch (error) {
+    return null;
+  }
 };
