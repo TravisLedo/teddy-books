@@ -10,7 +10,7 @@ import Admin from './pages/Admin/Admin';
 import {AuthContext} from './contexts/Contexts';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-import {getLocalUser} from './services/localStorageService';
+import {getLocalUser, getUserObjectFromJwt} from './services/localStorageService';
 import Profile from './pages/Profile/Profile';
 
 function App() {
@@ -45,7 +45,6 @@ function App() {
   useEffect(() => {
     window.addEventListener('resize', handleResize);
     const localJwtToken = getLocalUser();
-    console.log(localJwtToken);
     if (localJwtToken) {
       // Need to hit a validation endpoint to see if token nbot expired
       // If it is, use refresh token to get a new one

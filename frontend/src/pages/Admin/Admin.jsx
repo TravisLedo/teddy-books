@@ -52,7 +52,6 @@ function Admin(props) {
             padding: '10px',
           }}
         >
-          <h1>Admin</h1>
           <div>
             <Button
               className="control-button"
@@ -73,6 +72,7 @@ function Admin(props) {
             </Button>
           </div>
         </div>
+        <h1>Admin</h1>
         {booksData.map((book) => (
           <Accordion defaultActiveKey="0" key={book._id}>
             <BookAccordion book={book}></BookAccordion>

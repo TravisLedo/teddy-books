@@ -69,7 +69,6 @@ function Register(props) {
             Cancel
         </Button>
         <Button
-          className="control-button"
           variant="outline-secondary"
           onClick={() => {
             register();
@@ -77,7 +76,8 @@ function Register(props) {
         >
             Register
         </Button>
-      </Form>: <Navigate to='/'></Navigate>
+      </Form> :
+      <Navigate to='/'></Navigate>
       }
 
     </div>
