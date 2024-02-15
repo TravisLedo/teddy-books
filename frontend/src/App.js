@@ -10,8 +10,9 @@ import Admin from './pages/Admin/Admin';
 import {AuthContext} from './contexts/Contexts';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-import {getLocalUser, getUserObjectFromJwt} from './services/localStorageService';
+import {getLocalUser, getUserObjectFromJwt, removeLocalUser, setLocalUser} from './services/localStorageService';
 import Profile from './pages/Profile/Profile';
+import {apiServiceSecure, apiServiceUnsecure} from './services/apiService';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +40,54 @@ function App() {
     });
   };
 
+  const showLoginPopup = () => {
+    console.log('Need to relog');
+  };
+
+
   useEffect(() => {
+    apiServiceSecure.interceptors.request.use(
+        (config) => {
+          const token = getLocalUser();
+          if (token) {
+            config.headers['Authorization'] = 'Bearer ' + token;
+          }
+          config.headers['Content-Type'] = 'application/json';
+          return config;
+        },
+        (error) => {
+          Promise.reject(error);
+        },
+    );
+
+    apiServiceSecure.interceptors.response.use(
+        function(response) {
+          return response;
+        },
+        async function(error) {
+          const originalRequest = error.config;
+          if (
+            error.response.status === 401 && originalRequest._retry
+          ) {
+            console.log('Access Token and Refresh Token both expired.');
+            removeLocalUser();
+            showLoginPopup();
+          }
+
+
+          if (error.response.status === 401 && !originalRequest._retry) {
+            console.log('Access Token expired.');
+            originalRequest._retry = true;
+            try {
+              const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: getLocalUser()});
+              setLocalUser(newAccessToken.data);
+              console.log('Retrying with a new Access Token.');
+            } catch (error) {
+            }
+            return apiServiceSecure(originalRequest);
+          }
+        },
+    );
     window.addEventListener('resize', handleResize);
     const localJwtToken = getLocalUser();
     if (localJwtToken) {

@@ -40,11 +40,9 @@ function BookAccordion(props) {
     };
 
     try {
-      const updated = await updateBookById(newBookData);
-      console.log('updated ' + updated);
+      const book = await updateBookById(newBookData);
+      console.log('Book Updated: ' + book.title);
     } catch (error) {
-      console.log(error);
-      // authContext.logout();
     }
   };
 
