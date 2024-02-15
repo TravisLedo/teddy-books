@@ -8,7 +8,7 @@ import MainHeader from './components/mainHeader/mainHeader';
 import {React, useEffect, useState} from 'react';
 import Admin from './pages/Admin/Admin';
 import {AuthContext} from './contexts/Contexts';
-import Login from './pages/Login/Login';
+import LoginModal from './pages/Login/LoginModal';
 import Register from './pages/Register/Register';
 import {getLocalUser, getUserObjectFromJwt, removeLocalUser, setLocalUser} from './services/localStorageService';
 import Profile from './pages/Profile/Profile';
@@ -17,14 +17,21 @@ import {apiServiceSecure, apiServiceUnsecure} from './services/apiService';
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const handleLoginModalClose = () => setShowLoginModal(false);
+  const handleLoginModalShow = () => setShowLoginModal(true);
 
   const login = (jwtToken) => {
     localStorage.setItem('jwtToken', jwtToken);
+    setUser(getUserObjectFromJwt(jwtToken).user);
     setIsLoggedIn(true);
   };
 
   const logout = () => {
-    localStorage.removeItem('jwtToken');
+    removeLocalUser();
+    setUser(null);
     setIsLoggedIn(false);
   };
 
@@ -39,11 +46,6 @@ function App() {
       height: window.innerHeight,
     });
   };
-
-  const showLoginPopup = () => {
-    console.log('Need to relog');
-  };
-
 
   useEffect(() => {
     apiServiceSecure.interceptors.request.use(
@@ -71,7 +73,7 @@ function App() {
           ) {
             console.log('Access Token and Refresh Token both expired.');
             removeLocalUser();
-            showLoginPopup();
+            handleLoginModalShow();
           }
 
 
@@ -91,9 +93,6 @@ function App() {
     window.addEventListener('resize', handleResize);
     const localJwtToken = getLocalUser();
     if (localJwtToken) {
-      // Need to hit a validation endpoint to see if token nbot expired
-      // If it is, use refresh token to get a new one
-      // if refresh token is expired, clear local storage jwt token and force user to login again
       login(localJwtToken);
     } else {
       logout();
@@ -103,10 +102,12 @@ function App() {
 
   if (!isLoading) {
     return (
-      <AuthContext.Provider value={{isLoggedIn, login, logout}}>
+      <AuthContext.Provider value={{user, isLoggedIn, login, logout, handleLoginModalShow, handleLoginModalClose, showLoginModal}}>
         <div className="App" >
           <BrowserRouter>
             <MainHeader></MainHeader>
+            <LoginModal
+            ></LoginModal>
             <Routes>
               <Route
                 exact
@@ -122,11 +123,6 @@ function App() {
                 exact
                 path="/admin"
                 element={<Admin currentWindowSize={currentWindowSize} />}
-              ></Route>
-              <Route
-                exact
-                path="/login"
-                element={<Login currentWindowSize={currentWindowSize} />}
               ></Route>
               <Route
                 exact

@@ -15,8 +15,8 @@ function Admin(props) {
   const [showAddModal, setShowAddModal] = useState(false);
   const authContext = useContext(AuthContext);
 
-  const handleClose = () => setShowAddModal(false);
-  const handleShow = () => setShowAddModal(true);
+  const handleLoginModalClose = () => setShowAddModal(false);
+  const handleLoginModalShow = () => setShowAddModal(true);
 
   const fetchData = async () => {
     try {
@@ -30,7 +30,7 @@ function Admin(props) {
   const addBook = async (newBookData) => {
     try {
       await addNewBook(newBookData);
-      handleClose();
+      handleLoginModalClose();
       // todo: show toast to say success and refresh
     } catch (error) {
       console.log('Error saving new book.', error);
@@ -43,7 +43,7 @@ function Admin(props) {
 
   return (
     <div>
-      {authContext.isLoggedIn && getUserObjectFromJwt(getLocalUser()).user.isAdmin ? <div style={{width: '80%', margin: 'auto'}}>
+      {authContext.isLoggedIn && authContext.user.isAdmin ? <div style={{width: '80%', margin: 'auto'}}>
         <div
           style={{
             display: 'flex',
@@ -66,7 +66,7 @@ function Admin(props) {
             <Button
               className="control-button"
               variant="outline-secondary"
-              onClick={() => handleShow()}
+              onClick={() => handleLoginModalShow()}
             >
               <Image className="control-button-image" src={add}></Image>
             </Button>
@@ -80,11 +80,11 @@ function Admin(props) {
         ))}
         <AddBookModal
           showAddModal={showAddModal}
-          handleClose={handleClose}
-          handleShow={handleShow}
+          handleLoginModalClose={handleLoginModalClose}
+          handleLoginModalShow={handleLoginModalShow}
           addBook={addBook}
         ></AddBookModal>
-      </div> : <Navigate to='/login' replace={true}></Navigate>
+      </div> : <Navigate to='/' replace={true}></Navigate>
 
       }
 

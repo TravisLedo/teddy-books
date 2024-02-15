@@ -14,9 +14,11 @@
     justify-content: center;
 }
 
-
-.register-link{
-    padding: 50px;
-    color: #0accb9
+.button-container{
+    display: flex;
+    margin: auto;
+    align-self: center;
+    justify-content: center;
 }
+
 

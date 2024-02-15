@@ -1,8 +1,9 @@
 import Nav from 'react-bootstrap/Nav';
 import {Button, Dropdown} from 'react-bootstrap';
-import {React, useContext} from 'react';
+import {React, useContext, useState} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
 import {getLocalUser, getUserObjectFromJwt} from '../../services/localStorageService';
+import LoginModal from '../../pages/Login/LoginModal';
 
 export default function MainHeader(props) {
   const authContext = useContext(AuthContext);
@@ -52,26 +53,22 @@ export default function MainHeader(props) {
         />
       </Nav.Link>
       <div style={{position: 'absolute', right: 20, display: 'flex'}}>
-        {authContext.isLoggedIn? <div>
+        {authContext.isLoggedIn && authContext.user ? <div>
 
           <Dropdown>
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-              {getUserObjectFromJwt(getLocalUser()).user.name}
+              {authContext.user.name}
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item href="/profile">Settings</Dropdown.Item>
-              { authContext.isLoggedIn && getUserObjectFromJwt(getLocalUser()).user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
+              { authContext.isLoggedIn && authContext.user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
               <Dropdown.Item onClick={authContext.logout}>Log Out</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div> :
-        <Nav.Link href="/login" >
-          <Button variant='outline-secondary'>Login</Button>
-        </Nav.Link>}
-
+          <Button variant='outline-secondary' onClick={()=>authContext.handleLoginModalShow()}>Login</Button>
+        }
       </div>
-
-
     </div>
   );
 }

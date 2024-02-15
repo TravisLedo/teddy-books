@@ -14,7 +14,6 @@ function BookAccordion(props) {
   const [author, setAuthor] = useState(props.book.author);
   const [pages, setPages] = useState(props.book.pages);
   const [text, setText] = useState(props.book.text);
-  const authContext = useContext(AuthContext);
 
   const resetValues = () => {
     setEditing(false);

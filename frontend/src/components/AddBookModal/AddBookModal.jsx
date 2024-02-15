@@ -22,7 +22,7 @@ function AddBookModal(props) {
   return (
     <Modal
       show={props.showAddModal}
-      onHide={props.handleClose}
+      onHide={props.handleLoginModalClose}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -45,7 +45,7 @@ function AddBookModal(props) {
         ></BookBody>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.handleClose}>
+        <Button variant="secondary" onClick={props.handleLoginModalClose}>
           Close
         </Button>
         <Button variant="primary" onClick={handleSave}>
