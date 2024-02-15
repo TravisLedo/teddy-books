@@ -16,16 +16,13 @@ import Profile from './pages/Profile/Profile';
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userToken, setUserToken] = useState(null);
 
   const login = (jwtToken) => {
-    setUserToken(jwtToken);
     localStorage.setItem('jwtToken', jwtToken);
     setIsLoggedIn(true);
   };
 
   const logout = () => {
-    setUserToken(null);
     localStorage.removeItem('jwtToken');
     setIsLoggedIn(false);
   };
@@ -58,7 +55,7 @@ function App() {
 
   if (!isLoading) {
     return (
-      <AuthContext.Provider value={{userToken, isLoggedIn, login, logout}}>
+      <AuthContext.Provider value={{isLoggedIn, login, logout}}>
         <div className="App" >
           <BrowserRouter>
             <MainHeader></MainHeader>

@@ -1,13 +1,71 @@
 // apiService.js
 import axios from 'axios';
+import {getLocalUser, removeLocalUser, setLocalUser} from './localStorageService';
 
-const apiService = axios.create({
+const apiServiceUnsecure= axios.create({
   baseURL: process.env.REACT_APP_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+const apiServiceSecure = axios.create({
+  baseURL: process.env.REACT_APP_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+apiServiceSecure.interceptors.request.use(
+    (config) => {
+      const token = getLocalUser();
+      if (token) {
+        config.headers['Authorization'] = 'Bearer ' + token;
+      }
+      config.headers['Content-Type'] = 'application/json';
+      return config;
+    },
+    (error) => {
+      Promise.reject(error);
+    },
+);
+
+apiServiceSecure.interceptors.response.use(
+    function(response) {
+      return response;
+    },
+    async function(error) {
+      const originalRequest = error.config;
+
+      if (
+        error.response.status === 401 && originalRequest._retry
+      ) {
+        console.log('Access Token and Refresh Token both expired.');
+        removeLocalUser();
+        location.reload();
+        return Promise.reject(error);
+      }
+
+
+      if (error.response.status === 401 && !originalRequest._retry) {
+        console.log('Access Token expired.');
+        originalRequest._retry = true;
+        try {
+          const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: getLocalUser()});
+          setLocalUser(newAccessToken.data);
+          console.log('Retrying with a new Access Token.');
+        } catch (error) {
+        }
+        return apiServiceSecure(originalRequest);
+      }
+      return Promise.reject(error);
+    },
+);
+
 
 export const loginUser = async (userData) => {
   try {
-    const response = await apiService.post('/user/login', userData);
+    const response = await apiServiceUnsecure.post('/user/login', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -16,7 +74,7 @@ export const loginUser = async (userData) => {
 
 export const addNewUser = async (userData) => {
   try {
-    const response = await apiService.post('/user/add', userData);
+    const response = await apiServiceUnsecure.post('/user/add', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -26,7 +84,7 @@ export const addNewUser = async (userData) => {
 
 export const getAllBooks = async () => {
   try {
-    const response = await apiService.get('/books/all');
+    const response = await apiServiceUnsecure.get('/books/all');
     return response.data;
   } catch (error) {
     throw error;
@@ -35,7 +93,7 @@ export const getAllBooks = async () => {
 
 export const getBookById = async (_id) => {
   try {
-    const response = await apiService.get('/books/' + _id);
+    const response = await apiServiceUnsecure.get('/books/' + _id);
     return response.data;
   } catch (error) {
     throw error;
@@ -44,7 +102,7 @@ export const getBookById = async (_id) => {
 
 export const addNewBook = async (bookData) => {
   try {
-    const response = await apiService.post('/books/add', bookData);
+    const response = await apiServiceSecure.post('/books/add', bookData);
     return response.data;
   } catch (error) {
     throw error;
@@ -53,7 +111,7 @@ export const addNewBook = async (bookData) => {
 
 export const updateBookById = async (bookData) => {
   try {
-    const response = await apiService.put('/books/update', {bookData});
+    const response = await apiServiceSecure.put('/books/update', {bookData});
     return response.data;
   } catch (error) {
     throw error;
@@ -79,7 +137,7 @@ export const getAudioForPage = async (
     voiceSelection,
 ) => {
   try {
-    const response = await apiService.post('/books/witai/speak', {
+    const response = await apiServiceUnsecure.post('/books/witai/speak', {
       book: book,
       leftPage: leftPage,
       rightPage: rightPage,
@@ -96,7 +154,7 @@ export const getAudioForPage = async (
 export const removeTempAudioFromServer = async (audioSource) => {
   try {
     const file = audioSource.replace(process.env.REACT_APP_URL + '/', '');
-    const response = await apiService.post('/books/removeaudio', {
+    const response = await apiServiceUnsecure.post('/books/removeaudio', {
       file: file,
     });
     return response;

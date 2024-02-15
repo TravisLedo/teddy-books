@@ -31,11 +31,12 @@ function Books() {
         backgroundAttachment: 'fixed',
         width: '100%',
         justifyContent: 'center',
+        margin: 'auto',
       }}
     >
       {booksData.length > 0 ? (
         <Row
-          className="g-5 align-self-center pt-3 pb-3 w-100"
+          className="g-5 align-self-center pt-3 pb-3"
           style={{
             marginLeft: 'auto',
             marginRight: 'auto',

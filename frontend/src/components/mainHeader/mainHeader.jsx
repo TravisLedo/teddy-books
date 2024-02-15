@@ -2,7 +2,7 @@ import Nav from 'react-bootstrap/Nav';
 import {Button, Dropdown} from 'react-bootstrap';
 import {React, useContext} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
-import {getUserObjectFromJwt} from '../../services/localStorageService';
+import {getLocalUser, getUserObjectFromJwt} from '../../services/localStorageService';
 
 export default function MainHeader(props) {
   const authContext = useContext(AuthContext);
@@ -56,11 +56,11 @@ export default function MainHeader(props) {
 
           <Dropdown>
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-              {getUserObjectFromJwt(authContext.userToken).user.name}
+              {getUserObjectFromJwt(getLocalUser()).user.name}
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item href="/profile">Settings</Dropdown.Item>
-              { authContext.isLoggedIn && getUserObjectFromJwt(authContext.userToken).user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
+              { authContext.isLoggedIn && getUserObjectFromJwt(getLocalUser()).user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
               <Dropdown.Item onClick={authContext.logout}>Log Out</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

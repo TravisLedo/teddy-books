@@ -12,7 +12,8 @@ function Login(props) {
   const [password, setPassword] = useState();
 
   const navigate = useNavigate();
-
+  // todo: update the refresh token in db if there is one with user id.
+  // if not, add a new one.
   const login = async () => {
     try {
       const tokenResponse = await loginUser({email: email, password: password});

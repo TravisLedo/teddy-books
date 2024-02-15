@@ -5,7 +5,11 @@ export const getLocalUser = () => {
 };
 
 export const setLocalUser = (userData) => {
-  localStorage.setItem('jwtToken', JSON.stringify(userData));
+  localStorage.setItem('jwtToken', userData);
+};
+
+export const removeLocalUser = () => {
+  localStorage.removeItem('jwtToken');
 };
 
 export const getUserObjectFromJwt = (jwt) => {

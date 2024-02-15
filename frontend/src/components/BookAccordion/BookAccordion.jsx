@@ -1,4 +1,4 @@
-import {React, useState} from 'react';
+import {React, useState, useContext} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import {Button, Image, Card} from 'react-bootstrap';
 import {generateImageLink, updateBookById} from '../../services/apiService';
@@ -6,6 +6,7 @@ import BookBody from '../BookBody/BookBody';
 import edit from '../../assets/images/edit.png';
 import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
+import {AuthContext} from '../../contexts/Contexts';
 
 function BookAccordion(props) {
   const [editing, setEditing] = useState(false);
@@ -13,6 +14,7 @@ function BookAccordion(props) {
   const [author, setAuthor] = useState(props.book.author);
   const [pages, setPages] = useState(props.book.pages);
   const [text, setText] = useState(props.book.text);
+  const authContext = useContext(AuthContext);
 
   const resetValues = () => {
     setEditing(false);
@@ -22,7 +24,7 @@ function BookAccordion(props) {
     setText(props.book.text);
   };
 
-  const updateValues = () => {
+  const updateValues = async () => {
     setEditing(false);
     setTitle(title);
     setAuthor(author);
@@ -37,7 +39,13 @@ function BookAccordion(props) {
       text: text,
     };
 
-    updateBookById(newBookData);
+    try {
+      const updated = await updateBookById(newBookData);
+      console.log('updated ' + updated);
+    } catch (error) {
+      console.log(error);
+      // authContext.logout();
+    }
   };
 
   return (

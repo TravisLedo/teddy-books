@@ -12,14 +12,15 @@ function BookCard(props) {
 
   return (
     <Col className="d-flex justify-content-center px-0">
-      <Link to={`read/${props.book._id}`}>
+      <Link to={`read/${props.book._id}`} style={{maxWidth: '100%'}}>
         <Card
           className="justify-content-center card-clickable"
           style={{
+            margin: 0,
             margin: 'auto',
             width: '500px',
             height: '500px',
-            maxWidth: '95%',
+            maxWidth: '90%',
             borderColor: 'black',
             borderStyle: 'solid',
             borderWidth: 1,

@@ -16,6 +16,7 @@ app.use(express.static('public'));
 app.use(cors());
 require('dotenv').config();
 const bycrypt = require('bcrypt');
+const {jwtDecode} = require('jwt-decode');
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}.`);
@@ -28,11 +29,36 @@ mongoose
     })
     .catch((e) => console.log(e));
 
+
+app.post('/token/refresh', async (req, res) => {
+  const currentAccessToken = req.body.token;
+  const userData = jwtDecode(currentAccessToken).user;
+  try {
+    const refreshTokenReponse = await RefreshToken.findOne({userId: userData
+        ._id});
+
+    jwt.verify(refreshTokenReponse.token, process.env.JWT_SECRET, (err) => {
+      if (err) {
+        console.log('refresh token expired too. Log user out.');
+        res.sendStatus(401);
+      } else {
+        const accessToken = generateAccessToken(userData);
+        res.status(200).send(accessToken);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+
 app.get('/books/all', async (req, res) => {
   try {
     const books = await Book.find({});
     res.status(200).send(books);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -42,6 +68,7 @@ app.get('/books/:id', async (req, res) => {
     const book = await Book.findById(req.params.id);
     res.status(200).send(book);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -58,11 +85,12 @@ app.post('/books/add', authenthicateJwtToken, async (req, res) => {
     await book.save();
     res.status(200).send(book);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
 
-app.put('/books/update', async (req, res) => {
+app.put('/books/update', authenthicateJwtToken, async (req, res) => {
   try {
     const newBookValues = {
       title: req.body.bookData.title,
@@ -74,6 +102,7 @@ app.put('/books/update', async (req, res) => {
     await Book.findByIdAndUpdate(req.body.bookData._id, newBookValues);
     res.status(200).send(newBookValues);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -121,6 +150,7 @@ app.post('/books/witai/speak', async (req, res) => {
       res.status(200).send('empty.mp3');
     }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -137,6 +167,7 @@ app.post('/books/removeaudio', async (req, res) => {
       res.status(200).send('Temp fie removed');
     }
   } catch (error) {
+    console.log(error);
     res.status(201).send(error);
   }
 });
@@ -145,16 +176,15 @@ app.post('/user/login', async (req, res) => {
   try {
     const user = await User.findOne({email: req.body.email});
     const validPassword = await bycrypt.compare(req.body.password, user.password);
-
     if (validPassword) {
       const accessToken = generateAccessToken(user);
-      const refreshToken = new RefreshToken({token: generateRefreshToken(user)});
-      await refreshToken.save(refreshToken);
+      await RefreshToken.findOneAndUpdate({userId: user._id}, {userId: user._id, token: generateRefreshToken(user)}, {upsert: true});
       res.status(200).send(accessToken);
     } else {
       res.status(401).send('Login Failed.');
     }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -170,10 +200,11 @@ app.post('/user/add', async (req, res) => {
     });
     const newUser = await user.save();
     const accessToken = generateAccessToken(newUser);
-    const refreshToken = new RefreshToken({token: generateRefreshToken(newUser)});
+    const refreshToken = new RefreshToken({userId: newUser._id, token: generateRefreshToken(newUser)});
     await refreshToken.save(refreshToken);
     res.status(200).send(accessToken);
   } catch (error) {
+    console.log(error);
     console.log(error);
     res.status(500).send(error);
   }
@@ -220,25 +251,25 @@ const generateFolderNameFromTitle = (title) => {
 };
 
 function generateAccessToken(user) {
-  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '20s'});
+  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '10s'});
 }
 
 
 function generateRefreshToken(user) {
-  console.log(user);
-  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '60s'});
+  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '20s'});
 }
 
 function authenthicateJwtToken(req, res, next ) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) return res.sendStatus(401);
+
+  if (token == null) {
+    return res.sendStatus(401);
+  }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-
+    if (err) return res.sendStatus(401);
     req.user = user;
     next();
   });
 }
-
