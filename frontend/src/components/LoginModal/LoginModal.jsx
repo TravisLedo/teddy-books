@@ -1,6 +1,6 @@
 import {React, useState, useContext} from 'react';
-import {loginUser} from '../../services/apiService';
-import {Button, Form, Modal} from 'react-bootstrap';
+import {addNewUser, loginUser} from '../../services/apiService';
+import {Button, Col, Form, Modal, Row} from 'react-bootstrap';
 import {Link, Navigate, useNavigate} from 'react-router-dom';
 import './LoginModal.css';
 import {AuthContext} from '../../contexts/Contexts';
@@ -15,7 +15,6 @@ function LoginModal(props) {
   const [name, setName] = useState();
   const [passwordConfirm, setPasswordConfirm] = useState();
 
-
   const resetForms = async () => {
     setRegistering(false);
     setEmail(null);
@@ -26,18 +25,20 @@ function LoginModal(props) {
 
   const login = async () => {
     try {
-      const tokenResponse = await loginUser({email: email, password: password});
+      const tokenResponse = await loginUser({
+        email: email,
+        password: password,
+      });
       if (tokenResponse) {
         authContext.login(tokenResponse);
         authContext.handleLoginModalClose();
       }
     } catch (error) {
-      console.log('Login Failed.', error);
+      console.log('Error Logging in: ', error);
     }
   };
 
-
-  const register = async ()=>{
+  const register = async () => {
     // todo: add validation checks
     const userData = {
       email: email,
@@ -50,16 +51,17 @@ function LoginModal(props) {
         login();
       }
     } catch (error) {
+      console.log('Error creating new user: ', error);
     }
   };
 
   return (
     <Modal
       show={props.showLoginModal}
-      onHide={()=>{
+      onHide={() => {
         authContext.handleLoginModalClose();
       }}
-      onShow={()=>{
+      onShow={() => {
         resetForms();
       }}
       size="lg"
@@ -67,102 +69,122 @@ function LoginModal(props) {
       centered
     >
       <Modal.Header closeButton>
-        {!registering && !props.allowRegistering? <Modal.Title>Session has ended, please log back in.</Modal.Title> : !registering && props.allowRegistering?
-<Modal.Title>Login</Modal.Title> : <Modal.Title>Register New Account</Modal.Title>
-        }
+        {!registering && !props.allowRegistering ? (
+          <Modal.Title>Session has ended, please log back in.</Modal.Title>
+        ) : !registering && props.allowRegistering ? (
+          <Modal.Title>Login</Modal.Title>
+        ) : (
+          <Modal.Title>Register New Account</Modal.Title>
+        )}
       </Modal.Header>
       <Modal.Body>
-        {registering && props.allowRegistering? <Form className="form-container">
-          <Form.Group className="mb-3" controlId="email">
-            <Form.Control
-              type="email"
-              placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="name">
-            <Form.Control
-              type="text"
-              placeholder="Display Name"
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="password">
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="passwordConfirm">
-            <Form.Control
-              type="password"
-              placeholder="Confirm Password"
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-            />
-          </Form.Group>
-          <Button
-            className="control-button"
-            variant="outline-secondary"
-            onClick={() => {
-              setRegistering(false);
-            }}
-          >
-            Login
-          </Button>
-          <Button
-            variant="outline-secondary"
-            onClick={() => {
-              register();
-            }}
-          >
-            Register
-          </Button>
-        </Form> : <Form className="form-container">
-          <Form.Group className="mb-3" controlId="email">
-            <Form.Control
-              type="email"
-              placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="password">
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
-          <div className='button-container'>
-            <Button
-              variant="outline-secondary"
-              onClick={() => {
-                authContext.handleLoginModalClose();
-              }}
-            >Cancel
-            </Button>
-            <Button
-              variant="outline-secondary"
-              onClick={() => {
-                login();
-              }}
-            >Login
-            </Button>
-            {props.allowRegistering ? <Button
-              variant="outline-secondary"
-              onClick={() => {
-                setRegistering(true);
-              }}
-            >Register
-            </Button> : null}
+        {registering && props.allowRegistering ? (
+          <Form className="form-container">
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Control
+                type="email"
+                placeholder="Email"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="name">
+              <Form.Control
+                type="text"
+                placeholder="Display Name"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="password">
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="passwordConfirm">
+              <Form.Control
+                type="password"
+                placeholder="Confirm Password"
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+              />
+            </Form.Group>
+            <div className="button-container">
 
-          </div>
-        </Form>}
+              <Button
+                className="control-button"
+                variant="outline-secondary"
+                onClick={() => {
+                  setRegistering(false);
+                }}
+              >
+              Back
+              </Button>
+              <Button
+                className="control-button"
+                variant="outline-secondary"
+                onClick={() => {
+                  register();
+                }}
+              >
+              Register
+              </Button>
+            </div>
+          </Form>
+        ) : (
+          <Form className="form-container">
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Control
+                type="email"
+                placeholder="Email"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="password">
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
+            <div className="button-container">
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  authContext.handleLoginModalClose();
+                }}
+              >
+                    Cancel
+              </Button>
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  login();
+                }}
+              >
+                    Login
+              </Button>
+            </div>
 
+
+            {props.allowRegistering ? (
+                    <div className="button-container">
+                      <Button
+                        className="link-text-button"
+                        variant="outline-secondary"
+                        onClick={() => {
+                          setRegistering(true);
+                        }}
+                      >
+                      Register
+                      </Button>
+                    </div>
+              ) : null}
+
+
+          </Form>
+        )}
       </Modal.Body>
     </Modal>
-
-
   );
 }
 export default LoginModal;

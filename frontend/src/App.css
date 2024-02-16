@@ -30,7 +30,22 @@ font-family: "Gwibble";
   max-height: 100%;
 }
 
-.register-link{
-  align-self: center;
-  color: #0accb9
+.link-text-button{
+  color: #0accb9 !important;
+  border-width: 0 !important;
 }
+.link-text-button:hover{
+  color: #7237C5 !important;
+  border-width: 0 !important;
+  background-color: transparent !important;
+}
+
+.btn{
+  width: fit-content !important;
+}
+
+.modal-open {
+  width: 100% !important;
+  padding-right: 0 !important;
+  overflow-y: scroll !important;}
+

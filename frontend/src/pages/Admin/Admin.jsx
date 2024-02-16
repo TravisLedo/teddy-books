@@ -23,7 +23,7 @@ function Admin(props) {
       const result = await getAllBooks();
       setBooksData(result);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data: ', error);
     }
   };
 
@@ -33,7 +33,7 @@ function Admin(props) {
       handleBookModalClose();
       // todo: show toast to say success and refresh
     } catch (error) {
-      console.log('Error saving new book.', error);
+      console.log('Error saving new book: ', error);
     }
   };
 

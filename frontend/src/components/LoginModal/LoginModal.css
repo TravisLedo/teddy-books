@@ -19,6 +19,9 @@
     margin: auto;
     align-self: center;
     justify-content: center;
+    align-content: center;
+    text-align: center;
+    margin: 20px;
 }
 
 
