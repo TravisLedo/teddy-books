@@ -19,6 +19,10 @@ font-family: "Gwibble";
 
 
 
+.standard-button{
+  margin: 5px;
+}
+
 .control-button{
   width: 75px;
   height: auto;
@@ -41,7 +45,7 @@ font-family: "Gwibble";
 }
 
 .btn{
-  width: fit-content !important;
+  text-align: center !important;
 }
 
 .modal-open {
@@ -49,3 +53,13 @@ font-family: "Gwibble";
   padding-right: 0 !important;
   overflow-y: scroll !important;}
 
+
+  .form-container{
+    width: 75%;
+    margin: auto;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    height: 100%;
+    align-self: center;
+    justify-content: center;
+}

@@ -109,9 +109,8 @@ function LoginModal(props) {
               />
             </Form.Group>
             <div className="button-container">
-
               <Button
-                className="control-button"
+                className="standard-button"
                 variant="outline-secondary"
                 onClick={() => {
                   setRegistering(false);
@@ -120,7 +119,7 @@ function LoginModal(props) {
               Back
               </Button>
               <Button
-                className="control-button"
+                className="standard-button"
                 variant="outline-secondary"
                 onClick={() => {
                   register();
@@ -148,6 +147,8 @@ function LoginModal(props) {
             </Form.Group>
             <div className="button-container">
               <Button
+                className="standard-button"
+
                 variant="outline-secondary"
                 onClick={() => {
                   authContext.handleLoginModalClose();
@@ -156,6 +157,7 @@ function LoginModal(props) {
                     Cancel
               </Button>
               <Button
+                className="standard-button"
                 variant="outline-secondary"
                 onClick={() => {
                   login();

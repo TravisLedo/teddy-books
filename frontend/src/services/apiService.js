@@ -1,6 +1,5 @@
 // apiService.js
 import axios from 'axios';
-import {getLocalUser, removeLocalUser, setLocalUser} from './localStorageService';
 
 export const apiServiceUnsecure = axios.create({
   baseURL: process.env.REACT_APP_URL,

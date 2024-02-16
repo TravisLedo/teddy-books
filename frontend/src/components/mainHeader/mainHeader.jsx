@@ -55,7 +55,7 @@ export default function MainHeader(props) {
       <div style={{position: 'absolute', right: 20, display: 'flex'}}>
         {authContext.isLoggedIn && authContext.user ? <div>
 
-          <Dropdown>
+          <Dropdown className='standard-button'>
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
               {authContext.user.name}
             </Dropdown.Toggle>
@@ -66,7 +66,7 @@ export default function MainHeader(props) {
             </Dropdown.Menu>
           </Dropdown>
         </div> :
-          <Button variant='outline-secondary' onClick={()=>authContext.handleLoginModalShow(true)}>Login</Button>
+          <Button className='standard-button' variant='outline-secondary' onClick={()=>authContext.handleLoginModalShow(true)}>Login</Button>
         }
       </div>
     </div>
