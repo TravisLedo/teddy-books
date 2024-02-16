@@ -31,5 +31,6 @@ font-family: "Gwibble";
 }
 
 .register-link{
+  align-self: center;
   color: #0accb9
 }

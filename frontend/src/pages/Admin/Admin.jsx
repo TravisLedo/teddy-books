@@ -12,11 +12,11 @@ import {getLocalUser, getUserObjectFromJwt} from '../../services/localStorageSer
 
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
   const authContext = useContext(AuthContext);
 
-  const handleLoginModalClose = () => setShowAddModal(false);
-  const handleLoginModalShow = () => setShowAddModal(true);
+  const handleBookModalClose = () => setShowAddBookModal(false);
+  const handleBookModalShow = () => setShowAddBookModal(true);
 
   const fetchData = async () => {
     try {
@@ -30,7 +30,7 @@ function Admin(props) {
   const addBook = async (newBookData) => {
     try {
       await addNewBook(newBookData);
-      handleLoginModalClose();
+      handleBookModalClose();
       // todo: show toast to say success and refresh
     } catch (error) {
       console.log('Error saving new book.', error);
@@ -66,7 +66,7 @@ function Admin(props) {
             <Button
               className="control-button"
               variant="outline-secondary"
-              onClick={() => handleLoginModalShow()}
+              onClick={() => handleBookModalShow()}
             >
               <Image className="control-button-image" src={add}></Image>
             </Button>
@@ -79,9 +79,9 @@ function Admin(props) {
           </Accordion>
         ))}
         <AddBookModal
-          showAddModal={showAddModal}
-          handleLoginModalClose={handleLoginModalClose}
-          handleLoginModalShow={handleLoginModalShow}
+          showAddModal={showAddBookModal}
+          handleBookModalClose={handleBookModalClose}
+          handleBookModalShow={handleBookModalShow}
           addBook={addBook}
         ></AddBookModal>
       </div> : <Navigate to='/' replace={true}></Navigate>

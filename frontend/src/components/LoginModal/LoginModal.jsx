@@ -1,0 +1,168 @@
+import {React, useState, useContext} from 'react';
+import {loginUser} from '../../services/apiService';
+import {Button, Form, Modal} from 'react-bootstrap';
+import {Link, Navigate, useNavigate} from 'react-router-dom';
+import './LoginModal.css';
+import {AuthContext} from '../../contexts/Contexts';
+
+function LoginModal(props) {
+  const authContext = useContext(AuthContext);
+  const [registering, setRegistering] = useState(false);
+
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
+  const [name, setName] = useState();
+  const [passwordConfirm, setPasswordConfirm] = useState();
+
+
+  const resetForms = async () => {
+    setRegistering(false);
+    setEmail(null);
+    setPassword(null);
+    setName(null);
+    setPasswordConfirm(null);
+  };
+
+  const login = async () => {
+    try {
+      const tokenResponse = await loginUser({email: email, password: password});
+      if (tokenResponse) {
+        authContext.login(tokenResponse);
+        authContext.handleLoginModalClose();
+      }
+    } catch (error) {
+      console.log('Login Failed.', error);
+    }
+  };
+
+
+  const register = async ()=>{
+    // todo: add validation checks
+    const userData = {
+      email: email,
+      name: name,
+      password: password,
+    };
+    try {
+      const response = await addNewUser(userData);
+      if (response) {
+        login();
+      }
+    } catch (error) {
+    }
+  };
+
+  return (
+    <Modal
+      show={props.showLoginModal}
+      onHide={()=>{
+        authContext.handleLoginModalClose();
+      }}
+      onShow={()=>{
+        resetForms();
+      }}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header closeButton>
+        {!registering && !props.allowRegistering? <Modal.Title>Session has ended, please log back in.</Modal.Title> : !registering && props.allowRegistering?
+<Modal.Title>Login</Modal.Title> : <Modal.Title>Register New Account</Modal.Title>
+        }
+      </Modal.Header>
+      <Modal.Body>
+        {registering && props.allowRegistering? <Form className="form-container">
+          <Form.Group className="mb-3" controlId="email">
+            <Form.Control
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="name">
+            <Form.Control
+              type="text"
+              placeholder="Display Name"
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="password">
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="passwordConfirm">
+            <Form.Control
+              type="password"
+              placeholder="Confirm Password"
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+            />
+          </Form.Group>
+          <Button
+            className="control-button"
+            variant="outline-secondary"
+            onClick={() => {
+              setRegistering(false);
+            }}
+          >
+            Login
+          </Button>
+          <Button
+            variant="outline-secondary"
+            onClick={() => {
+              register();
+            }}
+          >
+            Register
+          </Button>
+        </Form> : <Form className="form-container">
+          <Form.Group className="mb-3" controlId="email">
+            <Form.Control
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="password">
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+          <div className='button-container'>
+            <Button
+              variant="outline-secondary"
+              onClick={() => {
+                authContext.handleLoginModalClose();
+              }}
+            >Cancel
+            </Button>
+            <Button
+              variant="outline-secondary"
+              onClick={() => {
+                login();
+              }}
+            >Login
+            </Button>
+            {props.allowRegistering ? <Button
+              variant="outline-secondary"
+              onClick={() => {
+                setRegistering(true);
+              }}
+            >Register
+            </Button> : null}
+
+          </div>
+        </Form>}
+
+      </Modal.Body>
+    </Modal>
+
+
+  );
+}
+export default LoginModal;

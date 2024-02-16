@@ -8,8 +8,7 @@ import MainHeader from './components/mainHeader/mainHeader';
 import {React, useEffect, useState} from 'react';
 import Admin from './pages/Admin/Admin';
 import {AuthContext} from './contexts/Contexts';
-import LoginModal from './pages/Login/LoginModal';
-import Register from './pages/Register/Register';
+import LoginModal from './components/LoginModal/LoginModal';
 import {getLocalUser, getUserObjectFromJwt, removeLocalUser, setLocalUser} from './services/localStorageService';
 import Profile from './pages/Profile/Profile';
 import {apiServiceSecure, apiServiceUnsecure} from './services/apiService';
@@ -19,9 +18,13 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [allowRegistering, setAllowRegistering] = useState(false);
 
   const handleLoginModalClose = () => setShowLoginModal(false);
-  const handleLoginModalShow = () => setShowLoginModal(true);
+  const handleLoginModalShow = (allowRegistering) => {
+    setAllowRegistering(allowRegistering);
+    setShowLoginModal(true);
+  };
 
   const login = (jwtToken) => {
     localStorage.setItem('jwtToken', jwtToken);
@@ -73,7 +76,7 @@ function App() {
           ) {
             console.log('Access Token and Refresh Token both expired.');
             removeLocalUser();
-            handleLoginModalShow();
+            handleLoginModalShow(false);
           }
 
 
@@ -81,7 +84,7 @@ function App() {
             console.log('Access Token expired.');
             originalRequest._retry = true;
             try {
-              const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: getLocalUser()});
+              const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: jwtToken});
               setLocalUser(newAccessToken.data);
               console.log('Retrying with a new Access Token.');
             } catch (error) {
@@ -102,11 +105,11 @@ function App() {
 
   if (!isLoading) {
     return (
-      <AuthContext.Provider value={{user, isLoggedIn, login, logout, handleLoginModalShow, handleLoginModalClose, showLoginModal}}>
+      <AuthContext.Provider value={{user, isLoggedIn, login, logout, handleLoginModalShow, handleLoginModalClose}}>
         <div className="App" >
           <BrowserRouter>
             <MainHeader></MainHeader>
-            <LoginModal
+            <LoginModal allowRegistering={allowRegistering} showLoginModal={showLoginModal}
             ></LoginModal>
             <Routes>
               <Route
@@ -123,11 +126,6 @@ function App() {
                 exact
                 path="/admin"
                 element={<Admin currentWindowSize={currentWindowSize} />}
-              ></Route>
-              <Route
-                exact
-                path="/register"
-                element={<Register currentWindowSize={currentWindowSize} />}
               ></Route>
               <Route
                 exact

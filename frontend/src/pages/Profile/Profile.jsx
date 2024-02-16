@@ -8,29 +8,20 @@ import {useEffect} from 'react';
 function Profile(props) {
   const authContext = useContext(AuthContext);
 
-  const navigate = useNavigate();
-
-  const logoutHandler = () => {
-    authContext.logout();
-  };
-
-  console.log(authContext.isLoggedIn);
-
   useEffect(() => {
     console.log(authContext.isLoggedIn);
   }, [authContext.isLoggedIn]);
-  // <Navigate to={{pathname: '/login'}} />
   return (
     <div className="page-container">
       {authContext.isLoggedIn ? <div> <Button
         className=""
         variant="outline-secondary"
         onClick={() => {
-          logoutHandler();
+          authContext.logout();
         }}
       >
           Logout
-      </Button></div> : <Navigate to='/login' replace={true}></Navigate>}
+      </Button></div> : <Navigate to='/' replace={true}></Navigate>}
 
     </div>
   );

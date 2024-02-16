@@ -3,7 +3,7 @@ import {Button, Dropdown} from 'react-bootstrap';
 import {React, useContext, useState} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
 import {getLocalUser, getUserObjectFromJwt} from '../../services/localStorageService';
-import LoginModal from '../../pages/Login/LoginModal';
+import LoginModal from '../LoginModal/LoginModal';
 
 export default function MainHeader(props) {
   const authContext = useContext(AuthContext);
@@ -60,13 +60,13 @@ export default function MainHeader(props) {
               {authContext.user.name}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item href="/profile">Settings</Dropdown.Item>
+              <Dropdown.Item href="/profile">Profile</Dropdown.Item>
               { authContext.isLoggedIn && authContext.user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
               <Dropdown.Item onClick={authContext.logout}>Log Out</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div> :
-          <Button variant='outline-secondary' onClick={()=>authContext.handleLoginModalShow()}>Login</Button>
+          <Button variant='outline-secondary' onClick={()=>authContext.handleLoginModalShow(true)}>Login</Button>
         }
       </div>
     </div>
