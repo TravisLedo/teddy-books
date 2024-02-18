@@ -12,6 +12,17 @@ export const removeLocalUser = () => {
   localStorage.removeItem('jwtToken');
 };
 
+
+export const setOfflineSettings = (settings) => {
+  console.log(settings);
+  localStorage.setItem('offlineSettings', JSON.stringify(settings));
+};
+
+export const getOfflineSettings = () => {
+  return JSON.parse(localStorage.getItem('offlineSettings'));
+};
+
+
 export const getUserObjectFromJwt = (jwt) => {
   try {
     return jwtDecode(jwt);

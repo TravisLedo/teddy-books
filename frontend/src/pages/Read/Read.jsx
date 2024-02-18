@@ -1,4 +1,4 @@
-import {React, useState, useEffect, useRef} from 'react';
+import {React, useState, useEffect, useRef, useContext} from 'react';
 import {useParams} from 'react-router-dom';
 import {
   Row,
@@ -22,8 +22,11 @@ import {OverlayStatus} from '../../Enums/OverlayStatus';
 import {Voices} from '../../Enums/Voices';
 
 import ReadControlArea from '../../components/ReadControlArea/ReadControlArea';
+import {AuthContext} from '../../contexts/Contexts';
+import {getOfflineSettings, setOfflineSettings} from '../../services/localStorageService';
 
 function Read(props) {
+  const authContext = useContext(AuthContext);
   const audioPlayerRef = useRef();
   const carouselRef = useRef();
   const {bookId} = useParams();
@@ -32,18 +35,18 @@ function Read(props) {
   const [currentCarouselPage, setCurrentCarouselPage] = useState(0);
   const [audioSource, setAudioSource] = useState();
   const [started, setStarted] = useState(false);
-  const [voiceSelection, setVoiceSelection] = useState(Voices.OLIVIA.voice);
   const [canChangePage, setCanChangePage] = useState(true);
 
-  const [userSettings, setUserSettings] = useState({
-    autoNextPage: true,
-    audioEnabled: true,
-  });
+  const [voiceSelection, setVoiceSelection] = useState();
+  const [autoNextPage, setAutoNextPage] = useState();
+  const [audioEnabled, setAudioEnabled] = useState();
 
   const delayVoiceTime = 2000;
   const [timerDone, setTimerDone] = useState(false);
 
+
   const handlePageChanged = async (page) => {
+    console.log('test');
     audioPlayerRef.current.pause();
     setTimerDone(false);
     setCanChangePage(false);
@@ -77,7 +80,7 @@ function Read(props) {
   };
 
   const handleAutoNextPage = () => {
-    if (userSettings.autoNextPage) {
+    if (autoNextPage) {
       next(currentCarouselPage + 1);
     }
   };
@@ -104,7 +107,7 @@ function Read(props) {
     try {
       const result = await getBookById(bookId);
       setBook(result);
-      // console.log("test 1 " + JSON.stringify(result));
+      // console.log('test 1 ' + JSON.stringify(result));
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -123,30 +126,41 @@ function Read(props) {
   };
 
   const handleAutoNextPageToggle = () => {
-    userSettings.autoNextPage ?
-      setUserSettings({...userSettings, autoNextPage: false}) :
-      setUserSettings({...userSettings, autoNextPage: true});
+    if (autoNextPage) {
+      setOfflineSettings({...getOfflineSettings(), autoNextPage: false});
+      setAutoNextPage(false);
+    } else {
+      setOfflineSettings({...getOfflineSettings(), autoNextPage: true});
+      setAutoNextPage(true);
+    }
 
     if (audioPlayerRef.current.ended) {
       next();
     }
   };
 
-  const handleAudioOnToggle = () => {
-    if (userSettings.audioEnabled) {
+  const handleAudioEnabledToggle = () => {
+    if (audioEnabled) {
       audioPlayerRef.current.pause();
     } else {
       audioPlayerRef.current.play();
     }
-    userSettings.audioEnabled ?
-      setUserSettings({...userSettings, audioEnabled: false}) :
-      setUserSettings({...userSettings, audioEnabled: true});
+    if (audioEnabled) {
+      setOfflineSettings({...getOfflineSettings(), audioEnabled: false});
+      setAudioEnabled(false);
+    } else {
+      setOfflineSettings({...getOfflineSettings(), audioEnabled: true});
+      setAudioEnabled(true);
+    }
+  };
+
+  const handleVoiceSelectionChange = (voice) => {
+    setOfflineSettings({...getOfflineSettings(), voiceSelection: voice});
+    setVoiceSelection(voice);
   };
 
   useEffect(() => {
     fetchData();
-
-    // todo: use local storage to save user settings
   }, [bookId]);
 
   useEffect(() => {
@@ -168,18 +182,31 @@ function Read(props) {
     if (
       timerDone &&
       started &&
-      userSettings.audioEnabled &&
+      audioEnabled &&
       !audioPlayerRef.current.isPlaying
     ) {
       try {
         audioPlayerRef.current.play();
       } catch (error) {}
     }
-  }, [userSettings.audioEnabled, timerDone, started]);
+  }, [audioEnabled, timerDone, started]);
 
   useEffect(() => {
     handlePageChanged(currentCarouselPage);
   }, [voiceSelection]);
+
+  useEffect(() => {
+    if (authContext.user) {
+      setAudioEnabled(authContext.user.settings.audioEnabled);
+      setAutoNextPage(authContext.user.settings.autoNextPage);
+      setVoiceSelection(authContext.user.settings.voiceSelection);
+    } else {
+      const offlineSettings = getOfflineSettings();
+      setAudioEnabled(offlineSettings.audioEnabled);
+      setAutoNextPage(offlineSettings.autoNextPage);
+      setVoiceSelection(offlineSettings.voiceSelection);
+    }
+  }, []);
 
   const generatePages = bookImageSources.map((book, index) => (
     <PagePairs
@@ -307,10 +334,11 @@ function Read(props) {
               }}
             >
               <ReadControlArea
-                userSettings={userSettings}
                 voiceSelection={voiceSelection}
-                setVoiceSelection={setVoiceSelection}
-                handleAudioOnToggle={handleAudioOnToggle}
+                audioEnabled={audioEnabled}
+                autoNextPage={autoNextPage}
+                handleVoiceSelectionChange={handleVoiceSelectionChange}
+                handleAudioEnabledToggle={handleAudioEnabledToggle}
                 handleAutoNextPageToggle={handleAutoNextPageToggle}
               ></ReadControlArea>
             </Row>

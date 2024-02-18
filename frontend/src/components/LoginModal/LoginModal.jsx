@@ -74,7 +74,7 @@ function LoginModal(props) {
         ) : !registering && props.allowRegistering ? (
           <Modal.Title>Login</Modal.Title>
         ) : (
-          <Modal.Title>Register New Account</Modal.Title>
+          <Modal.Title>Create New Account</Modal.Title>
         )}
       </Modal.Header>
       <Modal.Body>

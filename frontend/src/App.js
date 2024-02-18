@@ -9,9 +9,10 @@ import {React, useEffect, useState} from 'react';
 import Admin from './pages/Admin/Admin';
 import {AuthContext} from './contexts/Contexts';
 import LoginModal from './components/LoginModal/LoginModal';
-import {getLocalUser, getUserObjectFromJwt, removeLocalUser, setLocalUser} from './services/localStorageService';
+import {getLocalUser, getOfflineSettings, getUserObjectFromJwt, removeLocalUser, setLocalUser, setOfflineSettings} from './services/localStorageService';
 import Profile from './pages/Profile/Profile';
-import {apiServiceSecure, apiServiceUnsecure} from './services/apiService';
+import {activateApiServiceSecureInterceptors, apiServiceSecure, apiServiceUnsecure} from './services/apiService';
+import {Voices} from './Enums/Voices';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -51,57 +52,26 @@ function App() {
   };
 
   useEffect(() => {
-    apiServiceSecure.interceptors.request.use(
-        (config) => {
-          const token = getLocalUser();
-          if (token) {
-            config.headers['Authorization'] = 'Bearer ' + token;
-          }
-          config.headers['Content-Type'] = 'application/json';
-          return config;
-        },
-        (error) => {
-          Promise.reject(error);
-        },
-    );
-
-    apiServiceSecure.interceptors.response.use(
-        function(response) {
-          return response;
-        },
-        async function(error) {
-          const originalRequest = error.config;
-          if (
-            error.response.status === 401 && originalRequest._retry
-          ) {
-            console.log('Access Token and Refresh Token both expired.');
-            removeLocalUser();
-            handleLoginModalShow(false);
-          }
-
-
-          if (error.response.status === 401 && !originalRequest._retry) {
-            console.log('Access Token expired.');
-            originalRequest._retry = true;
-            try {
-              const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: jwtToken});
-              setLocalUser(newAccessToken.data);
-              console.log('Retrying with a new Access Token.');
-            } catch (error) {
-            }
-            return apiServiceSecure(originalRequest);
-          }
-        },
-    );
+    activateApiServiceSecureInterceptors(handleLoginModalShow);
     window.addEventListener('resize', handleResize);
     const localJwtToken = getLocalUser();
     if (localJwtToken) {
       login(localJwtToken);
     } else {
       logout();
+      if (!getOfflineSettings()) {
+        setOfflineSettings(
+            {
+              voiceSelection: Voices.OLIVIA.voice,
+              autoNextPage: true,
+              audioEnabled: true,
+            },
+        );
+      }
     }
     setIsLoading(false);
   }, []);
+
 
   if (!isLoading) {
     return (

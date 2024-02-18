@@ -150,7 +150,7 @@ app.post('/books/witai/speak', async (req, res) => {
       res.status(200).send('empty.mp3');
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send(error);
   }
 });
@@ -167,14 +167,14 @@ app.post('/books/removeaudio', async (req, res) => {
       res.status(200).send('Temp fie removed');
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(201).send(error);
   }
 });
 
 app.post('/user/login', async (req, res) => {
   try {
-    const user = await User.findOne({email: req.body.email});
+    const user = await User.findOne({email: req.body.email, isBlocked: false});
     const validPassword = await bycrypt.compare(req.body.password, user.password);
     if (validPassword) {
       const accessToken = generateAccessToken(user);

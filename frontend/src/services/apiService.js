@@ -1,5 +1,6 @@
 // apiService.js
 import axios from 'axios';
+import {getLocalUser, removeLocalUser, setLocalUser} from './localStorageService';
 
 export const apiServiceUnsecure = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -14,6 +15,53 @@ export const apiServiceSecure = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
+  apiServiceSecure.interceptors.request.use(
+      (config) => {
+        const token = getLocalUser();
+        if (token) {
+          config.headers['Authorization'] = 'Bearer ' + token;
+        }
+        config.headers['Content-Type'] = 'application/json';
+        return config;
+      },
+      (error) => {
+        Promise.reject(error);
+      },
+  );
+
+  apiServiceSecure.interceptors.response.use(
+      function(response) {
+        return response;
+      },
+      async function(error) {
+        const originalRequest = error.config;
+        if (
+          error.response.status === 401 && originalRequest._retry
+        ) {
+          console.log('Access Token and Refresh Token both expired.');
+          removeLocalUser();
+          handleLoginModalShow(false);
+        }
+
+
+        if (error.response.status === 401 && !originalRequest._retry) {
+          console.log('Access Token expired.');
+          originalRequest._retry = true;
+          try {
+            const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: getLocalUser()});
+            setLocalUser(newAccessToken.data);
+            console.log('Retrying with a new Access Token.');
+          } catch (error) {
+            console.log(error);
+          }
+          return apiServiceSecure(originalRequest);
+        }
+      },
+  );
+};
+
 
 export const loginUser = async (userData) => {
   try {
