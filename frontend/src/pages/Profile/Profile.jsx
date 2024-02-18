@@ -8,12 +8,9 @@ import {useEffect} from 'react';
 function Profile(props) {
   const authContext = useContext(AuthContext);
 
-  useEffect(() => {
-    console.log(authContext.isLoggedIn);
-  }, [authContext.isLoggedIn]);
   return (
     <div className="page-container">
-      {authContext.isLoggedIn ? <div> <Button
+      <div> <Button
         className=""
         variant="outline-secondary"
         onClick={() => {
@@ -21,7 +18,7 @@ function Profile(props) {
         }}
       >
           Logout
-      </Button></div> : <Navigate to='/' replace={true}></Navigate>}
+      </Button></div>
 
     </div>
   );

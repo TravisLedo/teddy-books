@@ -24,7 +24,6 @@ function BookAccordion(props) {
   };
 
   const updateValues = async () => {
-    setEditing(false);
     setTitle(title);
     setAuthor(author);
     setPages(pages);
@@ -39,8 +38,8 @@ function BookAccordion(props) {
     };
 
     try {
-      const book = await updateBookById(newBookData);
-      console.log('Book Updated: ' + book.title);
+      await updateBookById(newBookData);
+      setEditing(false);
     } catch (error) {
     }
   };

@@ -13,6 +13,7 @@ import {
   generateImageLink,
   getAudioForPage,
   removeTempAudioFromServer,
+  updateUserById,
 } from '../../services/apiService';
 import {Carousel} from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
@@ -44,9 +45,7 @@ function Read(props) {
   const delayVoiceTime = 2000;
   const [timerDone, setTimerDone] = useState(false);
 
-
   const handlePageChanged = async (page) => {
-    console.log('test');
     audioPlayerRef.current.pause();
     setTimerDone(false);
     setCanChangePage(false);
@@ -133,13 +132,15 @@ function Read(props) {
       setOfflineSettings({...getOfflineSettings(), autoNextPage: true});
       setAutoNextPage(true);
     }
-
+    if (authContext.user) {
+      authContext.updateUserDbData();
+    }
     if (audioPlayerRef.current.ended) {
       next();
     }
   };
 
-  const handleAudioEnabledToggle = () => {
+  const handleAudioEnabledToggle = async () => {
     if (audioEnabled) {
       audioPlayerRef.current.pause();
     } else {
@@ -152,11 +153,17 @@ function Read(props) {
       setOfflineSettings({...getOfflineSettings(), audioEnabled: true});
       setAudioEnabled(true);
     }
+    if (authContext.user) {
+      authContext.updateUserDbData();
+    }
   };
 
   const handleVoiceSelectionChange = (voice) => {
     setOfflineSettings({...getOfflineSettings(), voiceSelection: voice});
     setVoiceSelection(voice);
+    if (authContext.user) {
+      authContext.updateUserDbData();
+    }
   };
 
   useEffect(() => {

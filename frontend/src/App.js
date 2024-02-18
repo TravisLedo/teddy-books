@@ -9,14 +9,13 @@ import {React, useEffect, useState} from 'react';
 import Admin from './pages/Admin/Admin';
 import {AuthContext} from './contexts/Contexts';
 import LoginModal from './components/LoginModal/LoginModal';
-import {getLocalUser, getOfflineSettings, getUserObjectFromJwt, removeLocalUser, setLocalUser, setOfflineSettings} from './services/localStorageService';
+import {getLocalUser, getOfflineSettings, decodeJwtToken, removeLocalUser, setLocalUser, setOfflineSettings} from './services/localStorageService';
 import Profile from './pages/Profile/Profile';
-import {activateApiServiceSecureInterceptors, apiServiceSecure, apiServiceUnsecure} from './services/apiService';
+import {activateApiServiceSecureInterceptors, apiServiceSecure, apiServiceUnsecure, getUserById, loginUser, updateUserById} from './services/apiService';
 import {Voices} from './Enums/Voices';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [allowRegistering, setAllowRegistering] = useState(false);
@@ -27,16 +26,33 @@ function App() {
     setShowLoginModal(true);
   };
 
-  const login = (jwtToken) => {
-    localStorage.setItem('jwtToken', jwtToken);
-    setUser(getUserObjectFromJwt(jwtToken).user);
-    setIsLoggedIn(true);
+  const login = async (jwtToken) => {
+    try {
+      const decodedJwtToken = decodeJwtToken(jwtToken);
+      const userResult = await getUserById(decodedJwtToken._id);
+      setUser(userResult);
+      localStorage.setItem('jwtToken', jwtToken);
+      setOfflineSettings(userResult.settings);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const logout = () => {
     removeLocalUser();
     setUser(null);
-    setIsLoggedIn(false);
+  };
+
+  const updateUserDbData = async ()=>{
+    const userWithNewSettings = user;
+    userWithNewSettings.settings = getOfflineSettings();
+    try {
+      setUser(userWithNewSettings);
+      const updatedUser = await updateUserById(userWithNewSettings);
+      setUser(updatedUser);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const [currentWindowSize, setCurrentWindowSize] = useState({
@@ -52,11 +68,14 @@ function App() {
   };
 
   useEffect(() => {
-    activateApiServiceSecureInterceptors(handleLoginModalShow);
+    activateApiServiceSecureInterceptors(handleLoginModalShow, logout);
     window.addEventListener('resize', handleResize);
     const localJwtToken = getLocalUser();
     if (localJwtToken) {
       login(localJwtToken);
+      if (user) {
+        setOfflineSettings(user.settings);
+      }
     } else {
       logout();
       if (!getOfflineSettings()) {
@@ -72,10 +91,9 @@ function App() {
     setIsLoading(false);
   }, []);
 
-
   if (!isLoading) {
     return (
-      <AuthContext.Provider value={{user, isLoggedIn, login, logout, handleLoginModalShow, handleLoginModalClose}}>
+      <AuthContext.Provider value={{user, setUser, updateUserDbData, login, logout, handleLoginModalShow, handleLoginModalClose}}>
         <div className="App" >
           <BrowserRouter>
             <MainHeader></MainHeader>
@@ -95,12 +113,12 @@ function App() {
               <Route
                 exact
                 path="/admin"
-                element={<Admin currentWindowSize={currentWindowSize} />}
+                element={user && user.isAdmin? <Admin currentWindowSize={currentWindowSize} /> : <Books currentWindowSize={currentWindowSize} ></Books>}
               ></Route>
               <Route
                 exact
                 path="/profile"
-                element={<Profile currentWindowSize={currentWindowSize} />}
+                element={user ? <Profile currentWindowSize={currentWindowSize} /> : <Books currentWindowSize={currentWindowSize} ></Books>}
               ></Route>
               <Route
                 exact

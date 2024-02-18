@@ -32,17 +32,21 @@ mongoose
 
 app.post('/token/refresh', async (req, res) => {
   const currentAccessToken = req.body.token;
-  const userData = jwtDecode(currentAccessToken).user;
   try {
-    const refreshTokenReponse = await RefreshToken.findOne({userId: userData
+    const currentJwtUser = jwtDecode(currentAccessToken);
+    console.log(currentJwtUser);
+    const refreshTokenReponse = await RefreshToken.findOne({userId: currentJwtUser
         ._id});
+    console.log(refreshTokenReponse);
 
-    jwt.verify(refreshTokenReponse.token, process.env.JWT_SECRET, (err) => {
+    jwt.verify(refreshTokenReponse.token, process.env.JWT_SECRET, async (err) => {
       if (err) {
         console.log('refresh token expired too. Log user out.');
         res.sendStatus(401);
       } else {
-        const accessToken = generateAccessToken(userData);
+        const userData = await User.findById(currentJwtUser._id);
+        const userJwt = {_id: userData._id, email: userData.email};
+        const accessToken = generateAccessToken(userJwt);
         res.status(200).send(accessToken);
       }
     });
@@ -100,7 +104,7 @@ app.put('/books/update', authenthicateJwtToken, async (req, res) => {
       text: req.body.bookData.text,
     };
     await Book.findByIdAndUpdate(req.body.bookData._id, newBookValues);
-    res.status(200).send(newBookValues);
+    res.status(200).send('Updated book data.');
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
@@ -172,13 +176,14 @@ app.post('/books/removeaudio', async (req, res) => {
   }
 });
 
-app.post('/user/login', async (req, res) => {
+app.post('/users/login', async (req, res) => {
   try {
     const user = await User.findOne({email: req.body.email, isBlocked: false});
     const validPassword = await bycrypt.compare(req.body.password, user.password);
     if (validPassword) {
-      const accessToken = generateAccessToken(user);
-      await RefreshToken.findOneAndUpdate({userId: user._id}, {userId: user._id, token: generateRefreshToken(user)}, {upsert: true});
+      const userJwt = {_id: user._id, email: user.email};
+      const accessToken = generateAccessToken(userJwt);
+      await RefreshToken.findOneAndUpdate({userId: user._id}, {userId: user._id, token: generateRefreshToken(userJwt)}, {upsert: true});
       res.status(200).send(accessToken);
     } else {
       res.status(401).send('Login Failed.');
@@ -189,8 +194,18 @@ app.post('/user/login', async (req, res) => {
   }
 });
 
+app.get('/users/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.status(200).send(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
 
-app.post('/user/add', async (req, res) => {
+
+app.post('/users/add', async (req, res) => {
   try {
     const hash = await bycrypt.hash(req.body.password, 10);
     const user = new User({
@@ -199,12 +214,23 @@ app.post('/user/add', async (req, res) => {
       name: req.body.name,
     });
     const newUser = await user.save();
-    const accessToken = generateAccessToken(newUser);
-    const refreshToken = new RefreshToken({userId: newUser._id, token: generateRefreshToken(newUser)});
+    const userJwt = {_id: newUser._id, email: newUser.email};
+    const accessToken = generateAccessToken(userJwt);
+    const refreshToken = new RefreshToken({userId: userJwt._id, token: generateRefreshToken(userJwt)});
     await refreshToken.save(refreshToken);
     res.status(200).send(accessToken);
   } catch (error) {
     console.log(error);
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+app.put('/users/update', authenthicateJwtToken, async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, req.body.userData);
+    res.status(200).send(updatedUser);
+  } catch (error) {
     console.log(error);
     res.status(500).send(error);
   }
@@ -250,13 +276,13 @@ const generateFolderNameFromTitle = (title) => {
   return title.trim().replaceAll(' ', '_').toLowerCase();
 };
 
-function generateAccessToken(user) {
-  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '10s'});
+function generateAccessToken(userJwt) {
+  return jwt.sign(userJwt, process.env.JWT_SECRET, {expiresIn: '10s'});
 }
 
 
-function generateRefreshToken(user) {
-  return jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '20s'});
+function generateRefreshToken(jwtValues) {
+  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '20s'});
 }
 
 function authenthicateJwtToken(req, res, next ) {

@@ -8,7 +8,7 @@ import add from '../../assets/images/add.png';
 import {Button, Image} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import {Navigate} from 'react-router-dom';
-import {getLocalUser, getUserObjectFromJwt} from '../../services/localStorageService';
+import {getLocalUser, decodeJwtToken} from '../../services/localStorageService';
 
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
@@ -43,7 +43,7 @@ function Admin(props) {
 
   return (
     <div>
-      {authContext.isLoggedIn && authContext.user.isAdmin ? <div style={{width: '80%', margin: 'auto'}}>
+      {authContext.user.isAdmin ? <div style={{width: '80%', margin: 'auto'}}>
         <div
           style={{
             display: 'flex',
@@ -84,7 +84,7 @@ function Admin(props) {
           handleBookModalShow={handleBookModalShow}
           addBook={addBook}
         ></AddBookModal>
-      </div> : <Navigate to='/' replace={true}></Navigate>
+      </div> : null
 
       }
 

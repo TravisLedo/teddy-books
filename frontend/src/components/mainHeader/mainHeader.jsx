@@ -2,7 +2,7 @@ import Nav from 'react-bootstrap/Nav';
 import {Button, Dropdown} from 'react-bootstrap';
 import {React, useContext, useState} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
-import {getLocalUser, getUserObjectFromJwt} from '../../services/localStorageService';
+import {getLocalUser, decodeJwtToken} from '../../services/localStorageService';
 import LoginModal from '../LoginModal/LoginModal';
 
 export default function MainHeader(props) {
@@ -53,7 +53,7 @@ export default function MainHeader(props) {
         />
       </Nav.Link>
       <div style={{position: 'absolute', right: 20, display: 'flex'}}>
-        {authContext.isLoggedIn && authContext.user ? <div>
+        {authContext.user && getLocalUser() ? <div>
 
           <Dropdown className='standard-button'>
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
@@ -61,7 +61,7 @@ export default function MainHeader(props) {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-              { authContext.isLoggedIn && authContext.user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
+              { authContext.user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
               <Dropdown.Item onClick={authContext.logout}>Log Out</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

@@ -16,7 +16,7 @@ export const apiServiceSecure = axios.create({
   },
 });
 
-export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
+export const activateApiServiceSecureInterceptors = (handleLoginModalShow, logout)=>{
   apiServiceSecure.interceptors.request.use(
       (config) => {
         const token = getLocalUser();
@@ -65,7 +65,17 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
 
 export const loginUser = async (userData) => {
   try {
-    const response = await apiServiceUnsecure.post('/user/login', userData);
+    const response = await apiServiceUnsecure.post('/users/login', userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const getUserById = async (_id) => {
+  try {
+    const response = await apiServiceSecure.get('/users/' + _id);
     return response.data;
   } catch (error) {
     throw error;
@@ -74,7 +84,7 @@ export const loginUser = async (userData) => {
 
 export const addNewUser = async (userData) => {
   try {
-    const response = await apiServiceUnsecure.post('/user/add', userData);
+    const response = await apiServiceUnsecure.post('/users/add', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -85,6 +95,16 @@ export const addNewUser = async (userData) => {
 export const getAllBooks = async () => {
   try {
     const response = await apiServiceUnsecure.get('/books/all');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const updateUserById = async (userData) => {
+  try {
+    const response = await apiServiceSecure.put('/users/update', {userData});
     return response.data;
   } catch (error) {
     throw error;
@@ -143,7 +163,6 @@ export const getAudioForPage = async (
       rightPage: rightPage,
       voiceSelected: voiceSelection,
     });
-    console.log(response);
     return response;
   } catch (error) {
     console.log(error);
