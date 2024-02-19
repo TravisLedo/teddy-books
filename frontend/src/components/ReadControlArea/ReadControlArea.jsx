@@ -13,16 +13,12 @@ import {Voices} from '../../Enums/Voices';
 import './ReadControlArea.css';
 
 export default function ReadControlArea(props) {
-  useEffect(() => {
-    console.log(props.audioEnabled);
-  }, [props.audioEnabled]);
-
   return (
     <>
       <div style={{width: 'auto'}}>
         <OverlayTrigger
           overlay={(props) => <Tooltip {...props}>Toggle Voice</Tooltip>}
-          placement="bottom"
+          placement="top"
         >
           <Button
             variant="outline-secondary"
@@ -38,11 +34,13 @@ export default function ReadControlArea(props) {
       </div>
       <div style={{width: 'auto'}}>
         <OverlayTrigger
-          overlay={(props) => <Tooltip {...props}>Select Voice</Tooltip>}
-          placement="bottom"
+          overlay={(e) =>
+            <Tooltip {...e}>{props.voiceSelectionAllowed ? <div>Select Voice</div> :<div>Log in for more voices.</div>}</Tooltip>}
+          placement="top"
         >
           <Dropdown drop="up">
             <Dropdown.Toggle
+              disabled={!props.voiceSelectionAllowed}
               variant="outline-secondary"
               className="control-button"
             >
@@ -106,7 +104,7 @@ export default function ReadControlArea(props) {
       <div style={{width: 'auto'}}>
         <OverlayTrigger
           overlay={(props) => <Tooltip {...props}>Toggle Auto Next</Tooltip>}
-          placement="bottom"
+          placement="top"
         >
           <Button
             variant="outline-secondary"

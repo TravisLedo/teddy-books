@@ -13,7 +13,6 @@ import {
   generateImageLink,
   getAudioForPage,
   removeTempAudioFromServer,
-  updateUserById,
 } from '../../services/apiService';
 import {Carousel} from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
@@ -38,6 +37,7 @@ function Read(props) {
   const [started, setStarted] = useState(false);
 
   const [voiceSelection, setVoiceSelection] = useState();
+  const [voiceSelectionAllowed, setVoiceSelectionAllowed] = useState(false);
   const [autoNextPage, setAutoNextPage] = useState();
   const [audioEnabled, setAudioEnabled] = useState();
 
@@ -203,13 +203,15 @@ function Read(props) {
       setAudioEnabled(authContext.user.settings.audioEnabled);
       setAutoNextPage(authContext.user.settings.autoNextPage);
       setVoiceSelection(authContext.user.settings.voiceSelection);
+      setVoiceSelectionAllowed(true);
     } else {
       const offlineSettings = getOfflineSettings();
       setAudioEnabled(offlineSettings.audioEnabled);
       setAutoNextPage(offlineSettings.autoNextPage);
       setVoiceSelection(offlineSettings.voiceSelection);
+      setVoiceSelectionAllowed(false);
     }
-  }, []);
+  }, [authContext.user]);
 
   const generatePages = bookImageSources.map((book, index) => (
     <PagePairs
@@ -340,6 +342,7 @@ function Read(props) {
             >
               <ReadControlArea
                 voiceSelection={voiceSelection}
+                voiceSelectionAllowed={voiceSelectionAllowed}
                 audioEnabled={audioEnabled}
                 autoNextPage={autoNextPage}
                 handleVoiceSelectionChange={handleVoiceSelectionChange}
