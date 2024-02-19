@@ -23,7 +23,7 @@ import emptyAudio from '../../assets/audio/empty.mp3';
 
 import ReadControlArea from '../../components/ReadControlArea/ReadControlArea';
 import {AuthContext} from '../../contexts/Contexts';
-import {getOfflineSettings, setOfflineSettings} from '../../services/localStorageService';
+import {getLocalUser, getOfflineSettings, setOfflineSettings} from '../../services/localStorageService';
 
 function Read(props) {
   const authContext = useContext(AuthContext);
@@ -94,16 +94,23 @@ function Read(props) {
     }
   };
 
-  const handleAutoNextPageToggle = () => {
-    if (autoNextPage) {
-      setOfflineSettings({...getOfflineSettings(), autoNextPage: false});
-      setAutoNextPage(false);
+  const handleAutoNextPageToggle = async () => {
+    if (authContext.user && getLocalUser()) {
+      const newUserData = authContext.user;
+      if (autoNextPage) {
+        newUserData.settings.autoNextPage = false;
+      } else {
+        newUserData.settings.autoNextPage = true;
+      }
+      await authContext.updateUserDbData(newUserData);
     } else {
-      setOfflineSettings({...getOfflineSettings(), autoNextPage: true});
-      setAutoNextPage(true);
-    }
-    if (authContext.user) {
-      authContext.updateUserDbData();
+      if (autoNextPage) {
+        setOfflineSettings({...getOfflineSettings(), autoNextPage: false});
+        setAutoNextPage(false);
+      } else {
+        setOfflineSettings({...getOfflineSettings(), autoNextPage: true});
+        setAutoNextPage(true);
+      }
     }
     if (audioPlayerRef.current.ended) {
       next();
@@ -116,15 +123,22 @@ function Read(props) {
     } else {
       audioPlayerRef.current.play();
     }
-    if (audioEnabled) {
-      setOfflineSettings({...getOfflineSettings(), audioEnabled: false});
-      setAudioEnabled(false);
+    if (authContext.user && getLocalUser()) {
+      const newUserData = authContext.user;
+      if (audioEnabled) {
+        newUserData.settings.audioEnabled = false;
+      } else {
+        newUserData.settings.audioEnabled = true;
+      }
+      await authContext.updateUserDbData(newUserData);
     } else {
-      setOfflineSettings({...getOfflineSettings(), audioEnabled: true});
-      setAudioEnabled(true);
-    }
-    if (authContext.user) {
-      authContext.updateUserDbData();
+      if (audioEnabled) {
+        setOfflineSettings({...getOfflineSettings(), audioEnabled: false});
+        setAudioEnabled(false);
+      } else {
+        setOfflineSettings({...getOfflineSettings(), audioEnabled: true});
+        setAudioEnabled(true);
+      }
     }
   };
 

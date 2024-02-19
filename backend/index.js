@@ -17,6 +17,7 @@ app.use(cors());
 require('dotenv').config();
 const bycrypt = require('bcrypt');
 const {jwtDecode} = require('jwt-decode');
+const {error} = require('console');
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}.`);
@@ -31,8 +32,8 @@ mongoose
 
 
 app.post('/token/refresh', async (req, res) => {
-  const currentAccessToken = req.body.token;
   try {
+    const currentAccessToken = req.body.token;
     const currentJwtUser = jwtDecode(currentAccessToken);
     const refreshTokenReponse = await RefreshToken.findOne({userId: currentJwtUser
         ._id});
@@ -110,15 +111,15 @@ app.put('/books/update', authenthicateJwtToken, async (req, res) => {
 });
 
 app.post('/books/witai/speak', async (req, res) => {
-  const config = {
-    headers: {
-      Authorization: `Bearer ${process.env.WIT_AI_TOKEN}`,
-      Accept: 'audio/mpeg',
-    },
-    responseType: 'stream',
-  };
-
   try {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${process.env.WIT_AI_TOKEN}`,
+        Accept: 'audio/mpeg',
+      },
+      responseType: 'stream',
+    };
+
     const finalText =
       parsePageText(req.body.leftPage, req.body.book.text) +
       parsePageText(req.body.rightPage, req.body.book.text);
@@ -158,8 +159,8 @@ app.post('/books/witai/speak', async (req, res) => {
 });
 
 app.post('/books/removeaudio', async (req, res) => {
-  const DIR_PATH = './public';
   try {
+    const DIR_PATH = './public';
     if (req.body.file.contains('temp')) {
       fs.unlink(DIR_PATH + '/' + req.body.file, (err) => {
         if (err) {
@@ -186,6 +187,17 @@ app.post('/users/login', async (req, res) => {
     } else {
       res.status(401).send('Login Failed.');
     }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+
+app.post('/users/autoLogin', authenthicateJwtToken, async (req, res) => {
+  try {
+    const user = await User.findOne({email: req.body.email, isBlocked: false});
+    res.status(200).send(user);
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
@@ -223,9 +235,9 @@ app.post('/users/add', async (req, res) => {
   }
 });
 
-app.put('/users/update', authenthicateJwtToken, async (req, res) => {
+app.put('/users/update', async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, req.body.userData);
+    const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, req.body.userData, {new: true});
     res.status(200).send(updatedUser);
   } catch (error) {
     console.log(error);
@@ -238,23 +250,27 @@ app.put('/users/update', authenthicateJwtToken, async (req, res) => {
 // Files older than 1 minute will be removed.
 // Check runs every minute
 schedule.scheduleJob('*/1 * * * *', function() {
-  deleteOldFiles('./public/temp').catch();
+  deleteOldFiles('./public/temp');
 });
 
 async function deleteOldFiles(path) {
-  const dir = await fs.promises.opendir(path);
-  for await (const dirent of dir) {
-    const fileDate = new Date(fs.statSync(path + '/' + dirent.name).birthtime);
-    const oneMinute = 1000 * 60 * 1;
-    const anHourAgo = Date.now() - oneMinute;
+  try {
+    const dir = await fs.promises.opendir(path);
+    for await (const dirent of dir) {
+      const fileDate = new Date(fs.statSync(path + '/' + dirent.name).birthtime);
+      const oneMinute = 1000 * 60 * 1;
+      const anHourAgo = Date.now() - oneMinute;
 
-    if (fileDate < anHourAgo) {
-      fs.unlink(path + '/' + dirent.name, (err) => {
-        if (err) {
-          throw err;
-        }
-      });
+      if (fileDate < anHourAgo) {
+        fs.unlink(path + '/' + dirent.name, (error) => {
+          if (error) {
+            console.log(error);
+          }
+        });
+      }
     }
+  } catch (error) {
+    console.log(error);
   }
 }
 

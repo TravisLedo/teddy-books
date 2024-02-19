@@ -25,14 +25,12 @@ function LoginModal(props) {
 
   const login = async () => {
     try {
-      const tokenResponse = await loginUser({
+      const user ={
         email: email,
         password: password,
-      });
-      if (tokenResponse) {
-        authContext.login(tokenResponse);
-        authContext.handleLoginModalClose();
-      }
+      };
+      authContext.login(user);
+      authContext.handleLoginModalClose();
     } catch (error) {
       console.log('Error Logging in: ', error);
     }

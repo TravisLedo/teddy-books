@@ -16,7 +16,7 @@ export const apiServiceSecure = axios.create({
   },
 });
 
-export const activateApiServiceSecureInterceptors = (handleLoginModalShow, logout)=>{
+export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
   apiServiceSecure.interceptors.request.use(
       (config) => {
         const token = getLocalUser();
@@ -45,14 +45,13 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow, logou
           handleLoginModalShow(false);
         }
 
-
         if (error.response.status === 401 && !originalRequest._retry) {
           console.log('Access Token expired.');
           originalRequest._retry = true;
           try {
             const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: getLocalUser()});
             setLocalUser(newAccessToken.data);
-            console.log('Retrying with a new Access Token.');
+            console.log('Using new Access Token.');
           } catch (error) {
             console.log(error);
           }
@@ -66,6 +65,15 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow, logou
 export const loginUser = async (userData) => {
   try {
     const response = await apiServiceUnsecure.post('/users/login', userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const autoLoginUser = async (userData) => {
+  try {
+    const response = await apiServiceSecure.post('/users/autologin', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -104,7 +112,7 @@ export const getAllBooks = async () => {
 
 export const updateUserById = async (userData) => {
   try {
-    const response = await apiServiceSecure.put('/users/update', {userData});
+    const response = await apiServiceUnsecure.put('/users/update', {userData});
     return response.data;
   } catch (error) {
     throw error;

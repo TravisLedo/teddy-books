@@ -1,9 +1,8 @@
-import Nav from 'react-bootstrap/Nav';
+import {Link} from 'react-router-dom';
 import {Button, Dropdown} from 'react-bootstrap';
-import {React, useContext, useState} from 'react';
+import {React, useContext} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
-import {getLocalUser, decodeJwtToken} from '../../services/localStorageService';
-import LoginModal from '../LoginModal/LoginModal';
+import {getLocalUser} from '../../services/localStorageService';
 
 export default function MainHeader(props) {
   const authContext = useContext(AuthContext);
@@ -30,8 +29,8 @@ export default function MainHeader(props) {
       }}
     >
 
-      <Nav.Link
-        href="/"
+      <Link
+        to={'/'}
         style={{
           justifyContent: 'center',
           alignSelf: 'center',
@@ -51,7 +50,7 @@ export default function MainHeader(props) {
           src={require('../../assets/images/logo.png')}
           alt="logo"
         />
-      </Nav.Link>
+      </Link>
       <div style={{position: 'absolute', right: 20, display: 'flex'}}>
         {authContext.user && getLocalUser() ? <div>
 
@@ -60,8 +59,8 @@ export default function MainHeader(props) {
               {authContext.user.name}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-              { authContext.user.isAdmin ? <Dropdown.Item href="/admin">Admin</Dropdown.Item> : null}
+              <Dropdown.Item as={Link} to={'/profile'}>Profile</Dropdown.Item>
+              { authContext.user.isAdmin ? <Dropdown.Item as={Link} to={'/admin'}>Admin</Dropdown.Item> : null}
               <Dropdown.Item onClick={authContext.logout}>Log Out</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

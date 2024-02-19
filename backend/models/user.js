@@ -7,6 +7,8 @@ const userSchema = mongoose.Schema({
   name: {type: String, required: true},
   isAdmin: {type: Boolean, default: false},
   isBlocked: {type: Boolean, default: false},
+  dateJoined: {type: Boolean, default: false},
+  lastModified: {type: Boolean, default: false},
   settings: {
     autoNextPage: {type: Boolean, default: true},
     audioEnabled: {type: Boolean, default: true},
