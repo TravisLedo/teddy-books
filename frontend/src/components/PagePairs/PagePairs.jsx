@@ -1,10 +1,14 @@
 import Image from 'react-bootstrap/Image';
 import {Row, Col} from 'react-bootstrap';
-import React from 'react';
+import React, {useState} from 'react';
+import blank from '../../assets/images/blank.png';
 
 import './PagePairs.css';
 import PageNavigateButtons from '../PageNavigateButtons/PageNavigateButtons';
 export default function PagePairs(props) {
+  const [leftImage, setLeftImage] = useState(props.bookImageSources[props.index].leftImage);
+  const [rightImage, setRightImage] = useState(props.bookImageSources[props.index].rightImage);
+
   return (
     <div
       style={{
@@ -44,7 +48,8 @@ export default function PagePairs(props) {
             >
               <Image
                 rounded
-                src={props.bookImageSources[props.index].leftImage}
+                onError={()=>setLeftImage(blank)}
+                src={leftImage}
                 alt=""
                 style={{
                   maxWidth: '99%',
@@ -71,7 +76,8 @@ export default function PagePairs(props) {
             >
               <Image
                 rounded
-                src={props.bookImageSources[props.index].rightImage}
+                onError={()=>setRightImage(blank)}
+                src={rightImage}
                 alt=""
                 style={{
                   maxWidth: '99%',
@@ -116,7 +122,8 @@ export default function PagePairs(props) {
             >
               <Image
                 rounded
-                src={props.bookImageSources[props.index].leftImage}
+                onError={()=>setLeftImage(blank)}
+                src={leftImage}
                 alt=""
                 style={{
                   maxWidth: '99%',
@@ -151,7 +158,8 @@ export default function PagePairs(props) {
             >
               <Image
                 rounded
-                src={props.bookImageSources[props.index].rightImage}
+                onError={()=>setRightImage(blank)}
+                src={rightImage}
                 alt=""
                 style={{
                   maxWidth: '99%',

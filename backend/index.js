@@ -34,10 +34,8 @@ app.post('/token/refresh', async (req, res) => {
   const currentAccessToken = req.body.token;
   try {
     const currentJwtUser = jwtDecode(currentAccessToken);
-    console.log(currentJwtUser);
     const refreshTokenReponse = await RefreshToken.findOne({userId: currentJwtUser
         ._id});
-    console.log(refreshTokenReponse);
 
     jwt.verify(refreshTokenReponse.token, process.env.JWT_SECRET, async (err) => {
       if (err) {
@@ -220,7 +218,6 @@ app.post('/users/add', async (req, res) => {
     await refreshToken.save(refreshToken);
     res.status(200).send(accessToken);
   } catch (error) {
-    console.log(error);
     console.log(error);
     res.status(500).send(error);
   }

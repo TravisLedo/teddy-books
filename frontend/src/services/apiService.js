@@ -165,7 +165,6 @@ export const getAudioForPage = async (
     });
     return response;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

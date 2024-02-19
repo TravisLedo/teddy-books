@@ -20,7 +20,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import PagePairs from '../../components/PagePairs/PagePairs';
 import OverlayScreen from '../../components/OverlayScreen/OverlayScreen';
 import {OverlayStatus} from '../../Enums/OverlayStatus';
-import {Voices} from '../../Enums/Voices';
+import emptyAudio from '../../assets/audio/empty.mp3';
 
 import ReadControlArea from '../../components/ReadControlArea/ReadControlArea';
 import {AuthContext} from '../../contexts/Contexts';
@@ -36,7 +36,6 @@ function Read(props) {
   const [currentCarouselPage, setCurrentCarouselPage] = useState(0);
   const [audioSource, setAudioSource] = useState();
   const [started, setStarted] = useState(false);
-  const [canChangePage, setCanChangePage] = useState(true);
 
   const [voiceSelection, setVoiceSelection] = useState();
   const [autoNextPage, setAutoNextPage] = useState();
@@ -45,36 +44,11 @@ function Read(props) {
   const delayVoiceTime = 2000;
   const [timerDone, setTimerDone] = useState(false);
 
+
   const handlePageChanged = async (page) => {
     audioPlayerRef.current.pause();
     setTimerDone(false);
-    setCanChangePage(false);
     setAudioSource(null);
-
-    let leftPage = 0;
-    let rightPage = 0;
-    // skipping pages because they come in pairs
-    if (page === 0) {
-      leftPage = 1;
-      rightPage = 2;
-    } else {
-      leftPage = page * 2 + 1;
-      rightPage = leftPage + 1;
-    }
-
-    try {
-      const audio = await getAudioForPage(
-          book,
-          leftPage,
-          rightPage,
-          voiceSelection,
-      );
-      setAudioSource(process.env.REACT_APP_URL + '/' + audio.data);
-      setCanChangePage(true);
-    } catch (error) {
-      console.log(error);
-      setCanChangePage(true);
-    }
     setCurrentCarouselPage(page);
   };
 
@@ -95,10 +69,8 @@ function Read(props) {
       pairedImages.push({
         leftImage: images[index],
         rightImage: images[index + 1],
-        loaded: false,
       });
     }
-
     setBookImageSources(pairedImages);
   };
 
@@ -106,20 +78,19 @@ function Read(props) {
     try {
       const result = await getBookById(bookId);
       setBook(result);
-      // console.log('test 1 ' + JSON.stringify(result));
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   }
 
   const back = () => {
-    if (currentCarouselPage > 0 && canChangePage) {
+    if (currentCarouselPage > 0) {
       setCurrentCarouselPage(currentCarouselPage - 1);
     }
   };
 
   const next = () => {
-    if (currentCarouselPage < book.pages - 1 && canChangePage) {
+    if (currentCarouselPage < book.pages - 1) {
       setCurrentCarouselPage(currentCarouselPage + 1);
     }
   };
@@ -192,9 +163,34 @@ function Read(props) {
       audioEnabled &&
       !audioPlayerRef.current.isPlaying
     ) {
-      try {
-        audioPlayerRef.current.play();
-      } catch (error) {}
+      const handleAudio = async ()=>{
+        let leftPage = 0;
+        let rightPage = 0;
+        // skipping pages because they come in pairs
+        if (currentCarouselPage === 0) {
+          leftPage = 1;
+          rightPage = 2;
+        } else {
+          leftPage = currentCarouselPage * 2 + 1;
+          rightPage = leftPage + 1;
+        }
+        try {
+          const audio = await getAudioForPage(
+              book,
+              leftPage,
+              rightPage,
+              voiceSelection,
+          );
+          if (audio.data === 'empty.mp3') {
+            setAudioSource(emptyAudio);
+          } else {
+            setAudioSource(process.env.REACT_APP_URL + '/' + audio.data);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      handleAudio();
     }
   }, [audioEnabled, timerDone, started]);
 
@@ -231,16 +227,18 @@ function Read(props) {
   return (
     <div className="page">
       <audio
-        // autoPlay={userSettings.audioOn && timerDone}
+        autoPlay={true}
         onEnded={() => {
           handleAutoNextPage();
         }}
         src={audioSource}
         onPlay={(e) => {
           try {
-            removeTempAudioFromServer(
-                audioSource.replace(process.env.REACT_APP_URL + '/', ''),
-            );
+            if (audioSource !== emptyAudio) {
+              removeTempAudioFromServer(
+                  audioSource.replace(process.env.REACT_APP_URL + '/', ''),
+              );
+            }
           } catch (error) {}
         }}
         ref={audioPlayerRef}
