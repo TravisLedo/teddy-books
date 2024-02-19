@@ -44,7 +44,6 @@ function Read(props) {
   const delayVoiceTime = 2000;
   const [timerDone, setTimerDone] = useState(false);
 
-
   const handlePageChanged = async (page) => {
     audioPlayerRef.current.pause();
     setTimerDone(false);
@@ -90,7 +89,7 @@ function Read(props) {
   };
 
   const next = () => {
-    if (currentCarouselPage < book.pages - 1) {
+    if (currentCarouselPage < (book.pages/2)-1) {
       setCurrentCarouselPage(currentCarouselPage + 1);
     }
   };
