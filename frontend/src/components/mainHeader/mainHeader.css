@@ -1,3 +1,41 @@
-.dropdown-content{
-  color:black
+.main-navbar {
+  display: flex;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  z-index: 99;
+  height: 50px;
+  width: 100vw;
+  background-color: #FFF;
+  border-color: black;
+  border-style: solid;
+  border: 0;
+  border-bottom-width: 1;
+  box-shadow: 1px 5px 5px rgb(0 0 0 / 50%);
+  position: fixed;
+}
+
+.logo-link {
+  justify-content: center;
+  align-self: center;
+  max-width: 60%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-image {
+  justify-content: center;
+  align-self: center;
+  width: 100%;
+  height: 100%;
+  object-fit: 'contain',
+}
+
+.menu-button-container {
+  position: absolute;
+  right: 20px;
+  display: flex;
 }

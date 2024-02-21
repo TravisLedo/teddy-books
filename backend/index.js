@@ -290,12 +290,12 @@ const generateFolderNameFromTitle = (title) => {
 };
 
 function generateAccessToken(userJwt) {
-  return jwt.sign(userJwt, process.env.JWT_SECRET, {expiresIn: '10s'});
+  return jwt.sign(userJwt, process.env.JWT_SECRET, {expiresIn: '10m'});
 }
 
 
 function generateRefreshToken(jwtValues) {
-  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '20s'});
+  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '20m'});
 }
 
 function authenthicateJwtToken(req, res, next ) {

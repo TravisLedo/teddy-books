@@ -1,29 +1,27 @@
 import {React, useState, useEffect, useRef, useContext} from 'react';
 import {useParams} from 'react-router-dom';
-import {
-  Row,
-  Col,
-
-} from 'react-bootstrap';
+import {Row} from 'react-bootstrap';
 import ProgressBar from '@ramonak/react-progress-bar';
-
-import './Read.css';
+import {Carousel} from 'react-responsive-carousel';
+import PagePairs from '../../components/PagePairs/PagePairs';
+import OverlayScreen from '../../components/OverlayScreen/OverlayScreen';
+import {OverlayStatus} from '../../Enums/OverlayStatus';
+import emptyAudio from '../../assets/audio/empty.mp3';
+import ReadControlArea from '../../components/ReadControlArea/ReadControlArea';
+import {AuthContext} from '../../contexts/Contexts';
+import {
+  getLocalUser,
+  getOfflineSettings,
+  setOfflineSettings,
+} from '../../services/localStorageService';
 import {
   getBookById,
   generateImageLink,
   getAudioForPage,
   removeTempAudioFromServer,
 } from '../../services/apiService';
-import {Carousel} from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import PagePairs from '../../components/PagePairs/PagePairs';
-import OverlayScreen from '../../components/OverlayScreen/OverlayScreen';
-import {OverlayStatus} from '../../Enums/OverlayStatus';
-import emptyAudio from '../../assets/audio/empty.mp3';
-
-import ReadControlArea from '../../components/ReadControlArea/ReadControlArea';
-import {AuthContext} from '../../contexts/Contexts';
-import {getLocalUser, getOfflineSettings, setOfflineSettings} from '../../services/localStorageService';
+import './Read.css';
 
 function Read(props) {
   const authContext = useContext(AuthContext);
@@ -89,7 +87,7 @@ function Read(props) {
   };
 
   const next = () => {
-    if (currentCarouselPage < (book.pages/2)-1) {
+    if (currentCarouselPage < book.pages / 2 - 1) {
       setCurrentCarouselPage(currentCarouselPage + 1);
     }
   };
@@ -176,7 +174,7 @@ function Read(props) {
       audioEnabled &&
       !audioPlayerRef.current.isPlaying
     ) {
-      const handleAudio = async ()=>{
+      const handleAudio = async () => {
         let leftPage = 0;
         let rightPage = 0;
         // skipping pages because they come in pairs
@@ -240,7 +238,7 @@ function Read(props) {
   ));
 
   return (
-    <div className="page">
+    <div className="read-container">
       <audio
         autoPlay={true}
         onEnded={() => {
@@ -270,100 +268,47 @@ function Read(props) {
       ) : null}
 
       {book && bookImageSources.length > 0 ? (
-        <div className="justify-content-center align-items-center">
-          <div
-            style={{
-              width: '100%',
-              height: '80vh',
-              justifyContent: 'center',
-              alignContent: 'center',
-              marginTop: '10px',
-            }}
-          >
-            <Row
-              style={{
-                width: '100%',
-                padding: 0,
-                margin: 'auto',
-                marginTop: 10,
-              }}
+        <div className="justify-content-center align-items-center pages-container">
+          <Row>
+            <Carousel
+              selectedItem={currentCarouselPage}
+              useRef={carouselRef}
+              showThumbs={false}
+              showArrows={false}
+              showStatus={false}
+              emulateTouch={false /* behaves strangely*/}
+              showIndicators={false}
+              autoPlay={false}
+              onChange={(e) => handlePageChanged(e)}
             >
-              <Col>
-                <div
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    verticalAlign: 'middle',
-                    objectFit: 'contain',
-                    position: 'relative',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '100%',
-                      margin: 'auto',
-                      // cursor: "grab",
-                    }}
-                  >
-                    <Carousel
-                      selectedItem={currentCarouselPage}
-                      useRef={carouselRef}
-                      showThumbs={false}
-                      showArrows={false}
-                      showStatus={false}
-                      emulateTouch={false /* behaves strangely*/}
-                      showIndicators={false}
-                      autoPlay={false}
-                      onChange={(e) => handlePageChanged(e)}
-                    >
-                      {generatePages}
-                    </Carousel>
-                  </div>
-                </div>
-              </Col>
-            </Row>
+              {generatePages}
+            </Carousel>
+          </Row>
 
-            <Row
-              style={{
-                width: props.currentWindowSize.width * 0.8,
-                padding: 0,
-                margin: 'auto',
-                marginTop: 10,
-              }}
-            >
-              <div style={{width: 300, margin: 'auto'}}>
-                <ProgressBar
-                  bgColor="#7237C5"
-                  customLabel=" "
-                  completed={
-                    ((currentCarouselPage + 1) / bookImageSources.length) * 100
-                  }
-                  visuallyHidden
-                />
-              </div>
-            </Row>
+          <Row className="progress-bar-container">
+            <ProgressBar
+              height={props.currentWindowSize.height * 0.02}
+              bgColor="#7237C5"
+              customLabel=" "
+              completed={
+                ((currentCarouselPage + 1) / bookImageSources.length) * 100
+              }
+              visuallyHidden
+            />
+          </Row>
 
-            <Row
-              style={{
-                width: props.currentWindowSize.width * 0.8,
-                padding: 0,
-                margin: 'auto',
-                marginTop: 30,
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <ReadControlArea
-                voiceSelection={voiceSelection}
-                voiceSelectionAllowed={voiceSelectionAllowed}
-                audioEnabled={audioEnabled}
-                autoNextPage={autoNextPage}
-                handleVoiceSelectionChange={handleVoiceSelectionChange}
-                handleAudioEnabledToggle={handleAudioEnabledToggle}
-                handleAutoNextPageToggle={handleAutoNextPageToggle}
-              ></ReadControlArea>
-            </Row>
-          </div>
+          <Row className="control-area-container">
+            <ReadControlArea
+              currentWindowSize={props.currentWindowSize}
+              voiceSelection={voiceSelection}
+              voiceSelectionAllowed={voiceSelectionAllowed}
+              audioEnabled={audioEnabled}
+              autoNextPage={autoNextPage}
+              handleVoiceSelectionChange={handleVoiceSelectionChange}
+              handleAudioEnabledToggle={handleAudioEnabledToggle}
+              handleAutoNextPageToggle={handleAutoNextPageToggle}
+            ></ReadControlArea>
+          </Row>
         </div>
       ) : null}
     </div>

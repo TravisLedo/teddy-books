@@ -1,17 +1,14 @@
 import {React, useState, useContext} from 'react';
-import {addNewUser, loginUser} from '../../services/apiService';
-import {Button, Col, Form, Modal, Row} from 'react-bootstrap';
-import {Link, Navigate, useNavigate} from 'react-router-dom';
-import './LoginModal.css';
+import {addNewUser} from '../../services/apiService';
+import {Button, Form, Modal} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
+import './LoginModal.css';
 
 function LoginModal(props) {
   const authContext = useContext(AuthContext);
   const [registering, setRegistering] = useState(false);
-
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-
   const [name, setName] = useState();
   const [passwordConfirm, setPasswordConfirm] = useState();
 
@@ -25,7 +22,7 @@ function LoginModal(props) {
 
   const login = async () => {
     try {
-      const user ={
+      const user = {
         email: email,
         password: password,
       };
@@ -114,7 +111,7 @@ function LoginModal(props) {
                   setRegistering(false);
                 }}
               >
-              Back
+                Back
               </Button>
               <Button
                 className="standard-button"
@@ -123,7 +120,7 @@ function LoginModal(props) {
                   register();
                 }}
               >
-              Register
+                Register
               </Button>
             </div>
           </Form>
@@ -146,13 +143,12 @@ function LoginModal(props) {
             <div className="button-container">
               <Button
                 className="standard-button"
-
                 variant="outline-secondary"
                 onClick={() => {
                   authContext.handleLoginModalClose();
                 }}
               >
-                    Cancel
+                Cancel
               </Button>
               <Button
                 className="standard-button"
@@ -161,26 +157,23 @@ function LoginModal(props) {
                   login();
                 }}
               >
-                    Login
+                Login
               </Button>
             </div>
 
-
             {props.allowRegistering ? (
-                    <div className="button-container">
-                      <Button
-                        className="link-text-button"
-                        variant="outline-secondary"
-                        onClick={() => {
-                          setRegistering(true);
-                        }}
-                      >
-                      Register
-                      </Button>
-                    </div>
-              ) : null}
-
-
+              <div className="button-container">
+                <Button
+                  className="link-text-button"
+                  variant="outline-secondary"
+                  onClick={() => {
+                    setRegistering(true);
+                  }}
+                >
+                  Register
+                </Button>
+              </div>
+            ) : null}
           </Form>
         )}
       </Modal.Body>

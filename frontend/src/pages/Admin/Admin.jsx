@@ -7,8 +7,7 @@ import refresh from '../../assets/images/refresh.png';
 import add from '../../assets/images/add.png';
 import {Button, Image} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
-import {Navigate} from 'react-router-dom';
-import {getLocalUser, decodeJwtToken} from '../../services/localStorageService';
+import './Admin.css';
 
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
@@ -42,35 +41,28 @@ function Admin(props) {
   }, []);
 
   return (
-    <div>
-      {authContext.user.isAdmin ? <div style={{width: '80%', margin: 'auto'}}>
+    <div className='admin-content'>
+      {authContext.user.isAdmin ? <div>
         <div
-          style={{
-            display: 'flex',
-            justifyContent: 'end',
-            alignItems: 'end',
-            padding: '10px',
-          }}
+          className='top-buttons-container'
         >
-          <div>
-            <Button
-              className="control-button"
-              variant="outline-secondary"
-              onClick={() => {
-                setBooksData([]);
-                fetchData();
-              }}
-            >
-              <Image className="control-button-image" src={refresh}></Image>
-            </Button>
-            <Button
-              className="control-button"
-              variant="outline-secondary"
-              onClick={() => handleBookModalShow()}
-            >
-              <Image className="control-button-image" src={add}></Image>
-            </Button>
-          </div>
+          <Button
+            className="control-button"
+            variant="outline-secondary"
+            onClick={() => {
+              setBooksData([]);
+              fetchData();
+            }}
+          >
+            <Image className="control-button-image" src={refresh}></Image>
+          </Button>
+          <Button
+            className="control-button"
+            variant="outline-secondary"
+            onClick={() => handleBookModalShow()}
+          >
+            <Image className="control-button-image" src={add}></Image>
+          </Button>
         </div>
         <h1>Admin</h1>
         {booksData.map((book) => (

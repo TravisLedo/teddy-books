@@ -1,4 +1,3 @@
-// apiService.js
 import axios from 'axios';
 import {getLocalUser, removeLocalUser, setLocalUser} from './localStorageService';
 
@@ -53,7 +52,7 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
             setLocalUser(newAccessToken.data);
             console.log('Using new Access Token.');
           } catch (error) {
-            console.log(error);
+            // console.log(error);
           }
           return apiServiceSecure(originalRequest);
         }

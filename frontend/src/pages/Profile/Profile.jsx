@@ -1,25 +1,25 @@
 import {React, useContext} from 'react';
 import {Button} from 'react-bootstrap';
-import {useNavigate, Navigate} from 'react-router-dom';
-import './Profile.css';
 import {AuthContext} from '../../contexts/Contexts';
-import {useEffect} from 'react';
+import './Profile.css';
 
-function Profile(props) {
+function Profile() {
   const authContext = useContext(AuthContext);
 
   return (
     <div className="page-container">
-      <div> <Button
-        className=""
-        variant="outline-secondary"
-        onClick={() => {
-          authContext.logout();
-        }}
-      >
+      <div>
+        {' '}
+        <Button
+          className=""
+          variant="outline-secondary"
+          onClick={() => {
+            authContext.logout();
+          }}
+        >
           Logout
-      </Button></div>
-
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,35 +1,19 @@
 import React from 'react';
 import Spinner from 'react-bootstrap/Spinner';
-
-import './OverlayScreen.css';
 import {OverlayStatus} from '../../Enums/OverlayStatus';
+import './OverlayScreen.css';
+
 export default function OverlayScreen(props) {
-  // state for loading
-  // state for ready to click to start
-  // spinner
   return (
     <div className="overlay-screen">
       {props.status === OverlayStatus.LOADING ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-          }}
-        >
+        <div className="standard-overlay">
           <Spinner animation="border" role="status"></Spinner>
         </div>
       ) : props.status === OverlayStatus.READY_CLICK ? (
         <div
+          className="clickable-overlay"
           onClick={() => props.setStarted(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-            cursor: 'pointer',
-          }}
         >
           Click To Read
         </div>

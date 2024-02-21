@@ -1,10 +1,9 @@
-
-
-.page {
-    height: 100%;
-    width: 100%;
-    user-select: none;
-    touch-action: none;
+.read-container {
+  height: 100%;
+  width: 100%;
+  user-select: none;
+  touch-action: none;
+  padding-top: 5vh;
 }
 
 .title-label-text {
@@ -20,7 +19,26 @@
   font-family: "Lapsus";
 }
 
-.nopadding {
-  padding: 0 !important;
-  margin: 0 !important;
+.pages-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.progress-bar-container {
+  width: 95%;
+  height: 4vh;
+  margin: auto;
+}
+
+.control-area-container {
+  width: 80vw;
+  padding: 0;
+  margin-top: 30;
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  ;
+  height: 10vh;
+
 }

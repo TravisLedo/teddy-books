@@ -1,4 +1,4 @@
-import {React, useState, useContext} from 'react';
+import {React, useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import {Button, Image, Card} from 'react-bootstrap';
 import {generateImageLink, updateBookById} from '../../services/apiService';
@@ -6,7 +6,7 @@ import BookBody from '../BookBody/BookBody';
 import edit from '../../assets/images/edit.png';
 import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
-import {AuthContext} from '../../contexts/Contexts';
+import './BookAccordion.css';
 
 function BookAccordion(props) {
   const [editing, setEditing] = useState(false);
@@ -40,19 +40,15 @@ function BookAccordion(props) {
     try {
       await updateBookById(newBookData);
       setEditing(false);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   return (
     <Accordion.Item eventKey={props.book._id}>
       <Accordion.Header>{props.book.title}</Accordion.Header>
       <Accordion.Body>
-
-
         {editing ? (
-          <div style={{width: '100%', display: 'flex', justifyContent: 'flex-end'}}>
-
+          <div className="editing-buttons-container">
             <Button
               className="control-button"
               variant="outline-secondary"
@@ -73,8 +69,7 @@ function BookAccordion(props) {
             </Button>
           </div>
         ) : (
-          <div style={{width: '100%', display: 'flex', justifyContent: 'flex-end'}}>
-
+          <div className="editing-buttons-container">
             <Button
               className="control-button"
               variant="outline-secondary"
@@ -86,28 +81,11 @@ function BookAccordion(props) {
             </Button>
           </div>
         )}
-        <Card
-          className="justify-content-center"
-          style={{
-            margin: 'auto',
-            width: '200px',
-            height: '200px',
-            maxWidth: '95%',
-            borderColor: 'black',
-            borderStyle: 'solid',
-            borderWidth: 1,
-            marginBottom: '10px',
-          }}
-        >
+        <Card className="book-card">
           <Image
+            className="book-image"
             rounded
             src={generateImageLink(props.book, 1)}
-            style={{
-              maxWidth: '99%',
-              maxHeight: '99%',
-              objectFit: 'contain',
-              margin: 'auto',
-            }}
           />
         </Card>
         <BookBody

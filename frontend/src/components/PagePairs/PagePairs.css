@@ -1,0 +1,89 @@
+.page-pairs-container {
+    width: 100%;
+    height: 80vh;
+    margin: auto;
+    padding-top: 15px;
+}
+
+
+
+.landscape-container {
+    height: 100%;
+    width: 95%;
+    margin: auto;
+    padding: 10;
+    display: flex;
+    justify-content: center;
+}
+
+
+
+
+.landscape-container-row {
+    height: 100%;
+    width: 100%;
+    align-content: center;
+}
+
+.landscape-container-page {
+    margin: auto;
+    padding: 0;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    box-shadow: 1px 5px 5px rgb(0 0 0 / 50%);
+    height: 95%;
+    display: flex;
+    background-color: white;
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+
+.portrait-container {
+    width: 95%;
+    height: 100%;
+    margin: auto;
+    padding: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+.portrait-container-row-top {
+    width: 100%;
+    height: 50%;
+    align-content: end;
+    align-self: center;
+}
+
+.portrait-container-row-bottom {
+    width: 100%;
+    height: 50%;
+    align-content: start;
+    align-self: center;
+
+}
+
+.portrait-container-col {
+    margin: auto;
+    padding: 0;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    box-shadow: 1px 5px 5px rgb(0 0 0 / 50%);
+    height: 95%;
+    display: flex;
+    background-color: white;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+
+.page-image {
+    width: 99%;
+    height: 99%;
+    vertical-align: middle;
+    object-fit: contain;
+    margin: auto;
+}

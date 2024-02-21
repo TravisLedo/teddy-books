@@ -1,0 +1,11 @@
+.admin-content {
+  padding-top: 50px;
+  width: 80%;
+  margin: auto;
+}
+
+.top-buttons-container {
+  display: flex;
+  justify-content: end;
+  padding: 10px;
+}

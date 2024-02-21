@@ -16,13 +16,16 @@
     width: 100px;
     height: 100px;
     position: absolute;
-    left: 0px;
+    left: 5%;
+    top: 2.5%;
 }
+
 .arrow-container-right{
     width: 100px;
     height: 100%;
     position: absolute;
-    right: 0px;
+    right: 5%;
+    top: 2.5%;
 }
 .arrow-image{
     width: 100px;

@@ -3,8 +3,7 @@ import Form from 'react-bootstrap/Form';
 
 function BookBody(props) {
   return (
-    <Form className="form-container"
-    >
+    <Form className="form-container">
       <Form.Group className="mb-3" controlId="title">
         <Form.Control
           type="text"

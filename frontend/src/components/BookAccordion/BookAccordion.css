@@ -1,0 +1,24 @@
+.editing-buttons-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.book-card {
+  justify-content: center;
+  margin: auto;
+  width: 200px;
+  height: 250px;
+  max-width: 95%;
+  border-style: solid;
+  border-width: 1;
+  margin-bottom: 10px;
+
+}
+
+.book-image {
+  max-width: 99%;
+  max-height: 99%;
+  object-fit: contain;
+  margin: auto;
+}

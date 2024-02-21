@@ -1,7 +1,6 @@
-import './App.css';
-import Books from './pages/Books';
+import Books from './pages/Books/Books';
 import Read from './pages/Read/Read';
-import Error from './pages/Error';
+import Error from './pages/Error/Error';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import MainHeader from './components/mainHeader/mainHeader';
@@ -9,10 +8,23 @@ import {React, useEffect, useState} from 'react';
 import Admin from './pages/Admin/Admin';
 import {AuthContext} from './contexts/Contexts';
 import LoginModal from './components/LoginModal/LoginModal';
-import {getLocalUser, getOfflineSettings, decodeJwtToken, removeLocalUser, setOfflineSettings} from './services/localStorageService';
 import Profile from './pages/Profile/Profile';
-import {activateApiServiceSecureInterceptors, autoLoginUser, getUserById, loginUser, updateUserById} from './services/apiService';
 import {Voices} from './Enums/Voices';
+import {
+  getLocalUser,
+  getOfflineSettings,
+  decodeJwtToken,
+  removeLocalUser,
+  setOfflineSettings,
+} from './services/localStorageService';
+import {
+  activateApiServiceSecureInterceptors,
+  autoLoginUser,
+  getUserById,
+  loginUser,
+  updateUserById,
+} from './services/apiService';
+import './App.css';
 
 function App() {
   const navigate = useNavigate();
@@ -20,6 +32,10 @@ function App() {
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [allowRegistering, setAllowRegistering] = useState(false);
+  const [currentWindowSize, setCurrentWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
 
   const handleLoginModalClose = () => setShowLoginModal(false);
   const handleLoginModalShow = (allowRegistering) => {
@@ -33,9 +49,7 @@ function App() {
       const userResult = await autoLoginUser(decodedJwtToken);
       setUser(userResult);
       setOfflineSettings(userResult.settings);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const login = async (userData) => {
@@ -46,9 +60,7 @@ function App() {
       setUser(user);
       setOfflineSettings(user.settings);
       localStorage.setItem('jwtToken', jwtToken);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const logout = () => {
@@ -57,20 +69,13 @@ function App() {
     navigate('/');
   };
 
-  const updateUserDbData = async (userData)=>{
+  const updateUserDbData = async (userData) => {
     try {
       const updatedUser = await updateUserById(userData);
       setUser(updatedUser);
       setOfflineSettings(updatedUser.settings);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
-
-  const [currentWindowSize, setCurrentWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
 
   const handleResize = () => {
     setCurrentWindowSize({
@@ -87,13 +92,11 @@ function App() {
       autoLogin(localJwtToken);
     } else {
       if (!getOfflineSettings()) {
-        setOfflineSettings(
-            {
-              voiceSelection: Voices.OLIVIA.voice,
-              autoNextPage: true,
-              audioEnabled: true,
-            },
-        );
+        setOfflineSettings({
+          voiceSelection: Voices.JOE.voice,
+          autoNextPage: true,
+          audioEnabled: true,
+        });
       }
     }
     setIsLoading(false);
@@ -101,16 +104,28 @@ function App() {
 
   if (!isLoading) {
     return (
-      <AuthContext.Provider value={{user, setUser, updateUserDbData, login, logout, handleLoginModalShow, handleLoginModalClose}}>
-        <div className="App" >
+      <AuthContext.Provider
+        value={{
+          user,
+          setUser,
+          updateUserDbData,
+          login,
+          logout,
+          handleLoginModalShow,
+          handleLoginModalClose,
+        }}
+      >
+        <div className="App">
           <MainHeader></MainHeader>
-          <LoginModal allowRegistering={allowRegistering} showLoginModal={showLoginModal}
+          <LoginModal
+            allowRegistering={allowRegistering}
+            showLoginModal={showLoginModal}
           ></LoginModal>
           <Routes>
             <Route
               exact
               path="/"
-              element={<Books currentWindowSize={currentWindowSize} />}
+              element={<Books/>}
             ></Route>
             <Route
               exact
@@ -118,24 +133,32 @@ function App() {
               element={<Read currentWindowSize={currentWindowSize} />}
             ></Route>
 
-            {user && user.isAdmin? <Route
-              exact
-              path="/admin"
-              element= {<Admin currentWindowSize={currentWindowSize} />}
-            ></Route> : null}
+            {user && user.isAdmin ? (
+              <Route
+                exact
+                path="/admin"
+                element={<Admin/>}
+              ></Route>
+            ) : null}
 
-            {user && user.isAdmin?
+            {user && user.isAdmin ? (
               <Route
                 exact
                 path="/profile"
-                element={user ? <Profile currentWindowSize={currentWindowSize} /> : <Books currentWindowSize={currentWindowSize} ></Books>}
-              ></Route> :
-              null}
+                element={
+                  user ? (
+                    <Profile/>
+                  ) : (
+                    <Books></Books>
+                  )
+                }
+              ></Route>
+            ) : null}
 
             <Route
               exact
               path="/*"
-              element={<Error currentWindowSize={currentWindowSize} />}
+              element={<Error/>}
             ></Route>
           </Routes>
         </div>
