@@ -63,3 +63,24 @@
   align-self: center;
   justify-content: center;
 }
+
+
+
+.title-label {
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 4px;
+  background-color: #7237C5;
+  margin: 10px;
+  width: max-content;
+  align-self: center;
+}
+
+.title-label-text {
+  font-size: 25px;
+  color: white;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-family: "Lapsus";
+}

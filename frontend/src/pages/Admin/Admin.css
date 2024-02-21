@@ -2,6 +2,9 @@
   padding-top: 50px;
   width: 80%;
   margin: auto;
+  color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .top-buttons-container {

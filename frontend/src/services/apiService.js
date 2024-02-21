@@ -145,6 +145,15 @@ export const updateBookById = async (bookData) => {
   }
 };
 
+export const deleteBookById = async (bookId) => {
+  try {
+    const response = await apiServiceSecure.delete('/books/delete/' + bookId);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const generateImageLink = (book, pageNumber) => {
   return (
     process.env.REACT_APP_IMAGE_BASE_URL +

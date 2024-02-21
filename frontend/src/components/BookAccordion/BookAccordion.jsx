@@ -1,11 +1,12 @@
 import {React, useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import {Button, Image, Card} from 'react-bootstrap';
-import {generateImageLink, updateBookById} from '../../services/apiService';
+import {deleteBookById, generateImageLink, updateBookById} from '../../services/apiService';
 import BookBody from '../BookBody/BookBody';
 import edit from '../../assets/images/edit.png';
 import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
+import trash from '../../assets/images/trash.png';
 import './BookAccordion.css';
 
 function BookAccordion(props) {
@@ -43,12 +44,29 @@ function BookAccordion(props) {
     } catch (error) {}
   };
 
+
+  const deleteBook = async () => {
+    try {
+      await deleteBookById(props.book._id);
+      props.refreshData();
+    } catch (error) {}
+  };
+
   return (
     <Accordion.Item eventKey={props.book._id}>
       <Accordion.Header>{props.book.title}</Accordion.Header>
       <Accordion.Body>
         {editing ? (
           <div className="editing-buttons-container">
+            <Button
+              className="control-button"
+              variant="outline-secondary"
+              onClick={() => {
+                deleteBook();
+              }}
+            >
+              <Image className="control-button-image" src={trash}></Image>
+            </Button>
             <Button
               className="control-button"
               variant="outline-secondary"
@@ -67,6 +85,7 @@ function BookAccordion(props) {
             >
               <Image className="control-button-image" src={check}></Image>
             </Button>
+
           </div>
         ) : (
           <div className="editing-buttons-container">

@@ -17,7 +17,6 @@ app.use(cors());
 require('dotenv').config();
 const bycrypt = require('bcrypt');
 const {jwtDecode} = require('jwt-decode');
-const {error} = require('console');
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}.`);
@@ -70,6 +69,16 @@ app.get('/books/:id', async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     res.status(200).send(book);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+app.delete('/books/delete/:id', async (req, res) => {
+  try {
+    await Book.findByIdAndDelete(req.params.id);
+    res.status(200).send('Book Deleted.');
   } catch (error) {
     console.log(error);
     res.status(500).send(error);

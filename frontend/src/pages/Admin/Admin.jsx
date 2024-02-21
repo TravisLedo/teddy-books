@@ -26,6 +26,11 @@ function Admin(props) {
     }
   };
 
+  const refreshData=()=>{
+    setBooksData([]);
+    fetchData();
+  };
+
   const addBook = async (newBookData) => {
     try {
       await addNewBook(newBookData);
@@ -42,17 +47,18 @@ function Admin(props) {
 
   return (
     <div className='admin-content'>
+      <div className='title-label'> <div className='title-label-text'>Admin</div>
+      </div>
       {authContext.user.isAdmin ? <div>
+
+
         <div
           className='top-buttons-container'
         >
           <Button
             className="control-button"
             variant="outline-secondary"
-            onClick={() => {
-              setBooksData([]);
-              fetchData();
-            }}
+            onClick={() => refreshData()}
           >
             <Image className="control-button-image" src={refresh}></Image>
           </Button>
@@ -64,10 +70,9 @@ function Admin(props) {
             <Image className="control-button-image" src={add}></Image>
           </Button>
         </div>
-        <h1>Admin</h1>
         {booksData.map((book) => (
           <Accordion defaultActiveKey="0" key={book._id}>
-            <BookAccordion book={book}></BookAccordion>
+            <BookAccordion book={book} refreshData={refreshData}></BookAccordion>
           </Accordion>
         ))}
         <AddBookModal
