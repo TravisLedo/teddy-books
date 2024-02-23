@@ -75,7 +75,7 @@ app.get('/books/:id', async (req, res) => {
   }
 });
 
-app.delete('/books/delete/:id', async (req, res) => {
+app.delete('/books/delete/:id', authenthicateJwtToken, async (req, res) => {
   try {
     await Book.findByIdAndDelete(req.params.id);
     res.status(200).send('Book Deleted.');
@@ -202,7 +202,6 @@ app.post('/users/login', async (req, res) => {
   }
 });
 
-
 app.post('/users/autoLogin', authenthicateJwtToken, async (req, res) => {
   try {
     const user = await User.findOne({email: req.body.email, isBlocked: false});
@@ -244,7 +243,7 @@ app.post('/users/add', async (req, res) => {
   }
 });
 
-app.put('/users/update', async (req, res) => {
+app.put('/users/update', authenthicateJwtToken, async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, req.body.userData, {new: true});
     res.status(200).send(updatedUser);
@@ -255,7 +254,7 @@ app.put('/users/update', async (req, res) => {
 });
 
 
-// Remove any files that may be missed due to interuptions.
+// Remove any files that may be missed due to interuptions from auto delete.
 // Files older than 1 minute will be removed.
 // Check runs every minute
 schedule.scheduleJob('*/1 * * * *', function() {

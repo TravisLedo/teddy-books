@@ -1,4 +1,4 @@
-import {React, useState} from 'react';
+import {React, useState, useEffect} from 'react';
 import {Button} from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import BookBody from '../../components/BookBody/BookBody';
@@ -21,8 +21,8 @@ function AddBookModal(props) {
 
   return (
     <Modal
-      show={props.showAddModal}
-      onHide={props.handleLoginModalClose}
+      show={props.showAddBookModal}
+      onHide={()=>props.setShowAddBookModal(false)}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -45,10 +45,10 @@ function AddBookModal(props) {
         ></BookBody>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.handleLoginModalClose}>
+        <Button variant="secondary" onClick={()=>props.setShowAddBookModal(false)}>
           Close
         </Button>
-        <Button variant="primary" onClick={handleSave}>
+        <Button variant="primary" onClick={()=>handleSave()}>
           Add
         </Button>
       </Modal.Footer>

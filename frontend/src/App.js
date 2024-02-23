@@ -66,7 +66,7 @@ function App() {
   const logout = () => {
     removeLocalUser();
     setUser(null);
-    navigate('/');
+    //navigate('/');
   };
 
   const updateUserDbData = async (userData) => {
@@ -116,11 +116,11 @@ function App() {
         }}
       >
         <div className="App">
-          <MainHeader></MainHeader>
           <LoginModal
             allowRegistering={allowRegistering}
             showLoginModal={showLoginModal}
           ></LoginModal>
+          <MainHeader></MainHeader>
           <Routes>
             <Route
               exact

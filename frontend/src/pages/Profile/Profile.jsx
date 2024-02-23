@@ -7,9 +7,8 @@ function Profile() {
   const authContext = useContext(AuthContext);
 
   return (
-    <div className="page-container">
+    <div className="profile-container">
       <div>
-        {' '}
         <Button
           className=""
           variant="outline-secondary"
