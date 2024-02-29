@@ -1,14 +1,36 @@
 import {React, useContext} from 'react';
-import {Button} from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import './Profile.css';
 
-function Profile() {
+function Profile(props) {
   const authContext = useContext(AuthContext);
 
   return (
-    <div className="profile-container">
-      <div>
+    <div className='menu-card' style={{
+      width:
+          props.currentWindowSize.width > props.currentWindowSize.height ?
+            '75vw' :
+            '95vw',
+    }}>
+      <div className="title-label">
+        <div className="title-label-text">Profile</div>
+      </div>
+      <div className='menu-container'>
+        <Form>
+          <Form.Check
+            className='menu-item'
+            type="switch"
+            id="audio-switch"
+            label="Voice Audio"
+          />
+          <Form.Check
+            className='menu-item'
+            type="switch"
+            id="audio-switch"
+            label="Auto Next"
+          />
+        </Form>
         <Button
           className=""
           variant="outline-secondary"

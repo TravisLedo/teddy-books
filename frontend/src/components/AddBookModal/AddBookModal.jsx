@@ -2,6 +2,7 @@ import {React, useState, useEffect} from 'react';
 import {Button} from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import BookBody from '../../components/BookBody/BookBody';
+import './AddBookModal.css';
 
 function AddBookModal(props) {
   const [title, setTitle] = useState('');
@@ -44,13 +45,15 @@ function AddBookModal(props) {
           setText={setText}
         ></BookBody>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={()=>props.setShowAddBookModal(false)}>
+      <Modal.Footer><div className='buttons-container'>  <Button className="standard-button"
+        variant="outline-secondary" onClick={()=>props.setShowAddBookModal(false)}>
           Close
-        </Button>
-        <Button variant="primary" onClick={()=>handleSave()}>
+      </Button>
+      <Button className="standard-button btn-custom"
+        onClick={()=>handleSave()}>
           Add
-        </Button>
+      </Button></div>
+
       </Modal.Footer>
     </Modal>
   );

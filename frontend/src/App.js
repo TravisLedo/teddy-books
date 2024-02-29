@@ -137,7 +137,7 @@ function App() {
               <Route
                 exact
                 path="/admin"
-                element={<Admin/>}
+                element={<Admin currentWindowSize={currentWindowSize}/>}
               ></Route>
             ) : null}
 
@@ -147,7 +147,7 @@ function App() {
                 path="/profile"
                 element={
                   user ? (
-                    <Profile/>
+                    <Profile currentWindowSize={currentWindowSize}/>
                   ) : (
                     <Books></Books>
                   )

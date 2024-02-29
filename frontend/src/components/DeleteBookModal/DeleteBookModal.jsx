@@ -1,6 +1,7 @@
 import {React, useState} from 'react';
 import {Button} from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
+import './DeleteBookModal.css';
 
 function DeleteBookModal(props) {
   return (
@@ -19,12 +20,15 @@ function DeleteBookModal(props) {
       Are you sure you want to delete the book {props.book.title}?
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={()=>props.setShowDeleteBookModal(false)}>
+        <div className='buttons-container'>
+          <Button className="standard-button"
+            variant="outline-secondary" onClick={()=>props.setShowDeleteBookModal(false)}>
           No
-        </Button>
-        <Button variant="primary" onClick={()=>props.deleteBook()}>
+          </Button>
+          <Button className='btn-custom' onClick={()=>props.deleteBook()}>
           Yes
-        </Button>
+          </Button>
+        </div>
       </Modal.Footer>
     </Modal>
   );

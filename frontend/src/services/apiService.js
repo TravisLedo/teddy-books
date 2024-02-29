@@ -82,7 +82,35 @@ export const autoLoginUser = async (userData) => {
 
 export const getUserById = async (_id) => {
   try {
-    const response = await apiServiceSecure.get('/users/' + _id);
+    const response = await apiServiceSecure.get('/users/id/' + _id);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserByEmail = async (email) => {
+  try {
+    const response = await apiServiceSecure.get('/users/email/' + email);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getNewestUsers = async () => {
+  try {
+    const response = await apiServiceUnsecure.get('/users/newest');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const getRecentUsers = async () => {
+  try {
+    const response = await apiServiceUnsecure.get('/users/recent');
     return response.data;
   } catch (error) {
     throw error;
@@ -111,7 +139,7 @@ export const getAllBooks = async () => {
 
 export const updateUserById = async (userData) => {
   try {
-    const response = await apiServiceUnsecure.put('/users/update', {userData});
+    const response = await apiServiceSecure.put('/users/update', {userData});
     return response.data;
   } catch (error) {
     throw error;

@@ -114,8 +114,7 @@ function LoginModal(props) {
                 Back
               </Button>
               <Button
-                className="standard-button"
-                variant="outline-secondary"
+                className="standard-button btn-custom"
                 onClick={() => {
                   register();
                 }}
@@ -151,8 +150,7 @@ function LoginModal(props) {
                 Cancel
               </Button>
               <Button
-                className="standard-button"
-                variant="outline-secondary"
+                className="standard-button btn-custom"
                 onClick={() => {
                   login();
                 }}

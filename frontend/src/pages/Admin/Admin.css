@@ -1,9 +1,21 @@
-.admin-content {
+
+.admin-card{
+  min-height: 60vh;
+  background-color: white;
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 1px 5px 5px rgb(0 0 0 / 50%);
+  margin-top: 75px;
+  overflow: hidden;
   padding-top: 50px;
-  color: white;
+  padding-bottom: 50px;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-bottom: 20px;
+  background-color: white;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .top-buttons-container {
@@ -12,7 +24,45 @@
   padding: 10px;
 }
 
-.accordions-container {
-  width: 80vw;
+.tab-container {
+  width: 80%;
   overflow: hidden;
+  margin: auto;
+}
+
+.accordion-item {
+  margin: 2px;
+  border-width: 1px !important;
+  border-style: solid;
+  border-color: #0accb9;
+}
+
+.accordion-button {
+  background-color: #0accb9 !important;
+  color: white !important;
+  font-size: x-large !important;
+}
+
+.accordion-button:after {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !important;
+}
+
+.nav-link{
+  color: #0accb9;
+}
+
+.nav-link:hover{
+  color: #7237C5;
+}
+
+.nav-link:active{
+  color: #7237C5;
+}
+
+.clickable-user {
+  cursor: pointer;
+}
+
+.user-list{
+  padding-top: 100px;
 }

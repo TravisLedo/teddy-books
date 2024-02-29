@@ -39,7 +39,7 @@ app.post('/token/refresh', async (req, res) => {
 
     jwt.verify(refreshTokenReponse.token, process.env.JWT_SECRET, async (err) => {
       if (err) {
-        console.log('refresh token expired too. Log user out.');
+        console.log('Refresh token expired for ' + currentAccessToken._id + '(' +currentAccessToken.email + ')' + ', user needs to login again.');
         res.sendStatus(401);
       } else {
         const userData = await User.findById(currentJwtUser._id);
@@ -186,7 +186,7 @@ app.post('/books/removeaudio', async (req, res) => {
 
 app.post('/users/login', async (req, res) => {
   try {
-    const user = await User.findOne({email: req.body.email, isBlocked: false});
+    const user = await User.findOneAndUpdate({email: req.body.email, isBlocked: false}, {lastLogin: Date.now()});
     const validPassword = await bycrypt.compare(req.body.password, user.password);
     if (validPassword) {
       const userJwt = {_id: user._id, email: user.email};
@@ -204,7 +204,7 @@ app.post('/users/login', async (req, res) => {
 
 app.post('/users/autoLogin', authenthicateJwtToken, async (req, res) => {
   try {
-    const user = await User.findOne({email: req.body.email, isBlocked: false});
+    const user = await User.findOneAndUpdate({email: req.body.email, isBlocked: false}, {lastLogin: Date.now()});
     res.status(200).send(user);
   } catch (error) {
     console.log(error);
@@ -212,7 +212,7 @@ app.post('/users/autoLogin', authenthicateJwtToken, async (req, res) => {
   }
 });
 
-app.get('/users/:id', async (req, res) => {
+app.get('/users/id/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     res.status(200).send(user);
@@ -222,6 +222,35 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
+app.get('/users/email/:email', async (req, res) => {
+  try {
+    const user = await User.findOne({email: req.params.email});
+    res.status(200).send(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+app.get('/users/newest', async (req, res) => {
+  try {
+    const users = await User.find({}).limit(5).sort({createdAt: -1});
+    res.status(200).send(users);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+app.get('/users/recent', async (req, res) => {
+  try {
+    const users = await User.find({}).limit(5).sort({lastLogin: -1});
+    res.status(200).send(users);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
 
 app.post('/users/add', async (req, res) => {
   try {

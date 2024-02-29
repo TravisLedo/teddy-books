@@ -1,7 +1,25 @@
-.profile-container {
-    width: 400px;
-    display: flex;
+
+.menu-card{
+    margin-top: 75px;
     padding-top: 50px;
-    align-content: center;
-    justify-content: center;
+    padding-bottom: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 20px;
+    background-color: white;
+    min-height: 60vh;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 1px 5px 5px rgb(0 0 0 / 50%);
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-container{
+    padding: 10%;
+}
+
+.menu-item{
+    padding: 2%;
 }

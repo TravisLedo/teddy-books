@@ -12,7 +12,7 @@ import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
 import trash from '../../assets/images/trash.png';
 import './BookAccordion.css';
-import DeleteBookModal from '../AddBookModal/DeleteBookModal';
+import DeleteBookModal from '../DeleteBookModal/DeleteBookModal';
 
 function BookAccordion(props) {
   const [editing, setEditing] = useState(false);
@@ -31,11 +31,6 @@ function BookAccordion(props) {
   };
 
   const updateValues = async () => {
-    setTitle(title);
-    setAuthor(author);
-    setPages(pages);
-    setText(text);
-
     const newBookData = {
       _id: props.book._id,
       title: title,
