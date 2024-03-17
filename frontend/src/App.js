@@ -66,7 +66,53 @@ function App() {
   const logout = () => {
     removeLocalUser();
     setUser(null);
-    //navigate('/');
+    // navigate('/');
+  };
+
+  const updateAudioEnabled = async (audioEnabled) => {
+    if (user && getLocalUser()) {
+      const newUserData = user;
+      if (audioEnabled) {
+        newUserData.settings.audioEnabled = false;
+      } else {
+        newUserData.settings.audioEnabled = true;
+      }
+      await updateUserDbData(newUserData);
+    } else {
+      if (audioEnabled) {
+        setOfflineSettings({...getOfflineSettings(), audioEnabled: false});
+      } else {
+        setOfflineSettings({...getOfflineSettings(), audioEnabled: true});
+      }
+    }
+  };
+
+  const updateAutoNextPage = async (autoNextPage) => {
+    if (user && getLocalUser()) {
+      const newUserData = user;
+      if (autoNextPage) {
+        newUserData.settings.autoNextPage = false;
+      } else {
+        newUserData.settings.autoNextPage = true;
+      }
+      await updateUserDbData(newUserData);
+    } else {
+      if (autoNextPage) {
+        setOfflineSettings({...getOfflineSettings(), autoNextPage: false});
+      } else {
+        setOfflineSettings({...getOfflineSettings(), autoNextPage: true});
+      }
+    }
+  };
+
+  const updateVoiceSelection = async (voice) => {
+    if (user && getLocalUser()) {
+      const newUserData = user;
+      newUserData.settings.voiceSelection = voice;
+      await updateUserDbData(newUserData);
+    } else {
+      setOfflineSettings({...getOfflineSettings(), voiceSelection: voice});
+    }
   };
 
   const updateUserDbData = async (userData) => {
@@ -113,6 +159,9 @@ function App() {
           logout,
           handleLoginModalShow,
           handleLoginModalClose,
+          updateAudioEnabled,
+          updateVoiceSelection,
+          updateAutoNextPage,
         }}
       >
         <div className="App">

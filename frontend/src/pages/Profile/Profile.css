@@ -23,3 +23,13 @@
 .menu-item{
     padding: 2%;
 }
+
+.react-switch {
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  .setting-content{
+    padding: 20px;
+
+  }

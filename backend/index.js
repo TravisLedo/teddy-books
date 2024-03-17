@@ -224,7 +224,19 @@ app.get('/users/id/:id', async (req, res) => {
 
 app.get('/users/email/:email', async (req, res) => {
   try {
-    const user = await User.findOne({email: req.params.email});
+    const user = await User.find({email: req.params.email});
+    res.status(200).send(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+app.get('/users/name/:name', async (req, res) => {
+  try {
+    const user = await User.find( {name: {'$regex': req.params.name, '$options': 'i'}});
+    console.log(user);
+
     res.status(200).send(user);
   } catch (error) {
     console.log(error);

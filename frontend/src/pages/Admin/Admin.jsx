@@ -5,6 +5,8 @@ import {
   getAllBooks,
   getNewestUsers,
   getUserByEmail,
+  getUsersByName,
+  getUserById,
 } from '../../services/apiService';
 import Accordion from 'react-bootstrap/Accordion';
 import BookAccordion from '../../components/BookAccordion/BookAccordion';
@@ -21,8 +23,8 @@ import UserInfoAccordion from '../../components/UserInfoAccordion/UsertInfoAccor
 function Admin(props) {
   const [booksData, setBooksData] = useState([]);
   const [showAddBookModal, setShowAddBookModal] = useState(false);
-  const [searchEmail, setSearchEmail] = useState();
-  const [searchedUser, setSearchedUser] = useState();
+  const [searchInput, setSearchInput] = useState();
+  const [searchedUsers, setSearchedUsers] = useState([]);
   const [newestUsers, setNewestUsers] = useState([]);
   const [recentUsers, setRecentUsers] = useState([]);
 
@@ -58,11 +60,13 @@ function Admin(props) {
     }
   };
 
-  const searchUserByEmail = async () => {
+  const searchUsers = async () => {
     try {
-      const user = await getUserByEmail(searchEmail);
-      setSearchedUser(user);
-      console.log(user);
+      const usersById = await getUserById(searchInput);
+      const userByEmail = await getUserByEmail(searchInput);
+      const usersByName = await getUsersByName(searchInput);
+      const results = [...new Set(usersByName.concat(userByEmail).concat(usersById).flat())];
+      setSearchedUsers(results);
     } catch (error) {
       console.log('Error finding user by email: ', error);
     }
@@ -132,7 +136,7 @@ function Admin(props) {
                 ></BookAccordion>
               </Accordion>
             ))}
-          </div>{' '}
+          </div>
         </Tab>
         <Tab eventKey="users" title="Users">
           <div
@@ -144,17 +148,14 @@ function Admin(props) {
                   '95%',
             }}
           >
-            {searchedUser ? (
-              <Accordion defaultActiveKey="0" key={searchedUser._id}>
-                <UserInfoAccordion user={searchedUser}></UserInfoAccordion>
-              </Accordion>
-            ) : null}
+
+
             <Form className="form-container mb-0 pb-0">
-              <Form.Group controlId="email">
+              <Form.Group controlId="searchInput">
                 <Form.Control
-                  type="email"
-                  placeholder="Find user by email."
-                  onChange={(e) => setSearchEmail(e.target.value)}
+                  type="text"
+                  placeholder="Find user by email, name, id..."
+                  onChange={(e) => setSearchInput(e.target.value)}
                 />
               </Form.Group>
             </Form>
@@ -162,11 +163,16 @@ function Admin(props) {
               <Button
                 className="control-button"
                 variant="outline-secondary"
-                onClick={() => searchUserByEmail()}
+                onClick={() => searchUsers()}
               >
                 <Image className="control-button-image" src={search}></Image>
               </Button>{' '}
             </div>
+            {searchedUsers.map((user) => (
+              <Accordion defaultActiveKey="0" key={user._id}>
+                <UserInfoAccordion user={user}></UserInfoAccordion>
+              </Accordion>
+            ))}
 
             <div className="user-list">
               <h3>New Users</h3>

@@ -98,6 +98,15 @@ export const getUserByEmail = async (email) => {
   }
 };
 
+export const getUsersByName = async (name) => {
+  try {
+    const response = await apiServiceSecure.get('/users/name/'+ name);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getNewestUsers = async () => {
   try {
     const response = await apiServiceUnsecure.get('/users/newest');
@@ -106,7 +115,6 @@ export const getNewestUsers = async () => {
     throw error;
   }
 };
-
 
 export const getRecentUsers = async () => {
   try {
@@ -125,7 +133,6 @@ export const addNewUser = async (userData) => {
     throw error;
   }
 };
-
 
 export const getAllBooks = async () => {
   try {

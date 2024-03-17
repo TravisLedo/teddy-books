@@ -39,7 +39,7 @@ function Read(props) {
   const [autoNextPage, setAutoNextPage] = useState();
   const [audioEnabled, setAudioEnabled] = useState();
 
-  const delayVoiceTime = 2000;
+  const delayVoiceTime = 1000;
   const [timerDone, setTimerDone] = useState(false);
 
   const handlePageChanged = async (page) => {
@@ -93,59 +93,34 @@ function Read(props) {
   };
 
   const handleAutoNextPageToggle = async () => {
-    if (authContext.user && getLocalUser()) {
-      const newUserData = authContext.user;
-      if (autoNextPage) {
-        newUserData.settings.autoNextPage = false;
-      } else {
-        newUserData.settings.autoNextPage = true;
-      }
-      await authContext.updateUserDbData(newUserData);
+    authContext.updateAutoNextPage(autoNextPage);
+
+    if (autoNextPage) {
+      setAutoNextPage(false);
     } else {
-      if (autoNextPage) {
-        setOfflineSettings({...getOfflineSettings(), autoNextPage: false});
-        setAutoNextPage(false);
-      } else {
-        setOfflineSettings({...getOfflineSettings(), autoNextPage: true});
-        setAutoNextPage(true);
-      }
+      setAutoNextPage(true);
     }
     if (audioPlayerRef.current.ended) {
       next();
     }
   };
 
-  const handleAudioEnabledToggle = async () => {
+  const handleAudioEnabledToggle = ()=>{
+    authContext.updateAudioEnabled(audioEnabled);
+
     if (audioEnabled) {
       audioPlayerRef.current.pause();
+      setAudioEnabled(false);
     } else {
       audioPlayerRef.current.play();
-    }
-    if (authContext.user && getLocalUser()) {
-      const newUserData = authContext.user;
-      if (audioEnabled) {
-        newUserData.settings.audioEnabled = false;
-      } else {
-        newUserData.settings.audioEnabled = true;
-      }
-      await authContext.updateUserDbData(newUserData);
-    } else {
-      if (audioEnabled) {
-        setOfflineSettings({...getOfflineSettings(), audioEnabled: false});
-        setAudioEnabled(false);
-      } else {
-        setOfflineSettings({...getOfflineSettings(), audioEnabled: true});
-        setAudioEnabled(true);
-      }
+      setAudioEnabled(true);
     }
   };
 
+
   const handleVoiceSelectionChange = (voice) => {
-    setOfflineSettings({...getOfflineSettings(), voiceSelection: voice});
+    authContext.updateVoiceSelection(voice);
     setVoiceSelection(voice);
-    if (authContext.user) {
-      authContext.updateUserDbData();
-    }
   };
 
   useEffect(() => {

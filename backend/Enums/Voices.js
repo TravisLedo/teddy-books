@@ -6,4 +6,10 @@ const Voices = {
   MARK: {voice: 'Connor', alt: 'Mark'},
 };
 
+const findByVoice=(voice)=>{
+  Object.keys(StateValue).find(
+      (key) => StateValue[key] === 2,
+  );
+};
+
 module.exports = Voices;
