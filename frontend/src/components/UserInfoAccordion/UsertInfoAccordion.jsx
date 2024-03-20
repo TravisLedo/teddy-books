@@ -1,5 +1,5 @@
 import {React, useState, useContext} from 'react';
-import {addNewUser, updateUserById} from '../../services/apiService';
+import {addNewUser, updateUser} from '../../services/apiService';
 import {Button, Form, Modal, Image, Accordion} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import edit from '../../assets/images/edit.png';
@@ -33,46 +33,46 @@ function UserInfoAccordion(props) {
     newUserData.isAdmin = isAdmin;
     newUserData.isBlocked = isBlocked;
     try {
-      await updateUserById(newUserData);
+      await updateUser(newUserData);
       setEditing(false);
     } catch (error) {}
   };
 
   return (
     <Accordion.Item eventKey={props.user._id}>
-      <Accordion.Header>{props.user.email} ({props.user._id})</Accordion.Header>
+      <Accordion.Header>{props.user.email}</Accordion.Header>
       <Accordion.Body>
         {editing ? (
           <div className="editing-buttons-container">
             <Button
-              className="control-button"
+              className="edit-button"
               variant="outline-secondary"
               onClick={() => {
                 resetValues();
               }}
             >
-              <Image className="control-button-image" src={close}></Image>
+              <Image className="edit-button-image" src={close}></Image>
             </Button>
             <Button
-              className="control-button"
+              className="edit-button"
               variant="outline-secondary"
               onClick={() => {
                 updateValues();
               }}
             >
-              <Image className="control-button-image" src={check}></Image>
+              <Image className="edit-button-image" src={check}></Image>
             </Button>
           </div>
         ) : (
           <div className="editing-buttons-container">
             <Button
-              className="control-button"
+              className="edit-button"
               variant="outline-secondary"
               onClick={() => {
                 setEditing(true);
               }}
             >
-              <Image className="control-button-image" src={edit}></Image>
+              <Image className="edit-button-image" src={edit}></Image>
             </Button>
           </div>
         )}
@@ -82,22 +82,6 @@ function UserInfoAccordion(props) {
             <Form.Control
               type="text"
               value={props.user._id}
-              disabled
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="id">
-            <Form.Label>Created</Form.Label>
-            <Form.Control
-              type="text"
-              value={props.user.createdAt}
-              disabled
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="id">
-            <Form.Label>Modified</Form.Label>
-            <Form.Control
-              type="text"
-              value={props.user.updatedAt}
               disabled
             />
           </Form.Group>
@@ -159,6 +143,22 @@ function UserInfoAccordion(props) {
               value={isBlocked}
               disabled={!editing}
               onChange={(e) => setIsBlocked(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="id">
+            <Form.Label>Created</Form.Label>
+            <Form.Control
+              type="text"
+              value={props.user.createdAt}
+              disabled
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="id">
+            <Form.Label>Modified</Form.Label>
+            <Form.Control
+              type="text"
+              value={props.user.updatedAt}
+              disabled
             />
           </Form.Group>
         </Form> : null}

@@ -1,10 +1,10 @@
 import {React, useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
-import {Button, Image, Card} from 'react-bootstrap';
+import {Button, Image, Card, Form} from 'react-bootstrap';
 import {
   deleteBookById,
   generateImageLink,
-  updateBookById,
+  updateBook,
 } from '../../services/apiService';
 import BookBody from '../BookBody/BookBody';
 import edit from '../../assets/images/edit.png';
@@ -40,7 +40,7 @@ function BookAccordion(props) {
     };
 
     try {
-      await updateBookById(newBookData);
+      await updateBook(newBookData);
       setEditing(false);
     } catch (error) {}
   };
@@ -65,43 +65,43 @@ function BookAccordion(props) {
         {editing ? (
           <div className="editing-buttons-container">
             <Button
-              className="control-button"
+              className="edit-button"
               variant="outline-secondary"
               onClick={() => {
                 setShowDeleteBookModal(true);
               }}
             >
-              <Image className="control-button-image" src={trash}></Image>
+              <Image className="edit-button-image" src={trash}></Image>
             </Button>
             <Button
-              className="control-button"
+              className="edit-button"
               variant="outline-secondary"
               onClick={() => {
                 resetValues();
               }}
             >
-              <Image className="control-button-image" src={close}></Image>
+              <Image className="edit-button-image" src={close}></Image>
             </Button>
             <Button
-              className="control-button"
+              className="edit-button"
               variant="outline-secondary"
               onClick={() => {
                 updateValues();
               }}
             >
-              <Image className="control-button-image" src={check}></Image>
+              <Image className="edit-button-image" src={check}></Image>
             </Button>
           </div>
         ) : (
           <div className="editing-buttons-container">
             <Button
-              className="control-button"
+              className="edit-button"
               variant="outline-secondary"
               onClick={() => {
                 setEditing(true);
               }}
             >
-              <Image className="control-button-image" src={edit}></Image>
+              <Image className="edit-button-image" src={edit}></Image>
             </Button>
           </div>
         )}
@@ -123,6 +123,8 @@ function BookAccordion(props) {
           setPages={setPages}
           setText={setText}
           setEditing={setEditing}
+          createdAt={props.book.createdAt}
+          updatedAt={props.book.updatedAt}
         ></BookBody>
       </Accordion.Body>
     </Accordion.Item>

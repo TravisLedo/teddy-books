@@ -13,6 +13,7 @@
   padding-left: 20px;
   padding-right: 20px;
   margin-bottom: 20px;
+  border-radius: 10px;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -25,7 +26,7 @@
 }
 
 .tab-container {
-  width: 80%;
+  width: 100%;
   overflow: hidden;
   margin: auto;
 }
@@ -65,4 +66,14 @@
 
 .user-list{
   padding-top: 100px;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+  color: black;
+  background-color: transparent;
+  border-color: grey;
+  border-style: solid;
+  border-radius: 0px;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
 }

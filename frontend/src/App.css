@@ -39,6 +39,17 @@ html {
   width: 100%;
 }
 
+.edit-button {
+  width: 50px;
+  margin: 5px;
+  padding: 5px;
+}
+
+.edit-button-image {
+  height: 100%;
+  width: 100%;
+}
+
 .link-text-button {
   color: #0accb9 !important;
   border-width: 0 !important;
@@ -59,7 +70,6 @@ html {
   padding-right: 0 !important;
 }
 
-
 .form-container {
   margin: auto;
   padding-top: 50px;
@@ -69,8 +79,6 @@ html {
   justify-content: center;
   text-align:start
 }
-
-
 
 .title-label {
   border-top-left-radius: 10px;

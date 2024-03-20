@@ -107,6 +107,20 @@ export const getUsersByName = async (name) => {
   }
 };
 
+export const getUserByExactName = async (name) => {
+  try {
+    const response = await apiServiceSecure.get('/users/name/'+ name);
+    for (let index = 0; index < response.data.length; index++) {
+      if (response.data[index].name.trim().toLowerCase() === name.trim().toLowerCase() ) {
+        return response.data[index];
+      }
+    }
+    return null;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getNewestUsers = async () => {
   try {
     const response = await apiServiceUnsecure.get('/users/newest');
@@ -144,7 +158,7 @@ export const getAllBooks = async () => {
 };
 
 
-export const updateUserById = async (userData) => {
+export const updateUser = async (userData) => {
   try {
     const response = await apiServiceSecure.put('/users/update', {userData});
     return response.data;
@@ -171,7 +185,7 @@ export const addNewBook = async (bookData) => {
   }
 };
 
-export const updateBookById = async (bookData) => {
+export const updateBook = async (bookData) => {
   try {
     const response = await apiServiceSecure.put('/books/update', {bookData});
     return response.data;

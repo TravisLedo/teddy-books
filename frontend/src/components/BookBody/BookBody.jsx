@@ -45,6 +45,22 @@ function BookBody(props) {
           onChange={(e) => props.setText(e.target.value)}
         />
       </Form.Group>
+      <Form.Group className="mb-3" controlId="id">
+        <Form.Label>Created</Form.Label>
+        <Form.Control
+          type="text"
+          value={props.createdAt}
+          disabled
+        />
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="id">
+        <Form.Label>Modified</Form.Label>
+        <Form.Control
+          type="text"
+          value={props.updatedAt}
+          disabled
+        />
+      </Form.Group>
     </Form>
   );
 }

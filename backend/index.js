@@ -17,6 +17,7 @@ app.use(cors());
 require('dotenv').config();
 const bycrypt = require('bcrypt');
 const {jwtDecode} = require('jwt-decode');
+const {ObjectId} = require('mongodb');
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}.`);
@@ -39,7 +40,6 @@ app.post('/token/refresh', async (req, res) => {
 
     jwt.verify(refreshTokenReponse.token, process.env.JWT_SECRET, async (err) => {
       if (err) {
-        console.log('Refresh token expired for ' + currentAccessToken._id + '(' +currentAccessToken.email + ')' + ', user needs to login again.');
         res.sendStatus(401);
       } else {
         const userData = await User.findById(currentJwtUser._id);
@@ -214,33 +214,32 @@ app.post('/users/autoLogin', authenthicateJwtToken, async (req, res) => {
 
 app.get('/users/id/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id.trim());
     res.status(200).send(user);
   } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+    res.status(204).send(error);
   }
 });
 
 app.get('/users/email/:email', async (req, res) => {
   try {
-    const user = await User.find({email: req.params.email});
+    const regex = new RegExp(req.params.email.trim(), 'i');// find by substring ignore cases
+    const user = await User.find( {email: {'$regex': regex}});
     res.status(200).send(user);
   } catch (error) {
     console.log(error);
-    res.status(500).send(error);
+    res.status(204).send(error);
   }
 });
 
 app.get('/users/name/:name', async (req, res) => {
   try {
-    const user = await User.find( {name: {'$regex': req.params.name, '$options': 'i'}});
-    console.log(user);
-
+    const regex = new RegExp(req.params.name.trim(), 'i');
+    const user = await User.find( {name: {'$regex': regex}});
     res.status(200).send(user);
   } catch (error) {
     console.log(error);
-    res.status(500).send(error);
+    res.status(204).send(error);
   }
 });
 

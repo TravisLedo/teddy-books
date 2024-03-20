@@ -22,9 +22,10 @@ import {
   autoLoginUser,
   getUserById,
   loginUser,
-  updateUserById,
+  updateUser,
 } from './services/apiService';
 import './App.css';
+import ErrorModal from './components/ErrorModal/ErrorModal';
 
 function App() {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ function App() {
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [allowRegistering, setAllowRegistering] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [currentWindowSize, setCurrentWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -41,6 +44,11 @@ function App() {
   const handleLoginModalShow = (allowRegistering) => {
     setAllowRegistering(allowRegistering);
     setShowLoginModal(true);
+  };
+  const handleErrorModalClose = () => setShowErrorModal(false);
+  const handleErrorModalShow = (messages) => {
+    setErrorMessages(messages);
+    setShowErrorModal(true);
   };
 
   const autoLogin = async (localJwtToken) => {
@@ -69,8 +77,8 @@ function App() {
     // navigate('/');
   };
 
-  const updateAudioEnabled = async (audioEnabled) => {
-    if (user && getLocalUser()) {
+  const updateAudioEnabled = async (audioEnabled, asLoggedInUser) => {
+    if (asLoggedInUser) {
       const newUserData = user;
       if (audioEnabled) {
         newUserData.settings.audioEnabled = false;
@@ -87,8 +95,8 @@ function App() {
     }
   };
 
-  const updateAutoNextPage = async (autoNextPage) => {
-    if (user && getLocalUser()) {
+  const updateAutoNextPage = async (autoNextPage, asLoggedInUser) => {
+    if (asLoggedInUser) {
       const newUserData = user;
       if (autoNextPage) {
         newUserData.settings.autoNextPage = false;
@@ -105,8 +113,8 @@ function App() {
     }
   };
 
-  const updateVoiceSelection = async (voice) => {
-    if (user && getLocalUser()) {
+  const updateVoiceSelection = async (voice, asLoggedInUser) => {
+    if (asLoggedInUser) {
       const newUserData = user;
       newUserData.settings.voiceSelection = voice;
       await updateUserDbData(newUserData);
@@ -117,7 +125,7 @@ function App() {
 
   const updateUserDbData = async (userData) => {
     try {
-      const updatedUser = await updateUserById(userData);
+      const updatedUser = await updateUser(userData);
       setUser(updatedUser);
       setOfflineSettings(updatedUser.settings);
     } catch (error) {}
@@ -162,9 +170,11 @@ function App() {
           updateAudioEnabled,
           updateVoiceSelection,
           updateAutoNextPage,
+          handleErrorModalShow,
         }}
       >
         <div className="App">
+          <ErrorModal showErrorModal={showErrorModal} errorMessages={errorMessages} handleErrorModalClose={handleErrorModalClose}></ErrorModal>
           <LoginModal
             allowRegistering={allowRegistering}
             showLoginModal={showLoginModal}
@@ -196,7 +206,7 @@ function App() {
                 path="/profile"
                 element={
                   user ? (
-                    <Profile currentWindowSize={currentWindowSize}/>
+                    <Profile currentWindowSize={currentWindowSize} setErrorMessages={setErrorMessages} setShowErrorModal={setShowErrorModal}/>
                   ) : (
                     <Books></Books>
                   )

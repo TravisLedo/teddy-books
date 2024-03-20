@@ -185,7 +185,7 @@ function Read(props) {
   }, [voiceSelection]);
 
   useEffect(() => {
-    if (authContext.user) {
+    if (authContext.user && getLocalUser()) {
       setAudioEnabled(authContext.user.settings.audioEnabled);
       setAutoNextPage(authContext.user.settings.autoNextPage);
       setVoiceSelection(authContext.user.settings.voiceSelection);

@@ -14,7 +14,7 @@ import AddBookModal from '../../components/AddBookModal/AddBookModal';
 import refresh from '../../assets/images/refresh.png';
 import add from '../../assets/images/add.png';
 import search from '../../assets/images/search.png';
-import {Button, Image, Tab, Tabs, Form, Row, Col} from 'react-bootstrap';
+import {Button, Image, Tab, Tabs, Form, Row, Col, Nav} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import './Admin.css';
 import UserInfoModal from '../../components/UserInfoAccordion/UsertInfoAccordion';
@@ -61,15 +61,86 @@ function Admin(props) {
   };
 
   const searchUsers = async () => {
+    setSearchedUsers([]);
     try {
       const usersById = await getUserById(searchInput);
       const userByEmail = await getUserByEmail(searchInput);
       const usersByName = await getUsersByName(searchInput);
-      const results = [...new Set(usersByName.concat(userByEmail).concat(usersById).flat())];
-      setSearchedUsers(results);
+
+      const results = usersByName.concat(userByEmail).concat(usersById).filter((obj, index) => {
+        return index === usersByName.concat(userByEmail).concat(usersById).findIndex((o) => obj._id === o._id);
+      });
+
+      const removedEmpty = results.filter((value) => Object.keys(value).length !== 0);
+      setSearchedUsers(removedEmpty);
     } catch (error) {
       console.log('Error finding user by email: ', error);
     }
+  };
+
+
+  const usersTabBar=()=>{
+    return <Nav variant="pills" className="flex-column">
+      <Nav.Item>
+        <Nav.Link eventKey="newest">New</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link eventKey="recent">Recent</Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link eventKey="search">Search</Nav.Link>
+      </Nav.Item>
+    </Nav>;
+  };
+
+  const usersTabContent =()=>{
+    return <Tab.Content>
+      <Tab.Pane eventKey="newest"> <div className="user-list">
+        <h3>New Users</h3>
+        {newestUsers.map((user) => (
+          <Accordion defaultActiveKey="0" key={user._id}>
+            <UserInfoAccordion user={user}></UserInfoAccordion>
+          </Accordion>
+        ))}
+      </div></Tab.Pane>
+      <Tab.Pane eventKey="recent">  <div className="user-list">
+        <h3>Recent Active Users</h3>
+        {recentUsers.map((user) => (
+          <Accordion defaultActiveKey="0" key={user._id}>
+            <UserInfoAccordion user={user}></UserInfoAccordion>
+          </Accordion>
+        ))}
+      </div></Tab.Pane>
+      <Tab.Pane eventKey="search">
+        <div className="user-list">
+          <h3>Find User</h3>
+
+          <Form className="form-container mb-0 pb-0">
+            <Form.Group controlId="searchInput">
+              <Form.Control
+                type="text"
+                placeholder="Find user by email, name, id..."
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
+          <div className="top-buttons-container pt-0 mt-0">
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => searchUsers()}
+            >
+              <Image className="edit-button-image" src={search}></Image>
+            </Button>{' '}
+          </div>
+          {searchedUsers.map((user) => (
+            <Accordion defaultActiveKey="0" key={user._id}>
+              <UserInfoAccordion user={user}></UserInfoAccordion>
+            </Accordion>
+          ))}
+        </div>
+      </Tab.Pane>
+    </Tab.Content>;
   };
 
   useEffect(() => {
@@ -82,8 +153,8 @@ function Admin(props) {
       style={{
         width:
           props.currentWindowSize.width > props.currentWindowSize.height ?
-            '75vw' :
-            '95vw',
+            '60%' :
+            '95%',
       }}
     >
       <AddBookModal
@@ -97,11 +168,11 @@ function Admin(props) {
       </div>
       <div className="top-buttons-container">
         <Button
-          className="control-button"
+          className="edit-button"
           variant="outline-secondary"
           onClick={() => refreshData()}
         >
-          <Image className="control-button-image" src={refresh}></Image>
+          <Image className="edit-button-image" src={refresh}></Image>
         </Button>
       </div>
       <Tabs
@@ -112,20 +183,14 @@ function Admin(props) {
         <Tab eventKey="books" title="Books">
           <div
             className="tab-container"
-            style={{
-              width:
-                props.currentWindowSize.width > props.currentWindowSize.height ?
-                  '80%' :
-                  '95%',
-            }}
           >
             <div className="top-buttons-container">
               <Button
-                className="control-button"
+                className="edit-button"
                 variant="outline-secondary"
                 onClick={() => setShowAddBookModal(true)}
               >
-                <Image className="control-button-image" src={add}></Image>
+                <Image className="edit-button-image" src={add}></Image>
               </Button>
             </div>
             {booksData.map((book) => (
@@ -141,56 +206,16 @@ function Admin(props) {
         <Tab eventKey="users" title="Users">
           <div
             className="tab-container"
-            style={{
-              width:
-                props.currentWindowSize.width > props.currentWindowSize.height ?
-                  '80%' :
-                  '95%',
-            }}
           >
+            <Tab.Container defaultActiveKey="newest">
+              {props.currentWindowSize.width > props.currentWindowSize.height ? <Row>
+                <Col sm={2}>{usersTabBar()}</Col> <Col sm={10}>{usersTabContent()}
+                </Col> </Row>: <Row>{usersTabBar()}{usersTabContent()}</Row>}
 
 
-            <Form className="form-container mb-0 pb-0">
-              <Form.Group controlId="searchInput">
-                <Form.Control
-                  type="text"
-                  placeholder="Find user by email, name, id..."
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
-              </Form.Group>
-            </Form>
-            <div className="top-buttons-container pt-0 mt-0">
-              <Button
-                className="control-button"
-                variant="outline-secondary"
-                onClick={() => searchUsers()}
-              >
-                <Image className="control-button-image" src={search}></Image>
-              </Button>{' '}
-            </div>
-            {searchedUsers.map((user) => (
-              <Accordion defaultActiveKey="0" key={user._id}>
-                <UserInfoAccordion user={user}></UserInfoAccordion>
-              </Accordion>
-            ))}
+            </Tab.Container>
 
-            <div className="user-list">
-              <h3>New Users</h3>
-              {newestUsers.map((user) => (
-                <Accordion defaultActiveKey="0" key={user._id}>
-                  <UserInfoAccordion user={user}></UserInfoAccordion>
-                </Accordion>
-              ))}
-            </div>
 
-            <div className="user-list">
-              <h3>Recent Active Users</h3>
-              {recentUsers.map((user) => (
-                <Accordion defaultActiveKey="0" key={user._id}>
-                  <UserInfoAccordion user={user}></UserInfoAccordion>
-                </Accordion>
-              ))}
-            </div>
           </div>
         </Tab>
       </Tabs>
