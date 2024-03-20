@@ -88,11 +88,15 @@ function Profile(props) {
 
 
   useEffect(() => {
-    setAudioEnabled(authContext.user.settings.audioEnabled);
-    setAutoNextPage(authContext.user.settings.autoNextPage);
-    setVoiceSelection(authContext.user.settings.voiceSelection);
-    setUserName(authContext.user.name);
-    setEmail(authContext.user.email);
+    if (authContext.user) {
+      setAudioEnabled(authContext.user.settings.audioEnabled);
+      setAutoNextPage(authContext.user.settings.autoNextPage);
+      setVoiceSelection(authContext.user.settings.voiceSelection);
+      setUserName(authContext.user.name);
+      setEmail(authContext.user.email);
+    } else {
+
+    }
   }, [authContext.user]);
 
   return (

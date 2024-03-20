@@ -2,7 +2,7 @@ import Books from './pages/Books/Books';
 import Read from './pages/Read/Read';
 import Error from './pages/Error/Error';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Routes, Route, useNavigate} from 'react-router-dom';
+import {Routes, Route, useNavigate, Navigate} from 'react-router-dom';
 import MainHeader from './components/mainHeader/mainHeader';
 import {React, useEffect, useState} from 'react';
 import Admin from './pages/Admin/Admin';
@@ -139,11 +139,15 @@ function App() {
   };
 
   useEffect(() => {
+    const localJwtToken = getLocalUser();
+    const attemptAutoLogin = async ()=>{
+      await autoLogin(localJwtToken);
+      setIsLoading(false);
+    };
     activateApiServiceSecureInterceptors(handleLoginModalShow);
     window.addEventListener('resize', handleResize);
-    const localJwtToken = getLocalUser();
     if (localJwtToken) {
-      autoLogin(localJwtToken);
+      attemptAutoLogin();
     } else {
       if (!getOfflineSettings()) {
         setOfflineSettings({
@@ -152,8 +156,8 @@ function App() {
           audioEnabled: true,
         });
       }
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   if (!isLoading) {
@@ -200,19 +204,17 @@ function App() {
               ></Route>
             ) : null}
 
-            {user && user.isAdmin ? (
-              <Route
-                exact
-                path="/profile"
-                element={
-                  user ? (
+            <Route
+              exact
+              path="/profile"
+              element={
+                  user? (
                     <Profile currentWindowSize={currentWindowSize} setErrorMessages={setErrorMessages} setShowErrorModal={setShowErrorModal}/>
                   ) : (
-                    <Books></Books>
-                  )
-                }
-              ></Route>
-            ) : null}
+                   <Navigate to="/"/>
+                    )
+              }
+            ></Route>
 
             <Route
               exact

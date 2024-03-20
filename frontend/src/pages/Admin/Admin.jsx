@@ -17,7 +17,6 @@ import search from '../../assets/images/search.png';
 import {Button, Image, Tab, Tabs, Form, Row, Col, Nav} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import './Admin.css';
-import UserInfoModal from '../../components/UserInfoAccordion/UsertInfoAccordion';
 import UserInfoAccordion from '../../components/UserInfoAccordion/UsertInfoAccordion';
 
 function Admin(props) {
