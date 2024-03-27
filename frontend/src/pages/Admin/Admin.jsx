@@ -51,6 +51,10 @@ function Admin(props) {
   };
 
   const refreshData = () => {
+    setEmail('');
+    setPassword('');
+    setName('');
+    setPasswordConfirm('');
     setBooksData([]);
     setNewestUsers([]);
     setRecentUsers([]);
@@ -116,7 +120,6 @@ function Admin(props) {
     try {
       const response = await addNewUser(userData);
       if (response) {
-        resetRegisterForms();
         refreshData();
       }
     } catch (error) {
@@ -124,12 +127,6 @@ function Admin(props) {
     }
   };
 
-  const resetRegisterForms = async () => {
-    setEmail('');
-    setPassword('');
-    setName('');
-    setPasswordConfirm('');
-  };
   const usersTabBar=()=>{
     return <Nav variant="pills" className="flex-column">
       <Nav.Item>

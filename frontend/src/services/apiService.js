@@ -203,7 +203,7 @@ export const getBookById = async (_id) => {
 
 export const getBookByNameExact = async (name) => {
   try {
-    const response = await apiServiceSecure.get('/books/nameexact/'+ name);
+    const response = await apiServiceSecure.get('/books/exactname/'+ name);
     for (let index = 0; index < response.data.length; index++) {
       if (response.data[index].name.trim().toLowerCase() === name.trim().toLowerCase() ) {
         return response.data[index];
