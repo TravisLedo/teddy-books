@@ -1,10 +1,14 @@
-import {React, useState, useEffect} from 'react';
+import {React, useState, useEffect, useContext} from 'react';
 import {Button} from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import BookBody from '../../components/BookBody/BookBody';
 import './AddBookModal.css';
+import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
+import {AuthContext} from '../../contexts/Contexts';
 
 function AddBookModal(props) {
+  const authContext = useContext(AuthContext);
+
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [pages, setPages] = useState(2);
@@ -18,6 +22,25 @@ function AddBookModal(props) {
       text: text,
     };
     props.addBook(newBookData);
+  };
+
+  const validateFields = async () => {
+    let titleErrorsList = [];
+    let authorErrorsList = [];
+    let pagesErrorsList = [];
+    let textErrorList = [];
+
+    titleErrorsList = await validateBookTitle(title);
+    authorErrorsList = await validateBookAuthor(author);
+    pagesErrorsList = await validatePagesNumber(pages);
+    textErrorList = await validateBookText(text);
+
+    const errorsList = titleErrorsList.concat(authorErrorsList).concat(pagesErrorsList).concat(textErrorList);
+    if (errorsList.length>0) {
+      authContext.handleErrorModalShow(errorsList);
+    } else {
+      handleSave();
+    }
   };
 
   return (
@@ -50,7 +73,7 @@ function AddBookModal(props) {
           Close
       </Button>
       <Button className="standard-button btn-custom"
-        onClick={()=>handleSave()}>
+        onClick={()=>validateFields()}>
           Add
       </Button></div>
 

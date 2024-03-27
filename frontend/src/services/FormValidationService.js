@@ -1,4 +1,4 @@
-import {getUserByEmailExact, getUserByExactName} from './apiService';
+import {getBookByNameExact as getBookByTitleExact, getUserByEmailExact, getUserByExactName} from './apiService';
 
 export const validateUsername = async (userName)=>{
   const errors = [];
@@ -50,7 +50,7 @@ export const validatePasswordFormat = async (password)=>{
     errors.push('Password cannot be blank.');
   } else {
     if (password.length < 3) {
-      errors.push('{Password} must be at least 3 characters.');
+      errors.push('Password must be at least 3 characters.');
     } else if (password.length > 20) {
       errors.push('Email must be less than 21 characters.');
     }
@@ -74,6 +74,66 @@ export const validateIsBlocked = async (value)=>{
   }
   return errors;
 };
+
+export const validateBookTitle = async (title)=>{
+  const errors = [];
+  if (isInputBlank(title)) {
+    errors.push('Book title cannot be blank.');
+  } else {
+    if (title.length < 2) {
+      errors.push('Book title must be at least 2 characters.');
+    } else if (title.length > 50) {
+      errors.push('Email must be less than 51 characters.');
+    }
+    const user = await getBookByTitleExact(title);
+    if (user !== null) {
+      errors.push('Book title is already taken.');
+    }
+  }
+  return errors;
+};
+
+
+export const validateBookAuthor = async (author)=>{
+  const errors = [];
+  if (isInputBlank(author)) {
+    errors.push('Author name cannot be blank.');
+  } else {
+    if (author.length < 3) {
+      errors.push('Author name must be at least 3 characters.');
+    } else if (author.length > 50) {
+      errors.push('Author name must be less than 51 characters.');
+    }
+  }
+  return errors;
+};
+
+export const validatePagesNumber = async (value)=>{
+  const errors = [];
+  if (isInputBlank(value)) {
+    errors.push('Pages cannot be blank.');
+  } else {
+    try {
+      const numbervalue = parseInt(value);
+      if (numbervalue % 2 != 0) {
+        errors.push('Pages must be even');
+      }
+    } catch (error) {
+      errors.push('Pages value is an invalid format.');
+    }
+  }
+  return errors;
+};
+
+export const validateBookText = async (value)=>{
+  const errors = [];
+
+  if (value && value.length > 5000) {
+    errors.push('Text must be less than 5000');
+  }
+  return errors;
+};
+
 
 export const isInputBlank = (input)=>{
   if (!input || input.length < 1) {

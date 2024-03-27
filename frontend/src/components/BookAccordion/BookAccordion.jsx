@@ -1,4 +1,4 @@
-import {React, useState} from 'react';
+import {React, useContext, useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import {Button, Image, Card, Form} from 'react-bootstrap';
 import {
@@ -12,15 +12,19 @@ import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
 import trash from '../../assets/images/trash.png';
 import './BookAccordion.css';
-import DeleteBookModal from '../DeleteBookModal/DeleteBookModal';
+import DeleteModal from '../DeleteBookModal/DeleteModal';
+import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
+import {AuthContext} from '../../contexts/Contexts';
 
 function BookAccordion(props) {
+  const authContext = useContext(AuthContext);
+
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(props.book.title);
   const [author, setAuthor] = useState(props.book.author);
   const [pages, setPages] = useState(props.book.pages);
   const [text, setText] = useState(props.book.text);
-  const [showDeleteBookModal, setShowDeleteBookModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const resetValues = () => {
     setEditing(false);
@@ -45,21 +49,44 @@ function BookAccordion(props) {
     } catch (error) {}
   };
 
-  const deleteBook = async () => {
+  const validateFields = async () => {
+    let titleErrorsList = [];
+    let authorErrorsList = [];
+    let pagesErrorsList = [];
+    let textErrorList = [];
+
+    if (title.trim().toLowerCase() !== props.book.title.trim().toLowerCase()) {
+      titleErrorsList = await validateBookTitle(title);
+    }
+    authorErrorsList = await validateBookAuthor(author);
+    pagesErrorsList = await validatePagesNumber(pages);
+    textErrorList = await validateBookText(text);
+
+    const errorsList = titleErrorsList.concat(authorErrorsList).concat(pagesErrorsList).concat(textErrorList);
+    if (errorsList.length>0) {
+      authContext.handleErrorModalShow(errorsList);
+    } else {
+      updateValues();
+    }
+  };
+
+  const deleteItem = async () => {
     try {
       await deleteBookById(props.book._id);
+      setShowDeleteModal(false);
       props.refreshData();
     } catch (error) {}
   };
 
   return (
     <Accordion.Item eventKey={props.book._id}>
-      <DeleteBookModal
-        book={props.book}
-        deleteBook={deleteBook}
-        showDeleteBookModal={showDeleteBookModal}
-        setShowDeleteBookModal={setShowDeleteBookModal}
-      ></DeleteBookModal>
+      <DeleteModal
+        type={'book'}
+        name={props.book.title}
+        deleteItem={deleteItem}
+        showDeleteModal={showDeleteModal}
+        setShowDeleteModal={setShowDeleteModal}
+      ></DeleteModal>
       <Accordion.Header>{props.book.title}</Accordion.Header>
       <Accordion.Body>
         {editing ? (
@@ -68,7 +95,7 @@ function BookAccordion(props) {
               className="edit-button"
               variant="outline-secondary"
               onClick={() => {
-                setShowDeleteBookModal(true);
+                setShowDeleteModal(true);
               }}
             >
               <Image className="edit-button-image" src={trash}></Image>
@@ -86,7 +113,7 @@ function BookAccordion(props) {
               className="edit-button"
               variant="outline-secondary"
               onClick={() => {
-                updateValues();
+                validateFields();
               }}
             >
               <Image className="edit-button-image" src={check}></Image>

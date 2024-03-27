@@ -62,7 +62,17 @@ app.get('/books/all', async (req, res) => {
   }
 });
 
-app.get('/books/:id', async (req, res) => {
+app.get('/books/id/:id', async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    res.status(200).send(book);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
+app.get('/books/exactname/:name', async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     res.status(200).send(book);
@@ -112,7 +122,7 @@ app.put('/books/update', authenthicateJwtToken, async (req, res) => {
   }
 });
 
-app.post('/books/witai/speak', async (req, res) => {
+app.post('/witai/speak', async (req, res) => {
   try {
     const config = {
       headers: {
@@ -160,7 +170,7 @@ app.post('/books/witai/speak', async (req, res) => {
   }
 });
 
-app.post('/books/removeaudio', async (req, res) => {
+app.post('/witai/removeaudio', async (req, res) => {
   try {
     const DIR_PATH = './public';
     if (req.body.file.contains('temp')) {
@@ -212,7 +222,7 @@ app.get('/users/id/:id', async (req, res) => {
   }
 });
 
-app.get('/users/emailexact/:email', async (req, res) => {
+app.get('/users/exactemail/:email', async (req, res) => {
   try {
     const user = await User.find( {email: req.params.email.trim()});
     res.status(200).send(user);
@@ -235,6 +245,15 @@ app.get('/users/name/:name', async (req, res) => {
   try {
     const regex = new RegExp(req.params.name.trim(), 'i');
     const user = await User.find( {name: {'$regex': regex}});
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(204).send(error);
+  }
+});
+
+app.get('/users/exactname/:name', async (req, res) => {
+  try {
+    const user = await User.find( {name: req.params.name.trim()});
     res.status(200).send(user);
   } catch (error) {
     res.status(204).send(error);
@@ -287,6 +306,14 @@ app.put('/users/update', authenthicateJwtToken, async (req, res) => {
   }
 });
 
+app.delete('/users/delete/:id', authenthicateJwtToken, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).send('User Deleted.');
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 // Remove any files that may be missed due to interuptions from auto delete.
 // Files older than 1 minute will be removed.

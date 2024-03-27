@@ -100,7 +100,7 @@ export const getUsersByEmail = async (email) => {
 
 export const getUserByEmailExact = async (email) => {
   try {
-    const response = await apiServiceSecure.get('/users/emailexact/' + email);
+    const response = await apiServiceSecure.get('/users/exactemail/' + email);
 
     for (let index = 0; index < response.data.length; index++) {
       if (response.data[index].email.trim().toLowerCase() === email.trim().toLowerCase() ) {
@@ -124,7 +124,7 @@ export const getUsersByName = async (name) => {
 
 export const getUserByExactName = async (name) => {
   try {
-    const response = await apiServiceSecure.get('/users/name/'+ name);
+    const response = await apiServiceSecure.get('/users/exactname/'+ name);
     for (let index = 0; index < response.data.length; index++) {
       if (response.data[index].name.trim().toLowerCase() === name.trim().toLowerCase() ) {
         return response.data[index];
@@ -182,10 +182,34 @@ export const updateUser = async (userData) => {
   }
 };
 
+export const deleteUserById = async (userId) => {
+  try {
+    const response = await apiServiceSecure.delete('/users/delete/' + userId);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getBookById = async (_id) => {
   try {
-    const response = await apiServiceUnsecure.get('/books/' + _id);
+    const response = await apiServiceUnsecure.get('/books/id/' + _id);
     return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getBookByNameExact = async (name) => {
+  try {
+    const response = await apiServiceSecure.get('/books/nameexact/'+ name);
+    for (let index = 0; index < response.data.length; index++) {
+      if (response.data[index].name.trim().toLowerCase() === name.trim().toLowerCase() ) {
+        return response.data[index];
+      }
+    }
+    return null;
   } catch (error) {
     throw error;
   }
@@ -237,7 +261,7 @@ export const getAudioForPage = async (
     voiceSelection,
 ) => {
   try {
-    const response = await apiServiceUnsecure.post('/books/witai/speak', {
+    const response = await apiServiceUnsecure.post('/witai/speak', {
       book: book,
       leftPage: leftPage,
       rightPage: rightPage,
@@ -252,7 +276,7 @@ export const getAudioForPage = async (
 export const removeTempAudioFromServer = async (audioSource) => {
   try {
     const file = audioSource.replace(process.env.REACT_APP_URL + '/', '');
-    const response = await apiServiceUnsecure.post('/books/removeaudio', {
+    const response = await apiServiceUnsecure.post('/witai/removeaudio', {
       file: file,
     });
     return response;

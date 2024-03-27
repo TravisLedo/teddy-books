@@ -7,6 +7,7 @@ import {
   getUsersByEmail,
   getUsersByName,
   getUserById,
+  addNewUser,
 } from '../../services/apiService';
 import Accordion from 'react-bootstrap/Accordion';
 import BookAccordion from '../../components/BookAccordion/BookAccordion';
@@ -18,8 +19,11 @@ import {Button, Image, Tab, Tabs, Form, Row, Col, Nav} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import './Admin.css';
 import UserInfoAccordion from '../../components/UserInfoAccordion/UsertInfoAccordion';
+import {validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
 
 function Admin(props) {
+  const authContext = useContext(AuthContext);
+
   const [booksData, setBooksData] = useState([]);
   const [showAddBookModal, setShowAddBookModal] = useState(false);
   const [searchInput, setSearchInput] = useState();
@@ -27,7 +31,11 @@ function Admin(props) {
   const [newestUsers, setNewestUsers] = useState([]);
   const [recentUsers, setRecentUsers] = useState([]);
 
-  const authContext = useContext(AuthContext);
+  // for registering
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
 
   const fetchData = async () => {
     try {
@@ -79,7 +87,49 @@ function Admin(props) {
     }
   };
 
+  const validateRegisterFields = async () => {
+    let usernameErrorsList = [];
+    let emailErrorsList = [];
+    let passwordErrorsList = [];
+    usernameErrorsList = await validateUsername(name);
+    emailErrorsList = await validateEmail(email, true);
+    passwordErrorsList = await validatePasswordFormat(password);
 
+    if (password !== passwordConfirm) {
+      passwordErrorsList.push('Passwords must match.');
+    }
+
+    const errorsList = emailErrorsList.concat(usernameErrorsList).concat(passwordErrorsList);
+    if (errorsList.length>0) {
+      authContext.handleErrorModalShow(errorsList);
+    } else {
+      register();
+    }
+  };
+
+  const register = async () => {
+    const userData = {
+      email: email,
+      name: name,
+      password: password,
+    };
+    try {
+      const response = await addNewUser(userData);
+      if (response) {
+        resetRegisterForms();
+        refreshData();
+      }
+    } catch (error) {
+      console.log('Error creating new user: ', error);
+    }
+  };
+
+  const resetRegisterForms = async () => {
+    setEmail('');
+    setPassword('');
+    setName('');
+    setPasswordConfirm('');
+  };
   const usersTabBar=()=>{
     return <Nav variant="pills" className="flex-column">
       <Nav.Item>
@@ -91,6 +141,9 @@ function Admin(props) {
       <Nav.Item>
         <Nav.Link eventKey="search">Search</Nav.Link>
       </Nav.Item>
+      <Nav.Item>
+        <Nav.Link eventKey="register">Register</Nav.Link>
+      </Nav.Item>
     </Nav>;
   };
 
@@ -100,7 +153,7 @@ function Admin(props) {
         <h3>New Users</h3>
         {newestUsers.map((user) => (
           <Accordion defaultActiveKey="0" key={user._id}>
-            <UserInfoAccordion user={user}></UserInfoAccordion>
+            <UserInfoAccordion user={user} refreshData={refreshData}></UserInfoAccordion>
           </Accordion>
         ))}
       </div></Tab.Pane>
@@ -108,7 +161,7 @@ function Admin(props) {
         <h3>Recent Active Users</h3>
         {recentUsers.map((user) => (
           <Accordion defaultActiveKey="0" key={user._id}>
-            <UserInfoAccordion user={user}></UserInfoAccordion>
+            <UserInfoAccordion user={user} refreshData={refreshData}></UserInfoAccordion>
           </Accordion>
         ))}
       </div></Tab.Pane>
@@ -121,6 +174,7 @@ function Admin(props) {
               <Form.Control
                 type="text"
                 placeholder="Find user by email, name, id..."
+                value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
             </Form.Group>
@@ -136,9 +190,59 @@ function Admin(props) {
           </div>
           {searchedUsers.map((user) => (
             <Accordion defaultActiveKey="0" key={user._id}>
-              <UserInfoAccordion user={user}></UserInfoAccordion>
+              <UserInfoAccordion user={user} refreshData={refreshData}></UserInfoAccordion>
             </Accordion>
           ))}
+        </div>
+      </Tab.Pane>
+      <Tab.Pane eventKey="register">
+        <div className="user-list">
+          <h3>Register User</h3>
+
+          <Form className="form-container">
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Control
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="password">
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="passwordConfirm">
+              <Form.Control
+                type="password"
+                placeholder="Confirm Password"
+                value={passwordConfirm}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="name">
+              <Form.Control
+                type="text"
+                placeholder="Username"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Form.Group>
+            <div className="button-container">
+              <Button
+                className="standard-button btn-custom"
+                onClick={() => {
+                  validateRegisterFields();
+                }}
+              >
+                Register
+              </Button>
+            </div>
+          </Form>
         </div>
       </Tab.Pane>
     </Tab.Content>;
@@ -212,8 +316,6 @@ function Admin(props) {
               {props.currentWindowSize.width > props.currentWindowSize.height ? <Row>
                 <Col sm={2}>{usersTabBar()}</Col> <Col sm={10}>{usersTabContent()}
                 </Col> </Row>: <Row>{usersTabBar()}{usersTabContent()}</Row>}
-
-
             </Tab.Container>
 
 

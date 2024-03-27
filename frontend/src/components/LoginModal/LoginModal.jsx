@@ -15,17 +15,13 @@ function LoginModal(props) {
 
   const resetForms = async () => {
     setRegistering(false);
-    setEmail(null);
-    setPassword(null);
-    setName(null);
-    setPasswordConfirm(null);
+    setEmail('');
+    setPassword('');
+    setName('');
+    setPasswordConfirm('');
   };
 
   const switchForm = async (registering) => {
-    setEmail(null);
-    setPassword(null);
-    setName(null);
-    setPasswordConfirm(null);
     setRegistering(registering);
   };
 
@@ -123,13 +119,23 @@ function LoginModal(props) {
               <Form.Control
                 type="email"
                 placeholder="Email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="name">
+              <Form.Control
+                type="text"
+                placeholder="Username"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="password">
               <Form.Control
                 type="password"
                 placeholder="Password"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
@@ -137,14 +143,8 @@ function LoginModal(props) {
               <Form.Control
                 type="password"
                 placeholder="Confirm Password"
+                value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="name">
-              <Form.Control
-                type="text"
-                placeholder="Username"
-                onChange={(e) => setName(e.target.value)}
               />
             </Form.Group>
             <div className="button-container">
@@ -173,6 +173,7 @@ function LoginModal(props) {
               <Form.Control
                 type="email"
                 placeholder="Email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Form.Group>
@@ -180,6 +181,7 @@ function LoginModal(props) {
               <Form.Control
                 type="password"
                 placeholder="Password"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>

@@ -1,12 +1,14 @@
 import {React, useState, useContext} from 'react';
-import {updateUser} from '../../services/apiService';
+import {deleteUserById, updateUser} from '../../services/apiService';
 import {Button, Form, Image, Accordion} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import edit from '../../assets/images/edit.png';
 import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
+import trash from '../../assets/images/trash.png';
 import './UserInfoAccordion.css';
 import {validateEmail, validateIsAdmin, validateIsBlocked, validateUsername} from '../../services/FormValidationService';
+import DeleteModal from '../DeleteBookModal/DeleteModal';
 
 function UserInfoAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -15,6 +17,7 @@ function UserInfoAccordion(props) {
   const [userName, setUserName] = useState(props.user.name);
   const [isAdmin, setIsAdmin] = useState(props.user.isAdmin);
   const [isBlocked, setIsBlocked] = useState(props.user.isBlocked);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const resetValues = () => {
     setEditing(false);
@@ -62,12 +65,37 @@ function UserInfoAccordion(props) {
     }
   };
 
+
+  const deleteItem = async () => {
+    try {
+      await deleteUserById(props.user._id);
+      setShowDeleteModal(false);
+      props.refreshData();
+    } catch (error) {}
+  };
+
   return (
     <Accordion.Item eventKey={props.user._id}>
+      <DeleteModal
+        type={'user'}
+        name={props.user.email}
+        deleteItem={deleteItem}
+        showDeleteModal={showDeleteModal}
+        setShowDeleteModal={setShowDeleteModal}
+      ></DeleteModal>
       <Accordion.Header>{props.user.email}</Accordion.Header>
       <Accordion.Body>
         {editing ? (
           <div className="editing-buttons-container">
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => {
+                setShowDeleteModal(true);
+              }}
+            >
+              <Image className="edit-button-image" src={trash}></Image>
+            </Button>
             <Button
               className="edit-button"
               variant="outline-secondary"
