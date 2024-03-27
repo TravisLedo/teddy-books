@@ -17,7 +17,6 @@ app.use(cors());
 require('dotenv').config();
 const bycrypt = require('bcrypt');
 const {jwtDecode} = require('jwt-decode');
-const {ObjectId} = require('mongodb');
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}.`);
@@ -49,7 +48,6 @@ app.post('/token/refresh', async (req, res) => {
       }
     });
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -60,7 +58,6 @@ app.get('/books/all', async (req, res) => {
     const books = await Book.find({});
     res.status(200).send(books);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -70,7 +67,6 @@ app.get('/books/:id', async (req, res) => {
     const book = await Book.findById(req.params.id);
     res.status(200).send(book);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -80,7 +76,6 @@ app.delete('/books/delete/:id', authenthicateJwtToken, async (req, res) => {
     await Book.findByIdAndDelete(req.params.id);
     res.status(200).send('Book Deleted.');
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -97,7 +92,6 @@ app.post('/books/add', authenthicateJwtToken, async (req, res) => {
     await book.save();
     res.status(200).send(book);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -114,7 +108,6 @@ app.put('/books/update', authenthicateJwtToken, async (req, res) => {
     await Book.findByIdAndUpdate(req.body.bookData._id, newBookValues);
     res.status(200).send('Updated book data.');
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -197,7 +190,6 @@ app.post('/users/login', async (req, res) => {
       res.status(401).send('Login Failed.');
     }
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -207,7 +199,6 @@ app.post('/users/autoLogin', authenthicateJwtToken, async (req, res) => {
     const user = await User.findOneAndUpdate({email: req.body.email, isBlocked: false}, {lastLogin: Date.now()});
     res.status(200).send(user);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -221,13 +212,21 @@ app.get('/users/id/:id', async (req, res) => {
   }
 });
 
+app.get('/users/emailexact/:email', async (req, res) => {
+  try {
+    const user = await User.find( {email: req.params.email.trim()});
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(204).send(error);
+  }
+});
+
 app.get('/users/email/:email', async (req, res) => {
   try {
     const regex = new RegExp(req.params.email.trim(), 'i');// find by substring ignore cases
     const user = await User.find( {email: {'$regex': regex}});
     res.status(200).send(user);
   } catch (error) {
-    console.log(error);
     res.status(204).send(error);
   }
 });
@@ -238,7 +237,6 @@ app.get('/users/name/:name', async (req, res) => {
     const user = await User.find( {name: {'$regex': regex}});
     res.status(200).send(user);
   } catch (error) {
-    console.log(error);
     res.status(204).send(error);
   }
 });
@@ -248,7 +246,6 @@ app.get('/users/newest', async (req, res) => {
     const users = await User.find({}).limit(5).sort({createdAt: -1});
     res.status(200).send(users);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -258,7 +255,6 @@ app.get('/users/recent', async (req, res) => {
     const users = await User.find({}).limit(5).sort({lastLogin: -1});
     res.status(200).send(users);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -278,7 +274,6 @@ app.post('/users/add', async (req, res) => {
     await refreshToken.save(refreshToken);
     res.status(200).send(accessToken);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -288,7 +283,6 @@ app.put('/users/update', authenthicateJwtToken, async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, req.body.userData, {new: true});
     res.status(200).send(updatedUser);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });

@@ -7,17 +7,17 @@ import edit from '../../assets/images/edit.png';
 import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
 import './Profile.css';
-import {getUserByExactName, getUsersByName, updateUser} from '../../services/apiService';
+import {updateUser} from '../../services/apiService';
 import {validateEmail, validateUsername} from '../../services/FormValidationService';
 
 function Profile(props) {
   const authContext = useContext(AuthContext);
-  const [voiceSelection, setVoiceSelection] = useState();
-  const [autoNextPage, setAutoNextPage] = useState();
-  const [audioEnabled, setAudioEnabled] = useState();
+  const [voiceSelection, setVoiceSelection] = useState(authContext.user.settings.voiceSelection);
+  const [autoNextPage, setAutoNextPage] = useState(authContext.user.settings.autoNextPage);
+  const [audioEnabled, setAudioEnabled] = useState(authContext.user.settings.audioEnabled);
   const [editing, setEditing] = useState(false);
-  const [userName, setUserName] = useState();
-  const [email, setEmail] = useState();
+  const [userName, setUserName] = useState(authContext.user.name);
+  const [email, setEmail] = useState(authContext.user.email);
 
   const handleAutoNextPageToggle = async () => {
     const updated = await authContext.updateAutoNextPage(autoNextPage, true);
@@ -57,10 +57,10 @@ function Profile(props) {
     let usernameErrorsList = [];
     let emailErrorsList = [];
     if (userName.trim().toLowerCase() !== authContext.user.name.trim().toLowerCase()) {
-      usernameErrorsList = await validateUsername(userName, authContext.user.name);
+      usernameErrorsList = await validateUsername(userName);
     }
     if (email.trim().toLowerCase() !== authContext.user.email.trim().toLowerCase()) {
-      emailErrorsList = await validateEmail(email);
+      emailErrorsList = await validateEmail(email, true);
     }
     const errorsList = usernameErrorsList.concat(emailErrorsList);
     if (errorsList.length>0) {
@@ -88,15 +88,11 @@ function Profile(props) {
 
 
   useEffect(() => {
-    if (authContext.user) {
-      setAudioEnabled(authContext.user.settings.audioEnabled);
-      setAutoNextPage(authContext.user.settings.autoNextPage);
-      setVoiceSelection(authContext.user.settings.voiceSelection);
-      setUserName(authContext.user.name);
-      setEmail(authContext.user.email);
-    } else {
-
-    }
+    setAudioEnabled(authContext.user.settings.audioEnabled);
+    setAutoNextPage(authContext.user.settings.autoNextPage);
+    setVoiceSelection(authContext.user.settings.voiceSelection);
+    setUserName(authContext.user.name);
+    setEmail(authContext.user.email);
   }, [authContext.user]);
 
   return (

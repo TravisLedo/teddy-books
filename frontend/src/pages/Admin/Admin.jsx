@@ -4,7 +4,7 @@ import {
   getRecentUsers,
   getAllBooks,
   getNewestUsers,
-  getUserByEmail,
+  getUsersByEmail,
   getUsersByName,
   getUserById,
 } from '../../services/apiService';
@@ -46,6 +46,8 @@ function Admin(props) {
     setBooksData([]);
     setNewestUsers([]);
     setRecentUsers([]);
+    setSearchedUsers([]);
+    searchUsers();
     fetchData();
   };
 
@@ -63,7 +65,7 @@ function Admin(props) {
     setSearchedUsers([]);
     try {
       const usersById = await getUserById(searchInput);
-      const userByEmail = await getUserByEmail(searchInput);
+      const userByEmail = await getUsersByEmail(searchInput);
       const usersByName = await getUsersByName(searchInput);
 
       const results = usersByName.concat(userByEmail).concat(usersById).filter((obj, index) => {

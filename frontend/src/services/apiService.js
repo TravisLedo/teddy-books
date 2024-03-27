@@ -89,10 +89,25 @@ export const getUserById = async (_id) => {
   }
 };
 
-export const getUserByEmail = async (email) => {
+export const getUsersByEmail = async (email) => {
   try {
     const response = await apiServiceSecure.get('/users/email/' + email);
     return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserByEmailExact = async (email) => {
+  try {
+    const response = await apiServiceSecure.get('/users/emailexact/' + email);
+
+    for (let index = 0; index < response.data.length; index++) {
+      if (response.data[index].email.trim().toLowerCase() === email.trim().toLowerCase() ) {
+        return response.data[index];
+      }
+    }
+    return null;
   } catch (error) {
     throw error;
   }

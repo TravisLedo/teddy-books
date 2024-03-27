@@ -3,14 +3,15 @@ import {addNewUser} from '../../services/apiService';
 import {Button, Form, Modal} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import './LoginModal.css';
+import {validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
 
 function LoginModal(props) {
   const authContext = useContext(AuthContext);
   const [registering, setRegistering] = useState(false);
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [name, setName] = useState();
-  const [passwordConfirm, setPasswordConfirm] = useState();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
 
   const resetForms = async () => {
     setRegistering(false);
@@ -19,6 +20,15 @@ function LoginModal(props) {
     setName(null);
     setPasswordConfirm(null);
   };
+
+  const switchForm = async (registering) => {
+    setEmail(null);
+    setPassword(null);
+    setName(null);
+    setPasswordConfirm(null);
+    setRegistering(registering);
+  };
+
 
   const login = async () => {
     try {
@@ -34,7 +44,6 @@ function LoginModal(props) {
   };
 
   const register = async () => {
-    // todo: add validation checks
     const userData = {
       email: email,
       name: name,
@@ -47,6 +56,41 @@ function LoginModal(props) {
       }
     } catch (error) {
       console.log('Error creating new user: ', error);
+    }
+  };
+
+  const validateRegisterFields = async () => {
+    let usernameErrorsList = [];
+    let emailErrorsList = [];
+    let passwordErrorsList = [];
+    usernameErrorsList = await validateUsername(name);
+    emailErrorsList = await validateEmail(email, true);
+    passwordErrorsList = await validatePasswordFormat(password);
+
+    if (registering && password !== passwordConfirm) {
+      passwordErrorsList.push('Passwords must match.');
+    }
+
+    const errorsList = emailErrorsList.concat(usernameErrorsList).concat(passwordErrorsList);
+    if (errorsList.length>0) {
+      authContext.handleErrorModalShow(errorsList);
+    } else {
+      register();
+    }
+  };
+
+  const validateLoginFields = async () => {
+    let emailErrorsList = [];
+    let passwordErrorsList = [];
+
+    emailErrorsList = await validateEmail(email, false);
+    passwordErrorsList = await validatePasswordFormat(password);
+    const errorsList = emailErrorsList.concat(passwordErrorsList);
+
+    if (errorsList.length>0) {
+      authContext.handleErrorModalShow(errorsList);
+    } else {
+      login();
     }
   };
 
@@ -82,13 +126,6 @@ function LoginModal(props) {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="name">
-              <Form.Control
-                type="text"
-                placeholder="Display Name"
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Form.Group>
             <Form.Group className="mb-3" controlId="password">
               <Form.Control
                 type="password"
@@ -103,12 +140,19 @@ function LoginModal(props) {
                 onChange={(e) => setPasswordConfirm(e.target.value)}
               />
             </Form.Group>
+            <Form.Group className="mb-3" controlId="name">
+              <Form.Control
+                type="text"
+                placeholder="Username"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Form.Group>
             <div className="button-container">
               <Button
                 className="standard-button"
                 variant="outline-secondary"
                 onClick={() => {
-                  setRegistering(false);
+                  switchForm(false);
                 }}
               >
                 Back
@@ -116,7 +160,7 @@ function LoginModal(props) {
               <Button
                 className="standard-button btn-custom"
                 onClick={() => {
-                  register();
+                  validateRegisterFields();
                 }}
               >
                 Register
@@ -152,7 +196,7 @@ function LoginModal(props) {
               <Button
                 className="standard-button btn-custom"
                 onClick={() => {
-                  login();
+                  validateLoginFields();
                 }}
               >
                 Login
@@ -165,7 +209,7 @@ function LoginModal(props) {
                   className="link-text-button"
                   variant="outline-secondary"
                   onClick={() => {
-                    setRegistering(true);
+                    switchForm(true);
                   }}
                 >
                   Register
