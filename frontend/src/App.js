@@ -68,7 +68,10 @@ function App() {
       setUser(user);
       setOfflineSettings(user.settings);
       localStorage.setItem('jwtToken', jwtToken);
-    } catch (error) {}
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const logout = () => {

@@ -1,16 +1,20 @@
-import {getBookByNameExact as getBookByTitleExact, getUserByEmailExact, getUserByExactName} from './apiService';
+import {getBookByNameExact as getBookByTitleExact, getUserByEmail, getUserByName} from './apiService';
 
-export const validateUsername = async (userName)=>{
+export const validateUsername = async (userName, checkForExisting)=>{
   const errors = [];
   if (isInputBlank(userName)) {
     errors.push('Username cannot be blank.');
   } else {
     if (userName.length < 5) {
       errors.push('Username must be at least 5 characters.');
+    } else if (email.length >50) {
+      errors.push('Email must be less than 51 characters.');
     }
-    const user = await getUserByExactName(userName);
-    if (user !== null) {
-      errors.push('Username is already taken.');
+    if (checkForExisting) {
+      const user = await getUserByName(userName);
+      if (user) {
+        errors.push('Username is already taken.');
+      }
     }
   }
 
@@ -33,9 +37,9 @@ export const validateEmail = async (email, checkForExisting)=>{
     }
 
     if (checkForExisting) {
-      const user = await getUserByEmailExact(email);
+      const user = await getUserByEmail(email);
 
-      if (user !== null) {
+      if (user) {
         errors.push('Email is already taken.');
       }
     }

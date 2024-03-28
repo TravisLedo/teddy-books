@@ -57,7 +57,7 @@ function Profile(props) {
     let usernameErrorsList = [];
     let emailErrorsList = [];
     if (userName.trim().toLowerCase() !== authContext.user.name.trim().toLowerCase()) {
-      usernameErrorsList = await validateUsername(userName);
+      usernameErrorsList = await validateUsername(userName, true);
     }
     if (email.trim().toLowerCase() !== authContext.user.email.trim().toLowerCase()) {
       emailErrorsList = await validateEmail(email, true);

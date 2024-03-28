@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 function BookBody(props) {
   return (
     <Form className="form-container">
-      <Form.Group className="mb-3" controlId="title">
+      <Form.Group className="mb-3">
         <Form.Label>Title</Form.Label>
         <Form.Control
           type="text"
@@ -14,7 +14,7 @@ function BookBody(props) {
           onChange={(e) => props.setTitle(e.target.value)}
         />
       </Form.Group>
-      <Form.Group className="mb-3" controlId="author">
+      <Form.Group className="mb-3">
         <Form.Label>Author</Form.Label>
         <Form.Control
           type="text"
@@ -24,7 +24,7 @@ function BookBody(props) {
           onChange={(e) => props.setAuthor(e.target.value)}
         />
       </Form.Group>
-      <Form.Group className="mb-3" controlId="number">
+      <Form.Group className="mb-3">
         <Form.Label>Pages</Form.Label>
         <Form.Control
           type="number"
@@ -34,7 +34,7 @@ function BookBody(props) {
           onChange={(e) => props.setPages(e.target.value)}
         />
       </Form.Group>
-      <Form.Group className="mb-3" controlId="text">
+      <Form.Group className="mb-3">
         <Form.Label>Text</Form.Label>
         <Form.Control
           as="textarea"
@@ -45,7 +45,7 @@ function BookBody(props) {
           onChange={(e) => props.setText(e.target.value)}
         />
       </Form.Group>
-      <Form.Group className="mb-3" controlId="id">
+      <Form.Group className="mb-3">
         <Form.Label>Created</Form.Label>
         <Form.Control
           type="text"
@@ -53,7 +53,7 @@ function BookBody(props) {
           disabled
         />
       </Form.Group>
-      <Form.Group className="mb-3" controlId="id">
+      <Form.Group className="mb-3">
         <Form.Label>Modified</Form.Label>
         <Form.Control
           type="text"

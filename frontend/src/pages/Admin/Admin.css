@@ -64,10 +64,6 @@
   cursor: pointer;
 }
 
-.user-list{
-  padding-top: 100px;
-}
-
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
   color: black;
   background-color: transparent;
@@ -76,4 +72,8 @@
   border-radius: 0px;
   border-top-width: 1px;
   border-bottom-width: 1px;
+}
+
+[tabindex] {
+  outline: none;
 }

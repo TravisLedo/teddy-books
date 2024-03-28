@@ -46,7 +46,7 @@ function UserInfoAccordion(props) {
     let isBlockedErrors = [];
 
     if (userName.trim().toLowerCase() !== props.user.name.trim().toLowerCase()) {
-      usernameErrorsList = await validateUsername(userName);
+      usernameErrorsList = await validateUsername(userName, true);
     }
     if (email.trim().toLowerCase() !== props.user.email.trim().toLowerCase()) {
       emailErrorsList = await validateEmail(email, true);
@@ -129,7 +129,7 @@ function UserInfoAccordion(props) {
           </div>
         )}
         {props.user ? <Form className="form-container">
-          <Form.Group className="mb-3" controlId="id">
+          <Form.Group className="mb-3" controlId='userId'>
             <Form.Label>ID:</Form.Label>
             <Form.Control
               type="text"
@@ -138,7 +138,7 @@ function UserInfoAccordion(props) {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="email">
+          <Form.Group className="mb-3" controlId='email'>
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
@@ -148,7 +148,7 @@ function UserInfoAccordion(props) {
               onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="Name">
+          <Form.Group className="mb-3" controlId='username'>
             <Form.Label>Name</Form.Label>
 
             <Form.Control
@@ -159,7 +159,7 @@ function UserInfoAccordion(props) {
               onChange={(e) => setUserName(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="isAdmin">
+          <Form.Group className="mb-3" controlId='isAdmin'>
             <Form.Label>Admin</Form.Label>
             <Form.Control
               type="text"
@@ -169,7 +169,7 @@ function UserInfoAccordion(props) {
               onChange={(e) => setIsAdmin(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="isBlocked">
+          <Form.Group className="mb-3" controlId='isBlocked'>
             <Form.Label>Blocked</Form.Label>
             <Form.Control
               type="text"
@@ -179,7 +179,7 @@ function UserInfoAccordion(props) {
               onChange={(e) => setIsBlocked(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="id">
+          <Form.Group className="mb-3" controlId='created'>
             <Form.Label>Created</Form.Label>
             <Form.Control
               type="text"
@@ -187,14 +187,14 @@ function UserInfoAccordion(props) {
               disabled
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="id">
+          <Form.Group className="mb-3" controlId='modified'>
             <Form.Label>Modified</Form.Label>
             <Form.Control
               type="text"
               value={props.user.updatedAt}
               disabled
             />
-            <Form.Group className="mb-3" controlId="id">
+            <Form.Group className="mb-3" controlId='lastLogin'>
               <Form.Label>Last Login</Form.Label>
               <Form.Control
                 type="text"

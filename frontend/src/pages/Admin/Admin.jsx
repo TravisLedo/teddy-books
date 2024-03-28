@@ -1,11 +1,11 @@
-import {React, useState, useEffect, useContext} from 'react';
+import {React, useState, useEffect, useContext, useRef} from 'react';
 import {
   addNewBook,
   getRecentUsers,
   getAllBooks,
   getNewestUsers,
-  getUsersByEmail,
-  getUsersByName,
+  getUsersByEmailSubstring,
+  getUsersByNameSubstring,
   getUserById,
   addNewUser,
 } from '../../services/apiService';
@@ -19,14 +19,13 @@ import {Button, Image, Tab, Tabs, Form, Row, Col, Nav} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import './Admin.css';
 import UserInfoAccordion from '../../components/UserInfoAccordion/UsertInfoAccordion';
-import {validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
+import {isInputBlank, validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
 
 function Admin(props) {
   const authContext = useContext(AuthContext);
-
   const [booksData, setBooksData] = useState([]);
   const [showAddBookModal, setShowAddBookModal] = useState(false);
-  const [searchInput, setSearchInput] = useState();
+  const [searchInput, setSearchInput] = useState('');
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [newestUsers, setNewestUsers] = useState([]);
   const [recentUsers, setRecentUsers] = useState([]);
@@ -36,6 +35,8 @@ function Admin(props) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+
+  const [currentSideTab, setCurrentSideTab] = useState('New');
 
   const fetchData = async () => {
     try {
@@ -75,19 +76,20 @@ function Admin(props) {
 
   const searchUsers = async () => {
     setSearchedUsers([]);
-    try {
-      const usersById = await getUserById(searchInput);
-      const userByEmail = await getUsersByEmail(searchInput);
-      const usersByName = await getUsersByName(searchInput);
+    if (!isInputBlank(searchInput)) {
+      try {
+        const usersById = await getUserById(searchInput);
+        const userByEmail = await getUsersByEmailSubstring(searchInput);
+        const usersByName = await getUsersByNameSubstring(searchInput);
 
-      const results = usersByName.concat(userByEmail).concat(usersById).filter((obj, index) => {
-        return index === usersByName.concat(userByEmail).concat(usersById).findIndex((o) => obj._id === o._id);
-      });
+        const results = usersByName.concat(userByEmail).concat(usersById).filter((obj, index) => {
+          return index === usersByName.concat(userByEmail).concat(usersById).findIndex((o) => obj._id === o._id);
+        });
 
-      const removedEmpty = results.filter((value) => Object.keys(value).length !== 0);
-      setSearchedUsers(removedEmpty);
-    } catch (error) {
-      console.log('Error finding user by email: ', error);
+        const removedEmpty = results.filter((value) => Object.keys(value).length !== 0);
+        setSearchedUsers(removedEmpty);
+      } catch (error) {
+      }
     }
   };
 
@@ -95,7 +97,7 @@ function Admin(props) {
     let usernameErrorsList = [];
     let emailErrorsList = [];
     let passwordErrorsList = [];
-    usernameErrorsList = await validateUsername(name);
+    usernameErrorsList = await validateUsername(name, true);
     emailErrorsList = await validateEmail(email, true);
     passwordErrorsList = await validatePasswordFormat(password);
 
@@ -127,33 +129,59 @@ function Admin(props) {
     }
   };
 
+  const handleSideTabChange = (e) => {
+    setCurrentSideTab(e.target.innerText);
+  };
+
+
   const usersTabBar=()=>{
     return <Nav variant="pills" className="flex-column">
       <Nav.Item>
-        <Nav.Link eventKey="newest">New</Nav.Link>
+        <Nav.Link eventKey="new" onClick={(e)=>{
+          handleSideTabChange(e);
+        }} >New</Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="recent">Recent</Nav.Link>
+        <Nav.Link eventKey="recent" onClick={(e)=>{
+          handleSideTabChange(e);
+        }}>Recent</Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="search">Search</Nav.Link>
+        <Nav.Link eventKey="search" onClick={(e)=>{
+          handleSideTabChange(e);
+        }}>Search</Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="register">Register</Nav.Link>
+        <Nav.Link eventKey="register" onClick={(e)=>{
+          handleSideTabChange(e);
+        }}>Register</Nav.Link>
       </Nav.Item>
     </Nav>;
   };
 
   const usersTabContent =()=>{
-    return <Tab.Content>
-      <Tab.Pane eventKey="newest"> <div className="user-list">
+    return <Tab.Content onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentSideTab === 'Search') {
+          searchUsers();
+        } else if (currentSideTab === 'Register') {
+          validateRegisterFields();
+        }
+      }
+    }}>
+      {currentSideTab === 'New' ?
+      <Tab.Pane eventKey="new"> <div className="user-list">
         <h3>New Users</h3>
         {newestUsers.map((user) => (
           <Accordion defaultActiveKey="0" key={user._id}>
             <UserInfoAccordion user={user} refreshData={refreshData}></UserInfoAccordion>
           </Accordion>
         ))}
-      </div></Tab.Pane>
+      </div></Tab.Pane> :
+      null}
+      {currentSideTab === 'Recent' ?
+
       <Tab.Pane eventKey="recent">  <div className="user-list">
         <h3>Recent Active Users</h3>
         {recentUsers.map((user) => (
@@ -161,87 +189,92 @@ function Admin(props) {
             <UserInfoAccordion user={user} refreshData={refreshData}></UserInfoAccordion>
           </Accordion>
         ))}
-      </div></Tab.Pane>
-      <Tab.Pane eventKey="search">
-        <div className="user-list">
-          <h3>Find User</h3>
+      </div></Tab.Pane> : null}
 
-          <Form className="form-container mb-0 pb-0">
-            <Form.Group controlId="searchInput">
-              <Form.Control
-                type="text"
-                placeholder="Find user by email, name, id..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-          <div className="top-buttons-container pt-0 mt-0">
+      {currentSideTab === 'Search' ?
+      <Tab.Pane eventKey="search" >
+        <h3>Find User</h3>
+
+        <Form className="form-container mb-0 pb-0">
+          <Form.Group controlId='search'>
+            <Form.Control
+              type="text"
+              placeholder="Find user by email, name, id..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              autoFocus={true}
+            />
+          </Form.Group>
+        </Form>
+        <div className="top-buttons-container pt-0 mt-0">
+          <Button
+            className="edit-button"
+            variant="outline-secondary"
+            onClick={() => searchUsers()}
+          >
+            <Image className="edit-button-image" src={search}></Image>
+          </Button>
+        </div>
+        {searchedUsers.map((user) => (
+          <Accordion defaultActiveKey="0" key={user._id}>
+            <UserInfoAccordion user={user} refreshData={refreshData}></UserInfoAccordion>
+          </Accordion>
+        ))}
+      </Tab.Pane> :
+  null}
+      {currentSideTab === 'Register' ?
+      <Tab.Pane eventKey="register"
+      >
+        <h3>Register</h3>
+        <Form className="form-container"
+        >
+          <Form.Group className="mb-3" controlId='email'
+          >
+            <Form.Control
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus={true}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='password'>
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='passwordConfirm'>
+            <Form.Control
+              type="password"
+              placeholder="Confirm Password"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='username'>
+            <Form.Control
+              type="text"
+              placeholder="Username"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Form.Group>
+          <div className="button-container">
             <Button
-              className="edit-button"
-              variant="outline-secondary"
-              onClick={() => searchUsers()}
+              className="standard-button btn-custom"
+              onClick={() => {
+                validateRegisterFields();
+              }}
             >
-              <Image className="edit-button-image" src={search}></Image>
-            </Button>{' '}
-          </div>
-          {searchedUsers.map((user) => (
-            <Accordion defaultActiveKey="0" key={user._id}>
-              <UserInfoAccordion user={user} refreshData={refreshData}></UserInfoAccordion>
-            </Accordion>
-          ))}
-        </div>
-      </Tab.Pane>
-      <Tab.Pane eventKey="register">
-        <div className="user-list">
-          <h3>Register User</h3>
-
-          <Form className="form-container">
-            <Form.Group className="mb-3" controlId="email">
-              <Form.Control
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="password">
-              <Form.Control
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="passwordConfirm">
-              <Form.Control
-                type="password"
-                placeholder="Confirm Password"
-                value={passwordConfirm}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="name">
-              <Form.Control
-                type="text"
-                placeholder="Username"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Form.Group>
-            <div className="button-container">
-              <Button
-                className="standard-button btn-custom"
-                onClick={() => {
-                  validateRegisterFields();
-                }}
-              >
                 Register
-              </Button>
-            </div>
-          </Form>
-        </div>
-      </Tab.Pane>
+            </Button>
+          </div>
+        </Form>
+
+      </Tab.Pane> : null}
     </Tab.Content>;
   };
 
@@ -305,17 +338,17 @@ function Admin(props) {
             ))}
           </div>
         </Tab>
-        <Tab eventKey="users" title="Users">
+        <Tab eventKey="users" title="Users"
+
+        >
           <div
             className="tab-container"
           >
-            <Tab.Container defaultActiveKey="newest">
+            <Tab.Container defaultActiveKey="new" >
               {props.currentWindowSize.width > props.currentWindowSize.height ? <Row>
                 <Col sm={2}>{usersTabBar()}</Col> <Col sm={10}>{usersTabContent()}
                 </Col> </Row>: <Row>{usersTabBar()}{usersTabContent()}</Row>}
             </Tab.Container>
-
-
           </div>
         </Tab>
       </Tabs>

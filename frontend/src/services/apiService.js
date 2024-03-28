@@ -48,7 +48,7 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
           console.log('Access Token expired.');
           originalRequest._retry = true;
           try {
-            const newAccessToken = await apiServiceUnsecure.post('/token/refresh', {token: getLocalUser()});
+            const newAccessToken = await apiServiceUnsecure.post('/user/refresh', {token: getLocalUser()});
             setLocalUser(newAccessToken.data);
             console.log('Using new Access Token.');
           } catch (error) {
@@ -63,7 +63,7 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
 
 export const loginUser = async (userData) => {
   try {
-    const response = await apiServiceUnsecure.post('/users/login', userData);
+    const response = await apiServiceUnsecure.post('/user/login', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -72,7 +72,7 @@ export const loginUser = async (userData) => {
 
 export const autoLoginUser = async (userData) => {
   try {
-    const response = await apiServiceSecure.post('/users/autologin', userData);
+    const response = await apiServiceSecure.post('/user/autologin', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -82,14 +82,14 @@ export const autoLoginUser = async (userData) => {
 
 export const getUserById = async (_id) => {
   try {
-    const response = await apiServiceSecure.get('/users/id/' + _id);
+    const response = await apiServiceUnsecure.get('/user/id/' + _id);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getUsersByEmail = async (email) => {
+export const getUsersByEmailSubstring = async (email) => {
   try {
     const response = await apiServiceSecure.get('/users/email/' + email);
     return response.data;
@@ -98,39 +98,28 @@ export const getUsersByEmail = async (email) => {
   }
 };
 
-export const getUserByEmailExact = async (email) => {
+export const getUserByEmail = async (email) => {
   try {
-    const response = await apiServiceSecure.get('/users/exactemail/' + email);
-
-    for (let index = 0; index < response.data.length; index++) {
-      if (response.data[index].email.trim().toLowerCase() === email.trim().toLowerCase() ) {
-        return response.data[index];
-      }
-    }
-    return null;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getUsersByName = async (name) => {
-  try {
-    const response = await apiServiceSecure.get('/users/name/'+ name);
+    const response = await apiServiceUnsecure.get('/user/email/' + email);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getUserByExactName = async (name) => {
+export const getUsersByNameSubstring = async (name) => {
   try {
-    const response = await apiServiceSecure.get('/users/exactname/'+ name);
-    for (let index = 0; index < response.data.length; index++) {
-      if (response.data[index].name.trim().toLowerCase() === name.trim().toLowerCase() ) {
-        return response.data[index];
-      }
-    }
-    return null;
+    const response = await apiServiceUnsecure.get('/users/name/'+ name);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserByName = async (name) => {
+  try {
+    const response = await apiServiceUnsecure.get('/user/name/'+ name);
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -138,7 +127,7 @@ export const getUserByExactName = async (name) => {
 
 export const getNewestUsers = async () => {
   try {
-    const response = await apiServiceUnsecure.get('/users/newest');
+    const response = await apiServiceSecure.get('/users/newest');
     return response.data;
   } catch (error) {
     throw error;
@@ -147,7 +136,7 @@ export const getNewestUsers = async () => {
 
 export const getRecentUsers = async () => {
   try {
-    const response = await apiServiceUnsecure.get('/users/recent');
+    const response = await apiServiceSecure.get('/users/recent');
     return response.data;
   } catch (error) {
     throw error;
@@ -156,7 +145,7 @@ export const getRecentUsers = async () => {
 
 export const addNewUser = async (userData) => {
   try {
-    const response = await apiServiceUnsecure.post('/users/add', userData);
+    const response = await apiServiceUnsecure.post('/user/add', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -175,7 +164,7 @@ export const getAllBooks = async () => {
 
 export const updateUser = async (userData) => {
   try {
-    const response = await apiServiceSecure.put('/users/update', {userData});
+    const response = await apiServiceSecure.put('/user/update', {userData});
     return response.data;
   } catch (error) {
     throw error;
@@ -184,7 +173,7 @@ export const updateUser = async (userData) => {
 
 export const deleteUserById = async (userId) => {
   try {
-    const response = await apiServiceSecure.delete('/users/delete/' + userId);
+    const response = await apiServiceSecure.delete('/user/delete/' + userId);
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -194,7 +183,7 @@ export const deleteUserById = async (userId) => {
 
 export const getBookById = async (_id) => {
   try {
-    const response = await apiServiceUnsecure.get('/books/id/' + _id);
+    const response = await apiServiceUnsecure.get('/book/id/' + _id);
     return response.data;
   } catch (error) {
     throw error;
@@ -217,7 +206,7 @@ export const getBookByNameExact = async (name) => {
 
 export const addNewBook = async (bookData) => {
   try {
-    const response = await apiServiceSecure.post('/books/add', bookData);
+    const response = await apiServiceSecure.post('/book/add', bookData);
     return response.data;
   } catch (error) {
     throw error;
@@ -226,7 +215,7 @@ export const addNewBook = async (bookData) => {
 
 export const updateBook = async (bookData) => {
   try {
-    const response = await apiServiceSecure.put('/books/update', {bookData});
+    const response = await apiServiceSecure.put('/book/update', {bookData});
     return response.data;
   } catch (error) {
     throw error;
@@ -235,7 +224,7 @@ export const updateBook = async (bookData) => {
 
 export const deleteBookById = async (bookId) => {
   try {
-    const response = await apiServiceSecure.delete('/books/delete/' + bookId);
+    const response = await apiServiceSecure.delete('/book/delete/' + bookId);
     return response.data;
   } catch (error) {
     throw error;
@@ -252,6 +241,17 @@ export const generateImageLink = (book, pageNumber) => {
     '.png?alt=media&token=' +
     process.env.REACT_APP_STORAGE_TOKEN
   );
+};
+
+export const requestEmailResetCode = async (email) => {
+  try {
+    const response = await apiServiceUnsecure.get('/user/reset/'+ email);
+
+    console.log(response);
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getAudioForPage = async (
