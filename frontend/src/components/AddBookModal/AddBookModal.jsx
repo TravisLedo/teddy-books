@@ -15,14 +15,22 @@ function AddBookModal(props) {
   const [pages, setPages] = useState(2);
   const [text, setText] = useState('');
 
-  const handleSave = () => {
+  const resetForms = async () => {
+    setTitle('');
+    setAuthor('');
+    setPages(2);
+    setText('');
+  };
+
+  const handleSave = async () => {
     const newBookData = {
       title: title,
       author: author,
       pages: pages,
       text: text,
     };
-    props.addBook(newBookData);
+    await props.addBook(newBookData);
+    resetForms();
   };
 
   const validateFields = async () => {
@@ -48,6 +56,9 @@ function AddBookModal(props) {
     <Modal
       show={props.showAddBookModal}
       onHide={()=>props.setShowAddBookModal(false)}
+      onShow={() => {
+        resetForms();
+      }}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -67,6 +78,7 @@ function AddBookModal(props) {
           setAuthor={setAuthor}
           setPages={setPages}
           setText={setText}
+          adding={true}
         ></BookBody>
       </Modal.Body>
       <Modal.Footer><div className='buttons-container'>  <Button className="standard-button"

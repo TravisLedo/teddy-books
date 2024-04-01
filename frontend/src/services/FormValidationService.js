@@ -1,4 +1,4 @@
-import {getBookByNameExact as getBookByTitleExact, getUserByEmail, getUserByName} from './apiService';
+import {getBookByTitle, getUserByEmail, getUserByName} from './apiService';
 
 export const validateUsername = async (userName, checkForExisting)=>{
   const errors = [];
@@ -89,8 +89,8 @@ export const validateBookTitle = async (title)=>{
     } else if (title.length > 50) {
       errors.push('Email must be less than 51 characters.');
     }
-    const user = await getBookByTitleExact(title);
-    if (user !== null) {
+    const book = await getBookByTitle(title);
+    if (book) {
       errors.push('Book title is already taken.');
     }
   }

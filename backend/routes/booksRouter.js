@@ -22,9 +22,9 @@ router.get('/book/id/:id', async (req, res) => {
 });
 
 
-router.get('/book/name/:name', async (req, res) => {
+router.get('/book/title/:title', async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findOne({title: req.params.title.trim()});
     res.status(200).send(book);
   } catch (error) {
     res.status(500).send(error);

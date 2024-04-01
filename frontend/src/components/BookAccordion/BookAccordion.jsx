@@ -153,6 +153,7 @@ function BookAccordion(props) {
           setEditing={setEditing}
           createdAt={props.book.createdAt}
           updatedAt={props.book.updatedAt}
+          adding={false}
         ></BookBody>
       </Accordion.Body>
     </Accordion.Item>

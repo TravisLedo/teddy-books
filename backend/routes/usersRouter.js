@@ -56,8 +56,6 @@ router.post('/user/autoLogin', authenthicateJwtToken, async (req, res) => {
 });
 
 router.get('/user/id/:id', async (req, res) => {
-  console.log('test');
-
   try {
     const user = await User.findById(req.params.id.trim());
     res.status(200).send(user);

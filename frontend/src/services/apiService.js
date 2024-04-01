@@ -191,15 +191,11 @@ export const getBookById = async (_id) => {
   }
 };
 
-export const getBookByNameExact = async (name) => {
+export const getBookByTitle= async (name) => {
   try {
-    const response = await apiServiceSecure.get('/books/exactname/'+ name);
-    for (let index = 0; index < response.data.length; index++) {
-      if (response.data[index].name.trim().toLowerCase() === name.trim().toLowerCase() ) {
-        return response.data[index];
-      }
-    }
-    return null;
+    const response = await apiServiceSecure.get('/book/title/'+ name);
+    console.log(response.data);
+    return response.data;
   } catch (error) {
     throw error;
   }
