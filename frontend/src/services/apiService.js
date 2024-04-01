@@ -1,15 +1,16 @@
 import axios from 'axios';
 import {getLocalUser, removeLocalUser, setLocalUser} from './localStorageService';
+import {LoginModalType} from '../Enums/LoginModalType';
 
 export const apiServiceUnsecure = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: process.env.REACT_APP_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 export const apiServiceSecure = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: process.env.REACT_APP_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -41,7 +42,7 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
         ) {
           console.log('Access Token and Refresh Token both expired.');
           removeLocalUser();
-          handleLoginModalShow(false);
+          handleLoginModalShow(LoginModalType.LOGIN, false);
         }
 
         if (error.response.status === 401 && !originalRequest._retry) {
@@ -243,16 +244,33 @@ export const generateImageLink = (book, pageNumber) => {
   );
 };
 
-export const requestEmailResetCode = async (email) => {
+export const requestEmailResetCode = async (data) => {
   try {
-    const response = await apiServiceUnsecure.get('/user/reset/'+ email);
-
-    console.log(response);
+    const response = await apiServiceUnsecure.post('/user/reset/request', data);
     return response;
   } catch (error) {
     throw error;
   }
 };
+
+export const checkPasswordResetTokenLink = async (resetToken) => {
+  try {
+    const response = await apiServiceUnsecure.get('/user/reset/check/' + resetToken);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const resetPassword = async (data) => {
+  try {
+    const response = await apiServiceUnsecure.post('/user/reset/verify', data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const getAudioForPage = async (
     book,
@@ -275,7 +293,7 @@ export const getAudioForPage = async (
 
 export const removeTempAudioFromServer = async (audioSource) => {
   try {
-    const file = audioSource.replace(process.env.REACT_APP_URL + '/', '');
+    const file = audioSource.replace(process.env.REACT_APP_BACKEND_URL + '/', '');
     const response = await apiServiceUnsecure.post('/witai/removeaudio', {
       file: file,
     });

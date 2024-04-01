@@ -2,7 +2,7 @@ import Books from './pages/Books/Books';
 import Read from './pages/Read/Read';
 import Error from './pages/Error/Error';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Routes, Route, useNavigate, Navigate} from 'react-router-dom';
+import {Routes, Route, useNavigate, Navigate, useParams} from 'react-router-dom';
 import MainHeader from './components/mainHeader/mainHeader';
 import {React, useEffect, useState} from 'react';
 import Admin from './pages/Admin/Admin';
@@ -10,6 +10,8 @@ import {AuthContext} from './contexts/Contexts';
 import LoginModal from './components/LoginModal/LoginModal';
 import Profile from './pages/Profile/Profile';
 import {Voices} from './Enums/Voices';
+import {AlertType} from './Enums/AlertType';
+import {LoginModalType} from './Enums/LoginModalType';
 import {
   getLocalUser,
   getOfflineSettings,
@@ -25,30 +27,34 @@ import {
   updateUser,
 } from './services/apiService';
 import './App.css';
-import ErrorModal from './components/ErrorModal/ErrorModal';
+import AlertModal from './components/AlertModal/AlertModal';
 
 function App() {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginModalType, setLoginModalType] = useState(LoginModalType.LOGIN);
+  const [resetPasswordToken, setResetPasswordToken] = useState();
   const [allowRegistering, setAllowRegistering] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertType, setAlertType] = useState(AlertType.SUCCESS);
+  const [alertMessages, setAlertMessages] = useState([]);
   const [currentWindowSize, setCurrentWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
 
   const handleLoginModalClose = () => setShowLoginModal(false);
-  const handleLoginModalShow = (allowRegistering) => {
+  const handleLoginModalShow = (loginModalType, allowRegistering) => {
+    setLoginModalType(loginModalType);
     setAllowRegistering(allowRegistering);
     setShowLoginModal(true);
   };
-  const handleErrorModalClose = () => setShowErrorModal(false);
-  const handleErrorModalShow = (messages) => {
-    setErrorMessages(messages);
-    setShowErrorModal(true);
+  const handleAlertModalClose = () => setShowAlertModal(false);
+  const handleAlertModalShow = (alertType, messages) => {
+    setAlertType(alertType);
+    setAlertMessages(messages);
+    setShowAlertModal(true);
   };
 
   const autoLogin = async (localJwtToken) => {
@@ -77,7 +83,6 @@ function App() {
   const logout = () => {
     removeLocalUser();
     setUser(null);
-    // navigate('/');
   };
 
   const updateAudioEnabled = async (audioEnabled, asLoggedInUser) => {
@@ -177,14 +182,18 @@ function App() {
           updateAudioEnabled,
           updateVoiceSelection,
           updateAutoNextPage,
-          handleErrorModalShow,
+          handleAlertModalShow,
+          setLoginModalType,
+          setResetPasswordToken,
         }}
       >
         <div className="App">
-          <ErrorModal showErrorModal={showErrorModal} errorMessages={errorMessages} handleErrorModalClose={handleErrorModalClose}></ErrorModal>
+          <AlertModal showAlertModal={showAlertModal} alertType={alertType} alertMessages={alertMessages} handleAlertModalClose={handleAlertModalClose}></AlertModal>
           <LoginModal
+            loginModalType={loginModalType}
             allowRegistering={allowRegistering}
             showLoginModal={showLoginModal}
+            resetPasswordToken={resetPasswordToken}
           ></LoginModal>
           <MainHeader></MainHeader>
           <Routes>
@@ -212,7 +221,7 @@ function App() {
               path="/profile"
               element={
                   user? (
-                    <Profile currentWindowSize={currentWindowSize} setErrorMessages={setErrorMessages} setShowErrorModal={setShowErrorModal}/>
+                    <Profile currentWindowSize={currentWindowSize} setAlertMessages={setAlertMessages} setShowAlertModal={setShowAlertModal}/>
                   ) : (
                    <Navigate to="/"/>
                     )
@@ -221,8 +230,23 @@ function App() {
 
             <Route
               exact
+              path="/reset/:resetToken"
+              element={
+                <Books/>
+                /*
+                  isResettingPassword? (
+                    <Books/>
+                  ) : (
+                   <Navigate to="/"/>
+                    )
+                    */
+              }
+            ></Route>
+
+            <Route
+              exact
               path="/*"
-              element={<Error/>}
+              element={<Error currentWindowSize={currentWindowSize} />}
             ></Route>
           </Routes>
         </div>

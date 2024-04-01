@@ -9,6 +9,7 @@ import trash from '../../assets/images/trash.png';
 import './UserInfoAccordion.css';
 import {validateEmail, validateIsAdmin, validateIsBlocked, validateUsername} from '../../services/FormValidationService';
 import DeleteModal from '../DeleteBookModal/DeleteModal';
+import {AlertType} from '../../Enums/AlertType';
 
 function UserInfoAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -59,7 +60,7 @@ function UserInfoAccordion(props) {
     }
     const errorsList = usernameErrorsList.concat(emailErrorsList).concat(isAdminErrorsList).concat(isBlockedErrors);
     if (errorsList.length>0) {
-      authContext.handleErrorModalShow(errorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       updateUserValues();
     }

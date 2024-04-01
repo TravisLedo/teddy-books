@@ -15,6 +15,7 @@ import './BookAccordion.css';
 import DeleteModal from '../DeleteBookModal/DeleteModal';
 import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
 import {AuthContext} from '../../contexts/Contexts';
+import {AlertType} from '../../Enums/AlertType';
 
 function BookAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -64,7 +65,7 @@ function BookAccordion(props) {
 
     const errorsList = titleErrorsList.concat(authorErrorsList).concat(pagesErrorsList).concat(textErrorList);
     if (errorsList.length>0) {
-      authContext.handleErrorModalShow(errorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       updateValues();
     }

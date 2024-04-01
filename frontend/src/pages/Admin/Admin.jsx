@@ -20,6 +20,7 @@ import {AuthContext} from '../../contexts/Contexts';
 import './Admin.css';
 import UserInfoAccordion from '../../components/UserInfoAccordion/UsertInfoAccordion';
 import {isInputBlank, validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
+import {AlertType} from '../../Enums/AlertType';
 
 function Admin(props) {
   const authContext = useContext(AuthContext);
@@ -107,7 +108,7 @@ function Admin(props) {
 
     const errorsList = emailErrorsList.concat(usernameErrorsList).concat(passwordErrorsList);
     if (errorsList.length>0) {
-      authContext.handleErrorModalShow(errorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       register();
     }

@@ -11,7 +11,7 @@ function generateRefreshToken(jwtValues) {
 }
 
 function generatePasswordResetToken(jwtValues) {
-  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '1m'});
+  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '10m'});
 }
 
 // middleware
@@ -30,4 +30,14 @@ function authenthicateJwtToken(req, res, next ) {
   });
 }
 
-module.exports = {generateAccessToken, generateRefreshToken, generatePasswordResetToken, authenthicateJwtToken};
+const verifyResetPasswordTokenCode = (token)=>{
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+
+module.exports = {generateAccessToken, generateRefreshToken, generatePasswordResetToken, authenthicateJwtToken, verifyResetPasswordTokenCode};

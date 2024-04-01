@@ -5,6 +5,7 @@ import BookBody from '../../components/BookBody/BookBody';
 import './AddBookModal.css';
 import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
 import {AuthContext} from '../../contexts/Contexts';
+import {AlertType} from '../../Enums/AlertType';
 
 function AddBookModal(props) {
   const authContext = useContext(AuthContext);
@@ -37,7 +38,7 @@ function AddBookModal(props) {
 
     const errorsList = titleErrorsList.concat(authorErrorsList).concat(pagesErrorsList).concat(textErrorList);
     if (errorsList.length>0) {
-      authContext.handleErrorModalShow(errorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       handleSave();
     }

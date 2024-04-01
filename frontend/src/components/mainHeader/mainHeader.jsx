@@ -3,6 +3,8 @@ import {Button, Dropdown} from 'react-bootstrap';
 import {React, useContext} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
 import {getLocalUser} from '../../services/localStorageService';
+import {LoginModalType} from '../../Enums/LoginModalType';
+
 import './mainHeader.css';
 
 export default function MainHeader() {
@@ -43,7 +45,7 @@ export default function MainHeader() {
           <Button
             className="standard-button"
             variant="outline-secondary"
-            onClick={() => authContext.handleLoginModalShow(true)}
+            onClick={() => authContext.handleLoginModalShow(LoginModalType.LOGIN, true)}
           >
             Login
           </Button>

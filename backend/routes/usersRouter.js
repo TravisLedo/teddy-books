@@ -2,9 +2,10 @@ const router = require('express').Router();
 const User = require('../models/user');
 const bycrypt = require('bcrypt');
 const {jwtDecode} = require('jwt-decode');
-const {authenthicateJwtToken, generateRefreshToken, generateAccessToken, generatePasswordResetToken} = require('../services/jwtService');
+const {authenthicateJwtToken, generateRefreshToken, generateAccessToken, generatePasswordResetToken, verifyResetPasswordTokenCode} = require('../services/jwtService');
 const ResetPasswordToken = require('../models/resetPasswordToken');
 const RefreshToken = require('../models/refreshToken');
+const {sendEmailCode: sendEmailLink} = require('../services/emailService');
 
 router.post('/user/refreshtoken', async (req, res) => {
   try {
@@ -59,8 +60,6 @@ router.get('/user/id/:id', async (req, res) => {
 
   try {
     const user = await User.findById(req.params.id.trim());
-    console.log('test'+user);
-
     res.status(200).send(user);
   } catch (error) {
     res.status(204).send(error);
@@ -162,28 +161,57 @@ router.delete('/user/delete/:id', authenthicateJwtToken, async (req, res) => {
   }
 });
 
-router.get('/user/reset/:email', async (req, res) => {
+router.post('/user/reset/request', async (req, res) => {
   try {
-    const user = await User.findOne({email: req.params.email});
-
+    const user = await User.findOne({email: req.body.email});
     if (user) {
-      const code = Math.floor(Math.random()*10).toString().
-          concat(Math.floor(Math.random()*10).toString()).
-          concat(Math.floor(Math.random()*10).toString()).
-          concat(Math.floor(Math.random()*10).toString());
-
-      const userJwt = {_id: user._id, email: user.email, code: code};
-      const resetPasswordToken = new ResetPasswordToken({email: userJwt.email, token: generatePasswordResetToken(userJwt)});
-      const tempJwt = await resetPasswordToken.save();
-
-      // todo send email with the 4 digit code
-      res.status(200).send(tempJwt);
+      const userJwt = {_id: user._id, email: user.email, password: user.password};
+      const resetPasswordToken = new ResetPasswordToken({email: userJwt.email, token: generatePasswordResetToken(userJwt), valid: true});
+      await resetPasswordToken.save();
+      sendEmailLink(resetPasswordToken.token, req.body.siteBaseUrl);
+      res.status(200).send('Email sent if account exists.');
     } else {
-      res.status(500).send('Could not find email.');
+      res.status(200).send('Email sent if account exists.');
     }
   } catch (error) {
     res.status(500).send(error);
   }
 });
+
+router.get('/user/reset/check/:resetToken', async (req, res) => {
+  try {
+    const resetPasswordToken = await ResetPasswordToken.findOne({token: req.params.resetToken});
+    if (!resetPasswordToken || resetPasswordToken && !resetPasswordToken.valid) {
+      res.status(400).send('Reset password link does not exist, expired, or has already been used.');
+    } else {
+      res.status(200).send('Valid password reset link.');
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.post('/user/reset/verify', async (req, res) => {
+  try {
+    const resetPasswordToken = await ResetPasswordToken.findOne({email: req.body.email}).sort({createdAt: -1});
+    if (!resetPasswordToken) {
+      res.status(400).send('Requested email and submitted email does not match.');
+    } else {
+      const verificationResponse = verifyResetPasswordTokenCode(req.body.token);
+      if (verificationResponse) {
+        const invalidateResetPasswordToken = {email: resetPasswordToken.email, token: resetPasswordToken.token, valid: false};
+        const updated = await ResetPasswordToken.findByIdAndUpdate(resetPasswordToken._id, invalidateResetPasswordToken);
+        res.status(200).send('Password reset success.' + updated);
+      } else {
+        res.status(400).send('Email request expired or does not exist');
+        console.log('Email request expired or does not exist');
+      }
+    }
+  } catch (error) {
+    res.status(500).send(error);
+    console.log(error);
+  }
+});
+
 
 module.exports = router;

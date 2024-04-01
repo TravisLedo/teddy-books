@@ -9,6 +9,7 @@ import close from '../../assets/images/close.png';
 import './Profile.css';
 import {updateUser} from '../../services/apiService';
 import {validateEmail, validateUsername} from '../../services/FormValidationService';
+import {AlertType} from '../../Enums/AlertType';
 
 function Profile(props) {
   const authContext = useContext(AuthContext);
@@ -64,7 +65,7 @@ function Profile(props) {
     }
     const errorsList = usernameErrorsList.concat(emailErrorsList);
     if (errorsList.length>0) {
-      authContext.handleErrorModalShow(errorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       updateUserValues();
     }

@@ -1,14 +1,20 @@
 import {React, useState, useContext, useEffect} from 'react';
-import {addNewUser, getUserByEmail, requestEmailResetCode} from '../../services/apiService';
+import {addNewUser, getUserByEmail, requestEmailResetCode, updateUser, resetPassword} from '../../services/apiService';
 import {Button, Form, Modal} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import './LoginModal.css';
 import {validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
+import {AlertType} from '../../Enums/AlertType';
+import {LoginModalType} from '../../Enums/LoginModalType';
+import {useNavigate} from 'react-router-dom';
+import {
+  decodeJwtToken,
+} from '../../services/localStorageService';
+import {jwtDecode} from 'jwt-decode';
 
 function LoginModal(props) {
   const authContext = useContext(AuthContext);
-  const [registering, setRegistering] = useState(false);
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -16,13 +22,11 @@ function LoginModal(props) {
   const [verificationCode, setVerificationCode] = useState('');
 
   const resetForms = async () => {
-    setRegistering(false);
     setEmail('');
     setPassword('');
     setName('');
     setPasswordConfirm('');
     setVerificationCode('');
-    setIsResettingPassword(false);
   };
 
   const login = async () => {
@@ -33,12 +37,12 @@ function LoginModal(props) {
       };
       const successLogin = await authContext.login(user);
       if (successLogin) {
-        authContext.handleLoginModalClose();
+        cancelModal();
       } else {
-        authContext.handleErrorModalShow(['Login Failed']);
+        authContext.handleAlertModalShow(AlertType.ERROR, ['Login Failed']);
       }
     } catch (error) {
-      authContext.handleErrorModalShow(['Server Error']);
+      authContext.handleAlertModalShow(AlertType.ERROR, ['Server Error']);
     }
   };
 
@@ -54,7 +58,7 @@ function LoginModal(props) {
         login();
       }
     } catch (error) {
-      authContext.handleErrorModalShow(['Server Error']);
+      authContext.handleAlertModalShow(AlertType.ERROR, ['Server Error']);
     }
   };
 
@@ -66,13 +70,13 @@ function LoginModal(props) {
     emailErrorsList = await validateEmail(email, true);
     passwordErrorsList = await validatePasswordFormat(password);
 
-    if (registering && password !== passwordConfirm) {
+    if (props.registering && password !== passwordConfirm) {
       passwordErrorsList.push('Passwords must match.');
     }
 
     const errorsList = emailErrorsList.concat(usernameErrorsList).concat(passwordErrorsList);
     if (errorsList.length>0) {
-      authContext.handleErrorModalShow(errorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       register();
     }
@@ -87,54 +91,102 @@ function LoginModal(props) {
     const errorsList = emailErrorsList.concat(passwordErrorsList);
 
     if (errorsList.length>0) {
-      authContext.handleErrorModalShow(errorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       login();
     }
   };
 
-  const sendForgetPasswordRequest = async () => {
-    await requestEmailResetCode(email);
-    // Need to validate email exists first, disable editing of email once they send code. Add a timer to try again, same time as token expire.
-    // send them an email with a x digit code, they have to use that code to put with the new password.
-  };
 
-  const validateEmailForCode = async () => {
+  const validateEmailForResetLink = async () => {
     let emailErrorsList = [];
     emailErrorsList = await validateEmail(email, false);
     if (emailErrorsList.length>0) {
-      authContext.handleErrorModalShow(emailErrorsList);
+      authContext.handleAlertModalShow(AlertType.ERROR, emailErrorsList);
     } else {
-      const user = await getUserByEmail(email);
-      if (user) {
-        sendForgetPasswordRequest();
-      } else {
-        emailErrorsList.push('Email is not registered.');
-        authContext.handleErrorModalShow(emailErrorsList);
-      }
+      sendForgetPasswordRequest();
+    }
+  };
+
+  const sendForgetPasswordRequest = async () => {
+    try {
+      const data = {email: email, siteBaseUrl: process.env.REACT_APP_FRONTEND_URL};
+      await requestEmailResetCode(data);
+      cancelModal();
+      authContext.handleAlertModalShow(AlertType.SUCCESS, ['A reset password link has been sent to ' + email + ' if the account exists.']);
+    } catch (error) {
+    }
+  };
+
+  const validateResetPasswordFields= async () => {
+    let emailErrorsList = [];
+    let passwordErrorsList = [];
+    emailErrorsList = await validateEmail(email, false);
+    passwordErrorsList = await validatePasswordFormat(password);
+
+    if (props.loginModalType === LoginModalType.RESET_PASSWORD && password !== passwordConfirm) {
+      passwordErrorsList.push('Passwords must match.');
+    }
+
+    const errorsList = emailErrorsList.concat(passwordErrorsList);
+    if (errorsList.length>0) {
+      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
+    } else {
+      updateUserPassword();
     }
   };
 
 
+  const updateUserPassword = async () => {
+    try {
+      const data = {token: props.resetPasswordToken, email: email};
+      const success = await resetPassword(data);
+      if (success) {
+        authContext.handleLoginModalClose();
+        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset successful and you are now logged in.']);
+        login();
+      }
+
+      // updateUser();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const cancelModal= async () => {
+    if (props.loginModalType === LoginModalType.RESET_PASSWORD) {
+      navigate('/');
+    }
+    authContext.handleLoginModalClose();
+  };
+
+  useEffect(() => {
+    if (props.loginModalType === LoginModalType.RESET_PASSWORD) {
+      setEmail(jwtDecode(props.resetPasswordToken).email);
+    }
+  }, [props.loginModalType, props.resetPasswordToken]);
+
+
   return (
     <Modal
+      backdrop='static'
       tabIndex="0"
       autoFocus={false}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          if (!registering && !isResettingPassword) {
+          if (props.loginModalType === LoginModalType.LOGIN) {
             validateLoginFields();
-          } else if (registering && !isResettingPassword) {
+          } else if (props.loginModalType === LoginModalType.REGISTER) {
             validateRegisterFields();
-          } else if (isResettingPassword) {
-            // validate reset fields;
+          } else if (props.loginModalType === LoginModalType.FORGOT_PASSWORD) {
+            validateResetPasswordFields();
           }
         }
       }}
       show={props.showLoginModal}
       onHide={() => {
-        authContext.handleLoginModalClose();
+        cancelModal();
       }}
       onShow={() => {
         resetForms();
@@ -144,73 +196,77 @@ function LoginModal(props) {
       centered
     >
       <Modal.Header closeButton>
-        {!registering && !props.allowRegistering && !isResettingPassword? (
-          <Modal.Title>Session Expired</Modal.Title>
-        ) : !registering && props.allowRegistering && !isResettingPassword? (
-          <Modal.Title>Login</Modal.Title>
-        ) : !registering && isResettingPassword ? (
-          <Modal.Title>Password Reset</Modal.Title>
-        ) : <Modal.Title>Create New Account</Modal.Title>
-        }
+        <Modal.Title>{props.loginModalType}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-        {registering && props.allowRegistering ? (
-        <Form className="form-container">
-          <Form.Group className="mb-3" controlId='email'>
-            <Form.Control
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoFocus={true}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId='username'>
-            <Form.Control
-              type="text"
-              placeholder="Username"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId='password'>
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId='passwordConfirm'>
-            <Form.Control
-              type="password"
-              placeholder="Confirm Password"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-            />
-          </Form.Group>
-          <div className="button-container">
-            <Button
-              className="standard-button"
-              variant="outline-secondary"
-              onClick={() => {
-                setRegistering(false);
-              }}
-            >
-                Back
-            </Button>
-            <Button
-              className="standard-button btn-custom"
-              onClick={() => {
-                validateRegisterFields();
-              }}
-            >
-                Register
-            </Button>
+        {props.loginModalType === LoginModalType.LOGIN ? (
+          <div>
+            <Form className="form-container">
+              <Form.Group className="mb-3" controlId='email'>
+                <Form.Control
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoFocus={true}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId='password'>
+                <Form.Control
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  className="link-text-button"
+                  variant="outline-secondary"
+                  onClick={() => {
+                    authContext.setLoginModalType(LoginModalType.FORGOT_PASSWORD);
+                  }}
+                >
+                  Forgot Password
+                </Button>
+              </Form.Group>
+              <div className="button-container">
+                <Button
+                  className="standard-button"
+                  variant="outline-secondary"
+                  onClick={() => {
+                    cancelModal();
+                  }}
+                >
+                Cancel
+                </Button>
+                <Button
+                  className="standard-button btn-custom"
+                  onClick={() => {
+                    validateLoginFields();
+                  }}
+                >
+                Login
+                </Button>
+              </div>
+
+              {props.allowRegistering ? (
+              <div className="button-container mt-2">
+                <Button
+                  className="link-text-button"
+                  variant="outline-secondary"
+                  onClick={() => {
+                    authContext.setLoginModalType(LoginModalType.REGISTER);
+                  }}
+                >
+                  New Account
+                </Button>
+              </div>
+            ) : null}
+            </Form>
           </div>
-        </Form>
-        ) : isResettingPassword ? (
+
+
+        ) : props.loginModalType === LoginModalType.FORGOT_PASSWORD ? (
           <Form className="form-container">
             <Form.Group className="mb-3" controlId='email'>
               <Form.Control
@@ -223,59 +279,27 @@ function LoginModal(props) {
               <Button
                 className="standard-button btn-custom"
                 onClick={() => {
-                  validateEmailForCode();
+                  validateEmailForResetLink();
                 }}
               >
                 Send Code
               </Button>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId='code'>
-              <Form.Control
-                type="text"
-                placeholder="Verification Code"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId='password'>
-              <Form.Control
-                type="password"
-                placeholder="New Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId='passwordConfirm'>
-              <Form.Control
-                type="password"
-                placeholder="Confirm New Password"
-                value={passwordConfirm}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-              />
             </Form.Group>
             <div className="button-container">
               <Button
                 className="standard-button"
                 variant="outline-secondary"
                 onClick={() => {
-                  setRegistering(false);
-                  setIsResettingPassword(false);
+                  authContext.setLoginModalType(LoginModalType.LOGIN);
                 }}
               >
                 Back
               </Button>
-              <Button
-                className="standard-button btn-custom"
-                onClick={() => {
-                }}
-              >
-                Reset Password
-              </Button>
             </div>
           </Form>
 
-) : (<div>
+) : props.loginModalType === LoginModalType.REGISTER ? (
+
   <Form className="form-container">
     <Form.Group className="mb-3" controlId='email'>
       <Form.Control
@@ -286,6 +310,14 @@ function LoginModal(props) {
         autoFocus={true}
       />
     </Form.Group>
+    <Form.Group className="mb-3" controlId='username'>
+      <Form.Control
+        type="text"
+        placeholder="Username"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+    </Form.Group>
     <Form.Group className="mb-3" controlId='password'>
       <Form.Control
         type="password"
@@ -293,53 +325,82 @@ function LoginModal(props) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <Button
-        className="link-text-button"
-        variant="outline-secondary"
-        onClick={() => {
-          setIsResettingPassword(true);
-          setRegistering(false);
-        }}
-      >
-                  Forgot Password
-      </Button>
+    </Form.Group>
+    <Form.Group className="mb-3" controlId='passwordConfirm'>
+      <Form.Control
+        type="password"
+        placeholder="Confirm Password"
+        value={passwordConfirm}
+        onChange={(e) => setPasswordConfirm(e.target.value)}
+      />
     </Form.Group>
     <div className="button-container">
       <Button
         className="standard-button"
         variant="outline-secondary"
         onClick={() => {
-          authContext.handleLoginModalClose();
+          authContext.setLoginModalType(LoginModalType.LOGIN);
         }}
       >
-                Cancel
+        Back
       </Button>
       <Button
         className="standard-button btn-custom"
         onClick={() => {
-          validateLoginFields();
+          validateRegisterFields();
         }}
       >
-                Login
+        Register
       </Button>
     </div>
-
-    {props.allowRegistering ? (
-              <div className="button-container mt-2">
-                <Button
-                  className="link-text-button"
-                  variant="outline-secondary"
-                  onClick={() => {
-                    setRegistering(true);
-                  }}
-                >
-                  New Account
-                </Button>
-              </div>
-            ) : null}
   </Form>
-</div>
-        )}
+        ) : <Form className="form-container">
+          <Form.Group className="mb-3" controlId='email'>
+            <Form.Control
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='password'>
+            <Form.Control
+              type="password"
+              placeholder="New Password"
+              value={password}
+              autoFocus={true}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='passwordConfirm'>
+            <Form.Control
+              type="password"
+              placeholder="Confirm New Password"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+            />
+          </Form.Group>
+          <div className="button-container">
+            <Button
+              className="standard-button"
+              variant="outline-secondary"
+              onClick={() => {
+                cancelModal();
+              }}
+            >
+            Cancel
+            </Button>
+            <Button
+              className="standard-button btn-custom"
+              onClick={() => {
+                validateResetPasswordFields();
+              }}
+            >
+            Reset Password
+            </Button>
+          </div>
+        </Form>}
       </Modal.Body>
 
     </Modal>

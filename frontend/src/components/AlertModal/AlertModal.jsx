@@ -1,37 +1,38 @@
 import {React, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
-import './ErrorModal.css';
+import './AlertModal.css';
 
-function ErrorModal(props) {
+function AlertModal(props) {
   return (
     <div tabIndex="0"
       onKeyDown={(e) => {
         e.preventDefault();
         if (e.key === 'Enter' || e.key === 'Escape' ) {
-          props.handleErrorModalClose();
+          props.handleAlertModalClose();
         }
       }}
     >
       <Modal
-        show={props.showErrorModal}
-        onHide={()=>props.handleErrorModalClose()}
+        show={props.showAlertModal}
+        onHide={()=>props.handleAlertModalClose()}
         size="sm"
         aria-labelledby="contained-modal-title-vcenter"
         centered
+        backdrop='static'
       >
         <Modal.Header closeButton autoFocus={true}>
-          <Modal.Title >Error</Modal.Title>
+          <Modal.Title >{props.alertType}</Modal.Title>
         </Modal.Header>
         <Modal.Body
         >
-          {props.errorMessages.map((error) => (
+          {props.alertMessages.map((error) => (
             <div key={error}>{error}</div>
           ))}
         </Modal.Body>
         <Modal.Footer>
           <div className='buttons-container'>
-            <Button className='btn-custom' onClick={()=>props.handleErrorModalClose()}>
+            <Button className='btn-custom' onClick={()=>props.handleAlertModalClose()}>
           Dismiss
             </Button>
           </div>
@@ -42,4 +43,4 @@ function ErrorModal(props) {
   );
 }
 
-export default ErrorModal;
+export default AlertModal;

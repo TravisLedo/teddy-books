@@ -12,7 +12,6 @@ import {AuthContext} from '../../contexts/Contexts';
 import {
   getLocalUser,
   getOfflineSettings,
-  setOfflineSettings,
 } from '../../services/localStorageService';
 import {
   getBookById,
@@ -25,6 +24,7 @@ import './Read.css';
 
 function Read(props) {
   const authContext = useContext(AuthContext);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const audioPlayerRef = useRef();
   const carouselRef = useRef();
   const {bookId} = useParams();
@@ -170,7 +170,7 @@ function Read(props) {
           if (audio.data === 'empty.mp3') {
             setAudioSource(emptyAudio);
           } else {
-            setAudioSource(process.env.REACT_APP_URL + '/' + audio.data);
+            setAudioSource(process.env.REACT_APP_BACKEND_URL + '/' + audio.data);
           }
         } catch (error) {
           console.log(error);
@@ -224,7 +224,7 @@ function Read(props) {
           try {
             if (audioSource !== emptyAudio) {
               removeTempAudioFromServer(
-                  audioSource.replace(process.env.REACT_APP_URL + '/', ''),
+                  audioSource.replace(process.env.REACT_APP_BACKEND_URL + '/', ''),
               );
             }
           } catch (error) {}
