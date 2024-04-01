@@ -136,7 +136,8 @@ function App() {
       const updatedUser = await updateUser(userData);
       setUser(updatedUser);
       setOfflineSettings(updatedUser.settings);
-    } catch (error) {}
+    } catch (error) {
+    }
   };
 
   const handleResize = () => {

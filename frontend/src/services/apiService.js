@@ -42,7 +42,7 @@ export const activateApiServiceSecureInterceptors = (handleLoginModalShow)=>{
         ) {
           console.log('Access Token and Refresh Token both expired.');
           removeLocalUser();
-          handleLoginModalShow(LoginModalType.LOGIN, false);
+          handleLoginModalShow(LoginModalType.EXPIRED, false);
         }
 
         if (error.response.status === 401 && !originalRequest._retry) {

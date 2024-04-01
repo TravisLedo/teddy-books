@@ -175,7 +175,7 @@ function LoginModal(props) {
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          if (props.loginModalType === LoginModalType.LOGIN) {
+          if (props.loginModalType === LoginModalType.LOGIN || props.loginModalType === LoginModalType.EXPIRED) {
             validateLoginFields();
           } else if (props.loginModalType === LoginModalType.REGISTER) {
             validateRegisterFields();
@@ -200,7 +200,7 @@ function LoginModal(props) {
       </Modal.Header>
 
       <Modal.Body>
-        {props.loginModalType === LoginModalType.LOGIN ? (
+        {props.loginModalType === LoginModalType.LOGIN || props.loginModalType === LoginModalType.EXPIRED? (
           <div>
             <Form className="form-container">
               <Form.Group className="mb-3" controlId='email'>
@@ -249,7 +249,6 @@ function LoginModal(props) {
                 </Button>
               </div>
 
-              {props.allowRegistering ? (
               <div className="button-container mt-2">
                 <Button
                   className="link-text-button"
@@ -261,7 +260,6 @@ function LoginModal(props) {
                   New Account
                 </Button>
               </div>
-            ) : null}
             </Form>
           </div>
 

@@ -7,7 +7,7 @@ export const validateUsername = async (userName, checkForExisting)=>{
   } else {
     if (userName.length < 5) {
       errors.push('Username must be at least 5 characters.');
-    } else if (email.length >50) {
+    } else if (userName.length >50) {
       errors.push('Email must be less than 51 characters.');
     }
     if (checkForExisting) {

@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom';
 import {Button, Dropdown} from 'react-bootstrap';
-import {React, useContext} from 'react';
+import {React, useContext, useState, useEffect} from 'react';
 import {AuthContext} from '../../contexts/Contexts';
 import {getLocalUser} from '../../services/localStorageService';
 import {LoginModalType} from '../../Enums/LoginModalType';
