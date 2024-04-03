@@ -24,7 +24,6 @@ import './Read.css';
 
 function Read(props) {
   const authContext = useContext(AuthContext);
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const audioPlayerRef = useRef();
   const carouselRef = useRef();
   const {bookId} = useParams();
@@ -39,12 +38,11 @@ function Read(props) {
   const [autoNextPage, setAutoNextPage] = useState();
   const [audioEnabled, setAudioEnabled] = useState();
 
-  const delayVoiceTime = 1000;
-  const [timerDone, setTimerDone] = useState(false);
+  const delayTime = 1000;
+  const [delay, setDelay] = useState(delayTime);
 
   const handlePageChanged = async (page) => {
     audioPlayerRef.current.pause();
-    setTimerDone(false);
     setAudioSource(null);
     setCurrentCarouselPage(page);
   };
@@ -135,16 +133,11 @@ function Read(props) {
   }, [book]);
 
   useEffect(() => {
-    setTimeout(function() {
-      if (!timerDone) {
-        setTimerDone(true);
-      }
-    }, delayVoiceTime);
-  }, [timerDone]);
+    setDelay(delayTime);
+  }, [currentCarouselPage]);
 
   useEffect(() => {
     if (
-      timerDone &&
       started &&
       audioEnabled &&
       !audioPlayerRef.current.isPlaying
@@ -176,9 +169,13 @@ function Read(props) {
           console.log(error);
         }
       };
-      handleAudio();
+
+      const timer = setTimeout(() => {
+        handleAudio();
+      }, delay);
+      return () => clearTimeout(timer);
     }
-  }, [audioEnabled, timerDone, started]);
+  }, [audioEnabled, started, currentCarouselPage]);
 
   useEffect(() => {
     handlePageChanged(currentCarouselPage);

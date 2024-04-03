@@ -1,12 +1,15 @@
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
-import {React} from 'react';
+import {React, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {generateImageLink} from '../../services/apiService';
 import './bookCard.css';
+import blank from '../../assets/images/blank.png';
 
 function BookCard(props) {
+  const [image, setImage] = useState(generateImageLink(props.book, 1));
+
   return (
     <Col className="d-flex justify-content-center px-0">
       <Link to={`read/${props.book._id}`} style={{maxWidth: '100%'}}>
@@ -26,12 +29,16 @@ function BookCard(props) {
         >
           <Image
             rounded
-            src={generateImageLink(props.book, 1)}
+            src={image}
             style={{
               maxWidth: '99%',
               maxHeight: '99%',
               objectFit: 'contain',
               margin: 'auto',
+            }}
+            onError={(e) => {
+              e.onError = null;
+              setImage(blank);
             }}
           />
           <div className="corner-label">

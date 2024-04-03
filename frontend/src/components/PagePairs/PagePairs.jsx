@@ -28,8 +28,10 @@ export default function PagePairs(props) {
               <Image
                 className="page-image"
                 rounded
-                onError={() => setLeftImage(blank)}
-                src={leftImage}
+                onError={(e) => {
+                  e.onError = null;
+                  setLeftImage(blank);
+                }} src={leftImage}
                 alt=""
               />
             </Col>
@@ -37,7 +39,10 @@ export default function PagePairs(props) {
               <Image
                 className="page-image"
                 rounded
-                onError={() => setRightImage(blank)}
+                onError={(e) => {
+                  e.onError = null;
+                  setRightImage(blank);
+                }}
                 src={rightImage}
                 alt=""
               />
