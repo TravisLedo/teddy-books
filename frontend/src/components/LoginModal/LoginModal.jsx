@@ -39,7 +39,7 @@ function LoginModal(props) {
       if (successLogin) {
         cancelModal();
       } else {
-        authContext.handleAlertModalShow(AlertType.ERROR, ['Login Failed']);
+        authContext.handleAlertModalShow(AlertType.ERROR, ['Invalid Credentials.']);
       }
     } catch (error) {
       authContext.handleAlertModalShow(AlertType.ERROR, ['Server Error']);
@@ -146,8 +146,6 @@ function LoginModal(props) {
         authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset successful and you are now logged in.']);
         login();
       }
-
-      // updateUser();
     } catch (error) {
       console.log(error);
     }

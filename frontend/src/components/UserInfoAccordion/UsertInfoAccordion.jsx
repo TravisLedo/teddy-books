@@ -8,8 +8,9 @@ import close from '../../assets/images/close.png';
 import trash from '../../assets/images/trash.png';
 import './UserInfoAccordion.css';
 import {validateEmail, validateIsAdmin, validateIsBlocked, validateUsername} from '../../services/FormValidationService';
-import DeleteModal from '../DeleteBookModal/DeleteModal';
+import DeleteModal from '../DeleteModal/DeleteModal';
 import {AlertType} from '../../Enums/AlertType';
+import { DeleteType } from '../../Enums/DeleteType';
 
 function UserInfoAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -78,7 +79,7 @@ function UserInfoAccordion(props) {
   return (
     <Accordion.Item eventKey={props.user._id}>
       <DeleteModal
-        type={'user'}
+        type={DeleteType.USER_ADMIN}
         name={props.user.email}
         deleteItem={deleteItem}
         showDeleteModal={showDeleteModal}

@@ -24,6 +24,7 @@ import {
   autoLoginUser,
   getUserById,
   loginUser,
+  updatePassword,
   updateUser,
 } from './services/apiService';
 import './App.css';
@@ -140,6 +141,18 @@ function App() {
     }
   };
 
+  const updateUserDbPassword = async (userData) => {
+    try {
+      const updatedUser = await updatePassword(userData);
+      if (updatedUser) {
+        setUser(updatedUser);
+        setOfflineSettings(updatedUser.settings);
+      }
+      return updatedUser;
+    } catch (error) {
+    }
+  };
+
   const handleResize = () => {
     setCurrentWindowSize({
       width: window.innerWidth,
@@ -186,6 +199,7 @@ function App() {
           handleAlertModalShow,
           setLoginModalType,
           setResetPasswordToken,
+          updateUserDbPassword,
         }}
       >
         <div className="App">

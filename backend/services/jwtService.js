@@ -2,16 +2,16 @@ const jwt = require('jsonwebtoken');
 
 
 function generateAccessToken(userJwt) {
-  return jwt.sign(userJwt, process.env.JWT_SECRET, {expiresIn: '1m'});
+  return jwt.sign(userJwt, process.env.JWT_SECRET, {expiresIn: '10d'});
 }
 
 
 function generateRefreshToken(jwtValues) {
-  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '2m'});
+  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '30d'});
 }
 
 function generatePasswordResetToken(jwtValues) {
-  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '10m'});
+  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '1d'});
 }
 
 // middleware

@@ -10,6 +10,16 @@ import './mainHeader.css';
 export default function MainHeader() {
   const authContext = useContext(AuthContext);
 
+  const trimUsername =()=>{
+    const username = authContext.user.name;
+
+    if (username.length > 6) {
+      return authContext.user.name.substring(0, 6) + '...';
+    } else {
+      return authContext.user.name;
+    }
+  };
+
   return (
     <div className="main-navbar">
       <Link className="logo-link" to={'/'}>
@@ -24,7 +34,7 @@ export default function MainHeader() {
           <div>
             <Dropdown className="standard-button">
               <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                {authContext.user.name}
+                {trimUsername()}
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item as={Link} to={'/profile'}>

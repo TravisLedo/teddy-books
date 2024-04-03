@@ -1,5 +1,5 @@
 import {React, useContext, useState, useEffect} from 'react';
-import {Button, Dropdown, Form, Image} from 'react-bootstrap';
+import {Button, Col, Dropdown, Form, Image, Row} from 'react-bootstrap';
 import Switch from 'react-switch';
 import {AuthContext} from '../../contexts/Contexts';
 import {Voices} from '../../Enums/Voices';
@@ -7,18 +7,28 @@ import edit from '../../assets/images/edit.png';
 import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
 import './Profile.css';
-import {updateUser} from '../../services/apiService';
-import {validateEmail, validateUsername} from '../../services/FormValidationService';
+import {deactivateUser, deleteUserById, updateUser} from '../../services/apiService';
+import {validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
 import {AlertType} from '../../Enums/AlertType';
+import DeleteModal from '../../components/DeleteModal/DeleteModal';
+import {DeleteType} from '../../Enums/DeleteType';
 
 function Profile(props) {
   const authContext = useContext(AuthContext);
   const [voiceSelection, setVoiceSelection] = useState(authContext.user.settings.voiceSelection);
   const [autoNextPage, setAutoNextPage] = useState(authContext.user.settings.autoNextPage);
   const [audioEnabled, setAudioEnabled] = useState(authContext.user.settings.audioEnabled);
-  const [editing, setEditing] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [editingPassword, setEditingPassword] = useState(false);
   const [userName, setUserName] = useState(authContext.user.name);
   const [email, setEmail] = useState(authContext.user.email);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+
 
   const handleAutoNextPageToggle = async () => {
     const updated = await authContext.updateAutoNextPage(autoNextPage, true);
@@ -54,39 +64,140 @@ function Profile(props) {
     }
   };
 
-  const validateFields = async () => {
+  const validateNameValue = async () => {
     let usernameErrorsList = [];
-    let emailErrorsList = [];
     if (userName.trim().toLowerCase() !== authContext.user.name.trim().toLowerCase()) {
       usernameErrorsList = await validateUsername(userName, true);
-    }
-    if (email.trim().toLowerCase() !== authContext.user.email.trim().toLowerCase()) {
-      emailErrorsList = await validateEmail(email, true);
-    }
-    const errorsList = usernameErrorsList.concat(emailErrorsList);
-    if (errorsList.length>0) {
-      authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
+      if (usernameErrorsList.length>0) {
+        authContext.handleAlertModalShow(AlertType.ERROR, usernameErrorsList);
+      } else {
+        await updateNameValue();
+        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Username updated.']);
+      }
     } else {
-      updateUserValues();
+      resetNameValue();
     }
   };
 
-  const updateUserValues = async () => {
+  const validateEmailValue = async () => {
+    let emailErrorsList = [];
+    if (email.trim().toLowerCase() !== authContext.user.email.trim().toLowerCase()) {
+      emailErrorsList = await validateEmail(email, true);
+      if (emailErrorsList.length>0) {
+        authContext.handleAlertModalShow(AlertType.ERROR, emailErrorsList);
+      } else {
+        await updateEmailValue();
+        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Email updated.']);
+      }
+    } else {
+      resetEmailValue();
+    }
+  };
+
+  const validatePasswordValues = async () => {
+    let passwordErrorsList = [];
+
+    if (newPassword.length <1 && currentPassword.length <1 && newPasswordConfirm.length <1) {
+      setEditingPassword(false);
+    } else {
+      passwordErrorsList = await validatePasswordFormat(newPassword);
+
+      if (newPassword !== newPasswordConfirm) {
+        passwordErrorsList.push('New passwords must match.');
+      }
+
+      if (passwordErrorsList.length>0) {
+        authContext.handleAlertModalShow(AlertType.ERROR, passwordErrorsList);
+      } else {
+        await updatePasswordValues();
+      }
+    }
+  };
+
+  const validateDeletePasswordValues = async () => {
+    let passwordErrorsList = [];
+    passwordErrorsList = await validatePasswordFormat(deletePassword);
+    if (passwordErrorsList.length>0) {
+      authContext.handleAlertModalShow(AlertType.ERROR, passwordErrorsList);
+    } else {
+      try {
+        const userToDelete = authContext.user;
+        userToDelete.deletePassword = deletePassword;
+        const response = await deactivateUser(userToDelete);
+        if (response.status === 200) {
+          setShowDeleteModal(false);
+          authContext.logout();
+        } else if (response.status === 204) {
+          authContext.handleAlertModalShow(AlertType.ERROR, ['Invalid Password.']);
+        } else {
+          authContext.handleAlertModalShow(AlertType.ERROR, ['Something went wrong.']);
+        }
+      } catch (error) {
+      }
+    }
+  };
+
+
+  const updateNameValue = async () => {
     const newUserData = authContext.user;
-    newUserData.email = email;
     newUserData.name = userName;
     try {
       await updateUser(newUserData);
-      setEditing(false);
+      setEditingName(false);
     } catch (error) {}
   };
 
-  const resetValues = () => {
-    setEditing(false);
-    setUserName(authContext.user.name);
-    setEmail(authContext.user.email);
-  }; ;
+  const updateEmailValue = async () => {
+    const newUserData = authContext.user;
+    newUserData.email = email;
+    try {
+      await updateUser(newUserData);
+      setEditingEmail(false);
+    } catch (error) {}
+  };
 
+  const updatePasswordValues = async () => {
+    const newUserData = authContext.user;
+    newUserData.currentPassword = currentPassword;
+    newUserData.newPassword = newPassword;
+    try {
+      const successUpdate = await authContext.updateUserDbPassword(newUserData);
+
+      if (successUpdate) {
+        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password updated.']);
+        resetPasswordValues();
+      } else {
+        authContext.handleAlertModalShow(AlertType.ERROR, ['Current Password is not correct.']);
+      }
+    } catch (error) {
+    }
+  };
+
+  const resetNameValue = () => {
+    setEditingName(false);
+    setUserName(authContext.user.name);
+  };
+
+  const resetEmailValue = () => {
+    setEditingEmail(false);
+    setEmail(authContext.user.email);
+  };
+
+  const resetPasswordValues = () => {
+    setEditingPassword(false);
+    setCurrentPassword('');
+    setNewPassword('');
+    setNewPasswordConfirm('');
+  };
+
+  const resetDeletePasswordValue = () => {
+    setDeletePassword('');
+  };
+
+
+  const deleteItem = async () => {
+    validateDeletePasswordValues();
+  };
 
   useEffect(() => {
     setAudioEnabled(authContext.user.settings.audioEnabled);
@@ -103,18 +214,31 @@ function Profile(props) {
           '50%' :
           '95%',
     }}>
+      <DeleteModal
+        type={DeleteType.USER}
+        name={authContext.user.email}
+        deleteItem={deleteItem}
+        showDeleteModal={showDeleteModal}
+        setShowDeleteModal={setShowDeleteModal}
+        deletePassword={deletePassword}
+        setDeletePassword={setDeletePassword}
+      ></DeleteModal>
       <div className="title-label">
         <div className="title-label-text">Profile</div>
       </div>
       <div className='menu-container'>
-        <div className='setting-content'>
-          {editing ? (
+
+        <div className='setting-texts'>
+
+          <div>Username</div>
+          <Form.Control type="text" value={userName} disabled={!editingName} onChange={(e) => setUserName(e.target.value)}/>
+          {editingName ? (
           <div className="editing-buttons-container">
             <Button
               className="edit-button"
               variant="outline-secondary"
               onClick={() => {
-                resetValues();
+                resetNameValue();
               }}
             >
               <Image className="edit-button-image" src={close}></Image>
@@ -123,7 +247,7 @@ function Profile(props) {
               className="edit-button"
               variant="outline-secondary"
               onClick={() => {
-                validateFields();
+                validateNameValue();
               }}
             >
               <Image className="edit-button-image" src={check}></Image>
@@ -135,39 +259,125 @@ function Profile(props) {
               className="edit-button"
               variant="outline-secondary"
               onClick={() => {
-                setEditing(true);
+                setEditingName(true);
               }}
             >
               <Image className="edit-button-image" src={edit}></Image>
             </Button>
           </div>
         )}
-          <div>Username</div>
-          <Form.Control type="text" value={userName} disabled={!editing} onChange={(e) => setUserName(e.target.value)}/>
         </div>
-        <div className='setting-content'>
-          <div>Email</div>
-          <Form.Control type="email" value={email} disabled={!editing} onChange={(e) => setEmail(e.target.value)}/>
 
+        <div className='setting-texts'>
+          <div>Email</div>
+          <Form.Control type="email" value={email} disabled={!editingEmail} onChange={(e) => setEmail(e.target.value)}/>
+          {editingEmail ? (
+          <div className="editing-buttons-container">
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => {
+                resetEmailValue();
+              }}
+            >
+              <Image className="edit-button-image" src={close}></Image>
+            </Button>
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => {
+                validateEmailValue();
+              }}
+            >
+              <Image className="edit-button-image" src={check}></Image>
+            </Button>
+          </div>
+        ) : (
+          <div className="editing-buttons-container">
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => {
+                setEditingEmail(true);
+              }}
+            >
+              <Image className="edit-button-image" src={edit}></Image>
+            </Button>
+          </div>
+        )}
         </div>
-        <div className="setting-content">
-          <div>Auto Next Page</div>
-          <div> <Switch
-            className="react-switch"
-            onChange={()=> handleAutoNextPageToggle()}
-            checked={autoNextPage}
-          /></div>
+        <div className='setting-texts'>
+          <div>Current Password</div>
+          <Form.Control type="password" value={currentPassword} disabled={!editingPassword} onChange={(e) => setCurrentPassword(e.target.value)}/>
         </div>
-        <div className="setting-content">
-          <div>Voice Audio</div>
-          <div> <Switch
-            className="react-switch"
-            onChange={()=> handleAudioEnabledToggle()}
-            checked={audioEnabled}
-          /></div>
+        <div className='setting-texts'>
+          <div>New Password</div>
+          <Form.Control type="password" value={newPassword} disabled={!editingPassword} onChange={(e) => setNewPassword(e.target.value)}/>
         </div>
-        <div className='setting-content'>
-          <div>Voice Selection</div>
+        <div className='setting-texts'>
+          <div>Confirm New Password</div>
+          <Form.Control type="password" value={newPasswordConfirm} disabled={!editingPassword} onChange={(e) => setNewPasswordConfirm(e.target.value)}/>
+          {editingPassword ? (
+          <div className="editing-buttons-container">
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => {
+                resetPasswordValues();
+              }}
+            >
+              <Image className="edit-button-image" src={close}></Image>
+            </Button>
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => {
+                validatePasswordValues();
+              }}
+            >
+              <Image className="edit-button-image" src={check}></Image>
+            </Button>
+          </div>
+        ) : (
+          <div className="editing-buttons-container">
+            <Button
+              className="edit-button"
+              variant="outline-secondary"
+              onClick={() => {
+                setEditingPassword(true);
+              }}
+            >
+              <Image className="edit-button-image" src={edit}></Image>
+            </Button>
+          </div>
+        )}
+        </div>
+        <Row className='setting-controls'>
+          <Col>
+            <div className="">
+              <div>Auto Next</div>
+              <Switch
+                className="react-switch"
+                onChange={()=> handleAutoNextPageToggle()}
+                checked={autoNextPage}
+              />
+            </div>
+          </Col>
+          <Col>
+            <div className="">
+              <div>Voice Audio</div>
+              <Switch
+                className="react-switch"
+                onChange={()=> handleAudioEnabledToggle()}
+                checked={audioEnabled}
+              />
+            </div>
+          </Col>
+        </Row>
+
+        <Row className='setting-controls'> <Col>
+
+            Voice
           <Dropdown className="standard-button">
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
               {getVoiceName()}
@@ -233,8 +443,18 @@ function Profile(props) {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-        </div>
-
+        </Col></Row>
+        <Button
+          className="link-text-button"
+          variant="outline-secondary"
+          style={{paddingTop: '50px'}}
+          onClick={() => {
+            resetDeletePasswordValue();
+            setShowDeleteModal(true);
+          }}
+        >
+           Deactivate
+        </Button>
       </div>
     </div>
   );

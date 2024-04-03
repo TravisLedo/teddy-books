@@ -9,7 +9,7 @@ export const apiServiceUnsecure = axios.create({
   },
 });
 
-export const apiServiceSecure = axios.create({
+export const apiServiceSecure = axios.create({// Any requests made with this endpoint requires authenthication. Make user log back in if they are not.
   baseURL: process.env.REACT_APP_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -172,11 +172,29 @@ export const updateUser = async (userData) => {
   }
 };
 
-export const deleteUserById = async (userId) => {
+export const updatePassword = async (userData) => {
+  try {
+    const response = await apiServiceSecure.put('/user/update-password', {userData});
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUserById = async (userId) => { // For admin purposes, users will use the deactivate endpoint
   try {
     const response = await apiServiceSecure.delete('/user/delete/' + userId);
-    console.log(response.data);
     return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deactivateUser = async (userData) => {
+  try {
+    const response = await apiServiceSecure.delete('/user/deactivate/' + userData._id + '/' + userData.deletePassword);
+    console.log(response);
+    return response;
   } catch (error) {
     throw error;
   }

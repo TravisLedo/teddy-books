@@ -35,6 +35,9 @@ function AlertModal(props) {
             <Button className='btn-custom' onClick={()=>props.handleAlertModalClose()}>
           Dismiss
             </Button>
+            {props.confirmCallback ? <Button className='btn-custom' onClick={()=>props.confirmCallback()}>
+          Confirm
+            </Button> : null}
           </div>
 
         </Modal.Footer>

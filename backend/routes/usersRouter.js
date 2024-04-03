@@ -6,6 +6,7 @@ const {authenthicateJwtToken, generateRefreshToken, generateAccessToken, generat
 const ResetPasswordToken = require('../models/resetPasswordToken');
 const RefreshToken = require('../models/refreshToken');
 const {sendEmailCode: sendEmailLink} = require('../services/emailService');
+const DeactivatedUser = require('../models/deactivatedUser');
 
 router.post('/user/refreshtoken', async (req, res) => {
   try {
@@ -39,7 +40,7 @@ router.post('/user/login', async (req, res) => {
       await RefreshToken.findOneAndUpdate({userId: user._id}, {userId: user._id, token: generateRefreshToken(userJwt)}, {upsert: true});
       res.status(200).send(accessToken);
     } else {
-      res.status(401).send('Login Failed.');
+      res.status(401).send('Invalid Credentials.');
     }
   } catch (error) {
     res.status(500).send(error);
@@ -150,7 +151,27 @@ router.put('/user/update', authenthicateJwtToken, async (req, res) => {
   }
 });
 
-router.delete('/user/delete/:id', authenthicateJwtToken, async (req, res) => {
+
+router.put('/user/update-password', authenthicateJwtToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userData._id);
+    const validPassword = await bycrypt.compare(req.body.userData.currentPassword, user.password);
+
+    if (validPassword) {
+      const newPasswordUser = user;
+      newPasswordUser.password = await bycrypt.hash(req.body.userData.newPassword, 10);
+      const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, newPasswordUser, {new: true});
+      res.status(200).send(updatedUser);
+    } else {
+      res.status(400).send('Invalid current password');
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+router.delete('/user/delete/:id', authenthicateJwtToken, async (req, res) => {// admin use only
   try {
     await User.findByIdAndDelete(req.params.id);
     res.status(200).send('User Deleted.');
@@ -158,6 +179,26 @@ router.delete('/user/delete/:id', authenthicateJwtToken, async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+router.delete('/user/deactivate/:id/:deletePassword', authenthicateJwtToken, async (req, res) => { // delete user
+  try {
+    const user = await User.findById(req.params.id);
+    const validPassword = await bycrypt.compare(req.params.deletePassword, user.password);
+    if (validPassword) {
+      const deactivatedUser = new DeactivatedUser({
+        user: user,
+      });
+      await deactivatedUser.save();
+      await User.findByIdAndDelete(user._id);
+      res.status(200).send('User deactivated.');
+    } else {
+      res.status(204).send('Invalid password.');
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 
 router.post('/user/reset/request', async (req, res) => {
   try {

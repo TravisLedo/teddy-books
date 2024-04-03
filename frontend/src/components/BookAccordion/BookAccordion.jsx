@@ -12,10 +12,11 @@ import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
 import trash from '../../assets/images/trash.png';
 import './BookAccordion.css';
-import DeleteModal from '../DeleteBookModal/DeleteModal';
+import DeleteModal from '../DeleteModal/DeleteModal';
 import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
 import {AuthContext} from '../../contexts/Contexts';
 import {AlertType} from '../../Enums/AlertType';
+import { DeleteType } from '../../Enums/DeleteType';
 
 function BookAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -82,7 +83,7 @@ function BookAccordion(props) {
   return (
     <Accordion.Item eventKey={props.book._id}>
       <DeleteModal
-        type={'book'}
+        type={DeleteType.BOOK_ADMIN}
         name={props.book.title}
         deleteItem={deleteItem}
         showDeleteModal={showDeleteModal}
