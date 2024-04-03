@@ -1,4 +1,4 @@
-import {React} from 'react';
+import {React, useRef, useState, useEffect} from 'react';
 import {Button, Image, Dropdown} from 'react-bootstrap';
 import Tooltip from 'react-bootstrap/Tooltip';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -9,12 +9,26 @@ import pauseDisabled from '../../assets/images/pause-disabled.png';
 import audio from '../../assets/images/audio.png';
 import mute from '../../assets/images/mute.png';
 import chat from '../../assets/images/chat.png';
+import heart1 from '../../assets/images/heart1.png';
+import heart2 from '../../assets/images/heart2.png';
 import {Voices} from '../../Enums/Voices';
 import './ReadControlArea.css';
 
 export default function ReadControlArea(props) {
+  const offsetRef = useRef();
+
+  const [offsetSize, setOffsetSize] = useState(0);
+
+  useEffect(() => {
+    if (offsetRef) {
+      setOffsetSize(offsetRef.current.offsetWidth);
+    }
+  }, [offsetRef]);
+
   return (
     <div className="read-control-area-container">
+      <div style={{width: offsetSize}} >
+      </div>
       <OverlayTrigger
         overlay={(props) => <Tooltip {...props}>Toggle Voice</Tooltip>}
         placement="top"
@@ -136,6 +150,20 @@ export default function ReadControlArea(props) {
           ></Image>
         </Button>
       </OverlayTrigger>
+      <div className="corner-stats" onClick={(e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('test');
+      }}
+      ref={offsetRef}
+      >
+        <Image
+          className="corner-stats-image"
+          rounded
+          src={heart1}
+        />
+        <b>{props.book.likes.length}</b>
+      </div>
     </div>
   );
 }

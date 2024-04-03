@@ -1,6 +1,6 @@
 import {React, useState, useEffect, useRef, useContext} from 'react';
 import {useParams} from 'react-router-dom';
-import {Row} from 'react-bootstrap';
+import {Image, Row} from 'react-bootstrap';
 import ProgressBar from '@ramonak/react-progress-bar';
 import {Carousel} from 'react-responsive-carousel';
 import PagePairs from '../../components/PagePairs/PagePairs';
@@ -9,6 +9,7 @@ import {OverlayStatus} from '../../Enums/OverlayStatus';
 import emptyAudio from '../../assets/audio/empty.mp3';
 import ReadControlArea from '../../components/ReadControlArea/ReadControlArea';
 import {AuthContext} from '../../contexts/Contexts';
+
 import {
   getLocalUser,
   getOfflineSettings,
@@ -279,8 +280,10 @@ function Read(props) {
               handleVoiceSelectionChange={handleVoiceSelectionChange}
               handleAudioEnabledToggle={handleAudioEnabledToggle}
               handleAutoNextPageToggle={handleAutoNextPageToggle}
+              book={book}
             ></ReadControlArea>
           </Row>
+
         </div>
       ) : null}
     </div>

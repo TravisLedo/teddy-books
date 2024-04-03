@@ -6,6 +6,9 @@ import {Link} from 'react-router-dom';
 import {generateImageLink} from '../../services/apiService';
 import './bookCard.css';
 import blank from '../../assets/images/blank.png';
+import book from '../../assets/images/eye.png';
+import heart1 from '../../assets/images/heart1.png';
+import heart2 from '../../assets/images/heart2.png';
 
 function BookCard(props) {
   const [image, setImage] = useState(generateImageLink(props.book, 1));
@@ -32,7 +35,7 @@ function BookCard(props) {
             src={image}
             style={{
               maxWidth: '99%',
-              maxHeight: '99%',
+              maxHeight: '90%',
               objectFit: 'contain',
               margin: 'auto',
             }}
@@ -41,8 +44,28 @@ function BookCard(props) {
               setImage(blank);
             }}
           />
-          <div className="corner-label">
-            <b className="corner-label-text">{' ' + props.book.title + ' '}</b>
+
+          <div className="bottom-content">
+            <div className="corner-stats-container">
+              <div>
+                <div className="corner-stats" onClick={(e)=>{
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('test');
+                }}>
+                  <Image
+                    className="corner-stats-image"
+                    rounded
+                    src={heart1}
+                  />
+                  <b>{props.book.likes.length}</b></div>
+              </div>
+            </div>
+            <div className="corner-label">
+              <b className="corner-label-text">
+                {' ' + props.book.title + ' '}
+              </b>
+            </div>
           </div>
         </Card>
       </Link>

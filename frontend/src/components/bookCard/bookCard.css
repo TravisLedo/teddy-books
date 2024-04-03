@@ -37,4 +37,24 @@
   max-width: 400px;
 }
 
-.book-card {}
+.bottom-content{
+  width: 100%;
+}
+
+
+.corner-stats-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin-bottom: 5px;
+  display: flex;
+}
+
+.corner-stats {
+}
+
+.corner-stats-image {
+  height: 25px;
+  margin-left: 10px;
+  margin-right: 3px;
+}
