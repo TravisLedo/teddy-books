@@ -10,7 +10,7 @@ import './UserInfoAccordion.css';
 import {validateEmail, validateIsAdmin, validateIsBlocked, validateUsername} from '../../services/FormValidationService';
 import DeleteModal from '../DeleteModal/DeleteModal';
 import {AlertType} from '../../Enums/AlertType';
-import { DeleteType } from '../../Enums/DeleteType';
+import {DeleteType} from '../../Enums/DeleteType';
 
 function UserInfoAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -36,7 +36,11 @@ function UserInfoAccordion(props) {
     newUserData.isAdmin = isAdmin;
     newUserData.isBlocked = isBlocked;
     try {
-      await updateUser(newUserData);
+      const updatedUserData = await updateUser(newUserData);
+      props.refreshData();
+      if (updatedUserData._id === authContext.user._id) {
+        authContext.setUser(updatedUserData);
+      }
       setEditing(false);
     } catch (error) {}
   };

@@ -57,10 +57,6 @@ function Admin(props) {
     setPassword('');
     setName('');
     setPasswordConfirm('');
-    setBooksData([]);
-    setNewestUsers([]);
-    setRecentUsers([]);
-    setSearchedUsers([]);
     searchUsers();
     fetchData();
   };
