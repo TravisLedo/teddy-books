@@ -7,7 +7,7 @@ const bookSchema = mongoose.Schema({
   pages: {type: Number, required: false},
   text: {type: String},
   views: {type: Number, required: true, default: 0},
-  likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+  likes: [{type: String}],
 }, {timestamps: true},
 );
 

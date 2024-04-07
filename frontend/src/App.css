@@ -117,3 +117,10 @@ html {
   background-color: #7237C5;
   color: white;
 }
+
+.like-button {
+  height: 25px;
+  margin-left: 10px;
+  margin-right: 3px;
+  cursor: pointer;
+}

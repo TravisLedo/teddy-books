@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const axios = require('axios');
-const schedule = require('node-schedule');
+//const schedule = require('node-schedule');
 const {v4: uuidv4} = require('uuid');
 const fs = require('fs');
 
@@ -72,9 +72,10 @@ router.post('/witai/removeaudio', async (req, res) => {
 // Remove any files that may be missed due to interuptions from auto delete.
 // Files older than 1 minute will be removed.
 // Check runs every minute
-schedule.scheduleJob('*/1 * * * *', function() {
-  deleteOldFiles('./public/temp');
-});
+//schedule.scheduleJob('*/1 * * * *', function() {
+ // console.log('test');
+ // deleteOldFiles('./public/temp');
+//});
 
 async function deleteOldFiles(path) {
   try {

@@ -1,4 +1,4 @@
-import {React, useRef, useState, useEffect} from 'react';
+import {React, useRef, useState, useEffect, useContext} from 'react';
 import {Button, Image, Dropdown} from 'react-bootstrap';
 import Tooltip from 'react-bootstrap/Tooltip';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -13,11 +13,37 @@ import heart1 from '../../assets/images/heart1.png';
 import heart2 from '../../assets/images/heart2.png';
 import {Voices} from '../../Enums/Voices';
 import './ReadControlArea.css';
+import {AuthContext} from '../../contexts/Contexts';
+import {updateBook} from '../../services/apiService';
 
 export default function ReadControlArea(props) {
+  const authContext = useContext(AuthContext);
   const offsetRef = useRef();
-
   const [offsetSize, setOffsetSize] = useState(0);
+  const [likes, setLikes] = useState(props.book.likes);
+  const [likeImage, setLikeImage] = useState(heart1);
+
+  const handleLike = async ()=>{
+    if (authContext.user) {
+      const newBookData = props.book;
+      if (likes.includes(authContext.user._id)) {
+        newBookData.likes = newBookData.likes.filter((id) => id === authContext.user.id);
+      } else {
+        newBookData.likes.push(authContext.user._id);
+      }
+      const response = await updateBook(newBookData);
+      setLikes(response.likes);
+    }
+  };
+
+  useEffect(() => {
+    if (authContext.user && likes.includes(authContext.user._id)) {
+      setLikeImage(heart2);
+    } else {
+      setLikeImage(heart1);
+    }
+  }, [likes]);
+
 
   useEffect(() => {
     if (offsetRef) {
@@ -150,20 +176,35 @@ export default function ReadControlArea(props) {
           ></Image>
         </Button>
       </OverlayTrigger>
-      <div className="corner-stats" onClick={(e)=>{
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('test');
-      }}
-      ref={offsetRef}
+
+
+      <OverlayTrigger
+        overlay={(e) => (
+          <Tooltip {...e}>
+            {!authContext.user ? (
+              <div>Log in to like.</div>
+            ) : (
+              <div>Like</div>
+            )}
+          </Tooltip>
+        )}
+        placement="top"
       >
-        <Image
-          className="corner-stats-image"
-          rounded
-          src={heart1}
-        />
-        <b>{props.book.likes.length}</b>
-      </div>
+        <div onClick={(e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          handleLike();
+        }}
+        ref={offsetRef}
+        >
+          <Image
+            className="like-button"
+            rounded
+            src={likeImage}
+          />
+        </div>
+      </OverlayTrigger>
+      <b>{props.book.likes.length}</b>
     </div>
   );
 }

@@ -355,7 +355,7 @@ function Profile(props) {
         <Row className='setting-controls'>
           <Col>
             <div className="">
-              <div>Auto Next</div>
+              <div>Auto Next Page</div>
               <Switch
                 className="react-switch"
                 onChange={()=> handleAutoNextPageToggle()}

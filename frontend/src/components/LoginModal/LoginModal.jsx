@@ -19,14 +19,12 @@ function LoginModal(props) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
 
   const resetForms = async () => {
     setEmail('');
     setPassword('');
     setName('');
     setPasswordConfirm('');
-    setVerificationCode('');
   };
 
   const login = async () => {
@@ -35,14 +33,17 @@ function LoginModal(props) {
         email: email,
         password: password,
       };
-      const successLogin = await authContext.login(user);
-      if (successLogin) {
-        cancelModal();
-      } else {
-        authContext.handleAlertModalShow(AlertType.ERROR, ['Invalid Credentials.']);
-      }
+      await authContext.login(user);
+      cancelModal();
     } catch (error) {
-      authContext.handleAlertModalShow(AlertType.ERROR, ['Server Error']);
+      console.log(error.status);
+      if (!error.response) {
+        authContext.handleAlertModalShow(AlertType.ERROR, ['Server Error']);
+      } else if (error.response.status === 401 ) {
+        authContext.handleAlertModalShow(AlertType.ERROR, ['Invalid Credentials.']);
+      } else {
+        authContext.handleAlertModalShow(AlertType.ERROR, ['Server Error']);
+      }
     }
   };
 

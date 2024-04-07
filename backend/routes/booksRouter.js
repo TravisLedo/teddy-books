@@ -64,9 +64,11 @@ router.put('/book/update', authenthicateJwtToken, async (req, res) => {
       author: req.body.bookData.author,
       pages: req.body.bookData.pages,
       text: req.body.bookData.text,
+      likes: req.body.bookData.likes,
+      views: req.body.bookData.views,
     };
-    await Book.findByIdAndUpdate(req.body.bookData._id, newBookValues);
-    res.status(200).send('Updated book data.');
+    const updatedBook = await Book.findByIdAndUpdate(req.body.bookData._id, newBookValues, {new: true});
+    res.status(200).send(updatedBook);
   } catch (error) {
     res.status(500).send(error);
   }

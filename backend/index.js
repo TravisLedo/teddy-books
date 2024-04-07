@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./services/scheduledService');
 const port = 3001;
 const mongoose = require('mongoose');
 const express = require('express');
@@ -6,7 +7,6 @@ const cors = require('cors');
 const booksRouter = require('./routes/booksRouter');
 const usersRouter = require('./routes/usersRouter');
 const witAiRouter = require('./routes/witAiRouter');
-
 const app = express();
 
 app.use(express.json());

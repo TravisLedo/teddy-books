@@ -75,9 +75,8 @@ function App() {
       setUser(user);
       setOfflineSettings(user.settings);
       localStorage.setItem('jwtToken', jwtToken);
-      return true;
     } catch (error) {
-      return false;
+      throw error;
     }
   };
 
