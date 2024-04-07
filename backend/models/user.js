@@ -11,7 +11,7 @@ const userSchema = mongoose.Schema({
   settings: {
     autoNextPage: {type: Boolean, default: true},
     audioEnabled: {type: Boolean, default: true},
-    voiceSelection: {type: String, default: Voices.OLIVIA},
+    voiceSelection: {type: String, default: Voices.OLIVIA.voice},
   }}, {timestamps: true},
 );
 
