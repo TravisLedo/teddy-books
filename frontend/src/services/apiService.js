@@ -175,7 +175,7 @@ export const updatePassword = async (userData) => {
 export const deleteUserById = async (userId) => { // For admin purposes, users will use the deactivate endpoint
   try {
     const response = await apiServiceSecure.delete('/user/delete/' + userId);
-    return response.data;
+    return response;
   } catch (error) {
     throw error;
   }
@@ -184,7 +184,6 @@ export const deleteUserById = async (userId) => { // For admin purposes, users w
 export const deactivateUser = async (userData) => {
   try {
     const response = await apiServiceSecure.delete('/user/deactivate/' + userData._id + '/' + userData.deletePassword);
-    console.log(response);
     return response;
   } catch (error) {
     throw error;
@@ -203,7 +202,6 @@ export const getBookById = async (_id) => {
 export const getBookByTitle= async (name) => {
   try {
     const response = await apiServiceSecure.get('/book/title/'+ name);
-    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error;

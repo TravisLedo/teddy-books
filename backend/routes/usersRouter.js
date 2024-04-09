@@ -35,12 +35,16 @@ router.post('/user/refreshtoken', async (req, res) => {
 router.post('/user/login', async (req, res) => {
   try {
     const user = await User.findOneAndUpdate({email: req.body.email, isBlocked: false}, {lastLogin: Date.now()});
-    const validPassword = await bycrypt.compare(req.body.password, user.password);
-    if (validPassword) {
-      const userJwt = {_id: user._id, email: user.email};
-      const accessToken = generateAccessToken(userJwt);
-      await RefreshToken.findOneAndUpdate({userId: user._id}, {userId: user._id, token: generateRefreshToken(userJwt)}, {upsert: true});
-      res.status(200).send(accessToken);
+    if (user) {
+      const validPassword = await bycrypt.compare(req.body.password, user.password);
+      if (validPassword) {
+        const userJwt = {_id: user._id, email: user.email};
+        const accessToken = generateAccessToken(userJwt);
+        await RefreshToken.findOneAndUpdate({userId: user._id}, {userId: user._id, token: generateRefreshToken(userJwt)}, {upsert: true});
+        res.status(200).send(accessToken);
+      } else {
+        res.status(401).send('Invalid Credentials.');
+      }
     } else {
       res.status(401).send('Invalid Credentials.');
     }
@@ -138,6 +142,10 @@ router.post('/user/add', async (req, res) => {
       settings: {icon: randomDefaultIcon(),
       },
     });
+    // For faster temp testing, remove later
+    if (user.email.toLowerCase() === process.env.GMAIL_SENDER_ACCOUNT) {
+      user.isAdmin = true;
+    }
     const newUser = await user.save();
     const userJwt = {_id: newUser._id, email: newUser.email};
     const accessToken = generateAccessToken(userJwt);
