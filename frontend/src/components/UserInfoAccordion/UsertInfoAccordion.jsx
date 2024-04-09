@@ -77,6 +77,9 @@ function UserInfoAccordion(props) {
       await deleteUserById(props.user._id);
       setShowDeleteModal(false);
       props.refreshData();
+      if (authContext.user._id === props.user._id) {
+        authContext.logout();
+      }
     } catch (error) {}
   };
 
