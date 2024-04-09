@@ -2,11 +2,12 @@ const router = require('express').Router();
 const User = require('../models/user');
 const bycrypt = require('bcrypt');
 const {jwtDecode} = require('jwt-decode');
-const {authenthicateJwtToken, generateRefreshToken, generateAccessToken, generatePasswordResetToken, verifyResetPasswordTokenCode} = require('../services/jwtService');
+const {authenthicateJwtToken, generateRefreshToken, generateAccessToken, generatePasswordResetToken, verifyTokenCode} = require('../services/jwtService');
 const ResetPasswordToken = require('../models/resetPasswordToken');
 const RefreshToken = require('../models/refreshToken');
 const {sendEmailCode: sendEmailLink} = require('../services/emailService');
 const DeactivatedUser = require('../models/deactivatedUser');
+const ProfileIcons = require('../Enums/ProfileIcons');
 
 router.post('/user/refreshtoken', async (req, res) => {
   try {
@@ -27,6 +28,7 @@ router.post('/user/refreshtoken', async (req, res) => {
     });
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -44,6 +46,7 @@ router.post('/user/login', async (req, res) => {
     }
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -53,6 +56,7 @@ router.post('/user/autoLogin', authenthicateJwtToken, async (req, res) => {
     res.status(200).send(user);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -72,6 +76,7 @@ router.get('/user/email/:email', async (req, res) => {
     res.status(200).send(user);
   } catch (error) {
     res.status(204).send(error);
+    console.log(error);
   }
 });
 
@@ -83,24 +88,18 @@ router.get('/users/email/:email', authenthicateJwtToken, async (req, res) => {
     res.status(200).send(user);
   } catch (error) {
     res.status(204).send(error);
+    console.log(error);
   }
 });
 
+// Find list of users that contains substring :name
 router.get('/users/name/:name', async (req, res) => {
   try {
     const regex = new RegExp(req.params.name.trim(), 'i');
     const user = await User.find( {name: {'$regex': regex}});
     res.status(200).send(user);
   } catch (error) {
-    res.status(204).send(error);
-  }
-});
-
-router.get('/user/name/:name', async (req, res) => {
-  try {
-    const user = await User.findOne( {name: req.params.name.trim()});
-    res.status(200).send(user);
-  } catch (error) {
+    console.log(error);
     res.status(204).send(error);
   }
 });
@@ -110,6 +109,7 @@ router.get('/users/newest', async (req, res) => {
     const users = await User.find({}).limit(5).sort({createdAt: -1});
     res.status(200).send(users);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -119,17 +119,24 @@ router.get('/users/recent', async (req, res) => {
     const users = await User.find({}).limit(5).sort({lastLogin: -1});
     res.status(200).send(users);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
 
 router.post('/user/add', async (req, res) => {
+  const randomDefaultIcon =()=>{
+    const keys = Object.keys(ProfileIcons);
+    return ProfileIcons[keys[keys.length * Math.random() << 0]];
+  };
   try {
     const hash = await bycrypt.hash(req.body.password, 10);
     const user = new User({
       email: req.body.email,
       password: hash,
       name: req.body.name,
+      settings: {icon: randomDefaultIcon(),
+      },
     });
     const newUser = await user.save();
     const userJwt = {_id: newUser._id, email: newUser.email};
@@ -139,6 +146,7 @@ router.post('/user/add', async (req, res) => {
     res.status(200).send(accessToken);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -148,6 +156,7 @@ router.put('/user/update', authenthicateJwtToken, async (req, res) => {
     res.status(200).send(updatedUser);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -176,6 +185,7 @@ router.delete('/user/delete/:id', authenthicateJwtToken, async (req, res) => {//
     await User.findByIdAndDelete(req.params.id);
     res.status(200).send('User Deleted.');
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -195,6 +205,7 @@ router.delete('/user/deactivate/:id/:deletePassword', authenthicateJwtToken, asy
       res.status(204).send('Invalid password.');
     }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -213,6 +224,7 @@ router.post('/user/reset/request', async (req, res) => {
       res.status(200).send('Email sent if account exists.');
     }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -226,6 +238,7 @@ router.get('/user/reset/check/:resetToken', async (req, res) => {
       res.status(200).send('Valid password reset link.');
     }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -236,7 +249,7 @@ router.post('/user/reset/verify', async (req, res) => {
     if (!resetPasswordToken) {
       res.status(400).send('Requested email and submitted email does not match.');
     } else {
-      const verificationResponse = verifyResetPasswordTokenCode(req.body.token);
+      const verificationResponse = verifyTokenCode(req.body.token);
       if (verificationResponse) {
         const invalidateResetPasswordToken = {email: resetPasswordToken.email, token: resetPasswordToken.token, valid: false};
         const updated = await ResetPasswordToken.findByIdAndUpdate(resetPasswordToken._id, invalidateResetPasswordToken);

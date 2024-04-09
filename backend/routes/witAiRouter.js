@@ -47,7 +47,7 @@ router.post('/witai/speak', async (req, res) => {
       res.status(200).send('empty.mp3');
     }
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -59,44 +59,16 @@ router.post('/witai/removeaudio', async (req, res) => {
       fs.unlink(DIR_PATH + '/' + req.body.file, (err) => {
         if (err) {
           // throw err;
+          console.log(err);
         }
       });
       res.status(200).send('Temp fie removed');
     }
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     res.status(201).send(error);
   }
 });
-
-// Remove any files that may be missed due to interuptions from auto delete.
-// Files older than 1 minute will be removed.
-// Check runs every minute
-//schedule.scheduleJob('*/1 * * * *', function() {
- // console.log('test');
- // deleteOldFiles('./public/temp');
-//});
-
-async function deleteOldFiles(path) {
-  try {
-    const dir = await fs.promises.opendir(path);
-    for await (const dirent of dir) {
-      const fileDate = new Date(fs.statSync(path + '/' + dirent.name).birthtime);
-      const oneMinute = 1000 * 60 * 1;
-      const anHourAgo = Date.now() - oneMinute;
-
-      if (fileDate < anHourAgo) {
-        fs.unlink(path + '/' + dirent.name, (error) => {
-          if (error) {
-            console.log(error);
-          }
-        });
-      }
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 const parsePageText = (page, fullText) => {
   let parsedText;

@@ -131,12 +131,19 @@ function App() {
     }
   };
 
+  const updateIconSelection = async (icon) => {
+    const newUserData = user;
+    newUserData.settings.icon = icon;
+    await updateUserDbData(newUserData);
+  };
+
   const updateUserDbData = async (userData) => {
     try {
       const updatedUser = await updateUser(userData);
       setUser(updatedUser);
       setOfflineSettings(updatedUser.settings);
     } catch (error) {
+      throw error;
     }
   };
 
@@ -199,6 +206,7 @@ function App() {
           setLoginModalType,
           setResetPasswordToken,
           updateUserDbPassword,
+          updateIconSelection,
         }}
       >
         <div className="App">

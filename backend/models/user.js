@@ -12,7 +12,10 @@ const userSchema = mongoose.Schema({
     autoNextPage: {type: Boolean, default: true},
     audioEnabled: {type: Boolean, default: true},
     voiceSelection: {type: String, default: Voices.OLIVIA.voice},
+    icon: {type: String, required: true},
   }}, {timestamps: true},
 );
+
+
 
 module.exports = mongoose.model('User', userSchema);

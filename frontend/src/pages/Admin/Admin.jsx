@@ -94,7 +94,7 @@ function Admin(props) {
     let usernameErrorsList = [];
     let emailErrorsList = [];
     let passwordErrorsList = [];
-    usernameErrorsList = await validateUsername(name, true);
+    usernameErrorsList = await validateUsername(name);
     emailErrorsList = await validateEmail(email, true);
     passwordErrorsList = await validatePasswordFormat(password);
 

@@ -9,6 +9,7 @@ router.get('/books/all', async (req, res) => {
     res.status(200).send(books);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -18,6 +19,7 @@ router.get('/book/id/:id', async (req, res) => {
     res.status(200).send(book);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -28,6 +30,7 @@ router.get('/book/title/:title', async (req, res) => {
     res.status(200).send(book);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -37,6 +40,7 @@ router.delete('/book/delete/:id', authenthicateJwtToken, async (req, res) => {
     res.status(200).send('Book Deleted.');
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -53,6 +57,7 @@ router.post('/book/add', authenthicateJwtToken, async (req, res) => {
     res.status(200).send(book);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 
@@ -71,6 +76,7 @@ router.put('/book/update', authenthicateJwtToken, async (req, res) => {
     res.status(200).send(updatedBook);
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 });
 

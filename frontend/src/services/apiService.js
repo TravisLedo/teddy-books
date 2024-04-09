@@ -117,15 +117,6 @@ export const getUsersByNameSubstring = async (name) => {
   }
 };
 
-export const getUserByName = async (name) => {
-  try {
-    const response = await apiServiceUnsecure.get('/user/name/'+ name);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const getNewestUsers = async () => {
   try {
     const response = await apiServiceSecure.get('/users/newest');

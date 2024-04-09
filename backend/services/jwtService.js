@@ -30,7 +30,7 @@ function authenthicateJwtToken(req, res, next ) {
   });
 }
 
-const verifyResetPasswordTokenCode = (token)=>{
+const verifyTokenCode = (token)=>{
   try {
     jwt.verify(token, process.env.JWT_SECRET);
     return true;
@@ -39,5 +39,4 @@ const verifyResetPasswordTokenCode = (token)=>{
   }
 };
 
-
-module.exports = {generateAccessToken, generateRefreshToken, generatePasswordResetToken, authenthicateJwtToken, verifyResetPasswordTokenCode};
+module.exports = {generateAccessToken, generateRefreshToken, generatePasswordResetToken, authenthicateJwtToken, verifyTokenCode};

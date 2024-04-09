@@ -48,3 +48,58 @@
     max-width: 400px;
     text-align: start;
   }
+
+  .icon-window{
+    width: 100%;
+    overflow-x: scroll;
+  }
+
+  .icon-window-row{
+    width:max-content;
+    padding-left: 15px;
+    padding-right: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .icon-window-col{
+    width:max-content;
+    padding: 0%;
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+  }
+
+  .icon{
+    width:75px;
+    height:75px;
+    cursor: pointer;
+    padding: 10px;
+  }
+
+  .icon-selected{
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+  }
+
+  .icon-main-container{
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .icon-main{
+    width:100px;
+    height:100px;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  

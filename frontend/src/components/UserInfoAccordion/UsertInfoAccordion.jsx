@@ -52,7 +52,7 @@ function UserInfoAccordion(props) {
     let isBlockedErrors = [];
 
     if (userName.trim().toLowerCase() !== props.user.name.trim().toLowerCase()) {
-      usernameErrorsList = await validateUsername(userName, true);
+      usernameErrorsList = await validateUsername(userName);
     }
     if (email.trim().toLowerCase() !== props.user.email.trim().toLowerCase()) {
       emailErrorsList = await validateEmail(email, true);

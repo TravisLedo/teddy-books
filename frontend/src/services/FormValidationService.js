@@ -1,6 +1,6 @@
-import {getBookByTitle, getUserByEmail, getUserByName} from './apiService';
+import {getBookByTitle, getUserByEmail} from './apiService';
 
-export const validateUsername = async (userName, checkForExisting)=>{
+export const validateUsername = async (userName)=>{
   const errors = [];
   if (isInputBlank(userName)) {
     errors.push('Username cannot be blank.');
@@ -9,12 +9,6 @@ export const validateUsername = async (userName, checkForExisting)=>{
       errors.push('Username must be at least 5 characters.');
     } else if (userName.length >50) {
       errors.push('Email must be less than 51 characters.');
-    }
-    if (checkForExisting) {
-      const user = await getUserByName(userName);
-      if (user) {
-        errors.push('Username is already taken.');
-      }
     }
   }
 

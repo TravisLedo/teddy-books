@@ -2,22 +2,14 @@ const schedule = require('node-schedule');
 const fs = require('fs');
 const ResetPasswordToken = require('../models/resetPasswordToken');
 const RefreshToken = require('../models/refreshToken');
+const {verifyTokenCode} = require('./jwtService');
 
-// Every minute
-const deleteOldAudioFilesJob = schedule.scheduleJob('*/1 * * * *', function() {
-  console.log('Scheduled Job: Delete Old Audio Files.');
-  // deleteOldAudioFiles('./public/temp');
+const hourlyScheduledJobs = schedule.scheduleJob('0 * * * *', function() {
+  deleteOldAudioFiles('./public/temp');
+  deleteExpiredRefreshTokens();
+  deleteExpiredResetPasswordTokens();
 });
 
-// Every minute
-schedule.scheduleJob('*/1 * * * *', function() {
-  // deleteOldAudioFiles('./public/temp');
-});
-
-// Every minute
-schedule.scheduleJob('*/1 * * * *', function() {
-  // deleteOldAudioFiles('./public/temp');
-});
 
 // Remove any audio files that may be missed due to interuptions from auto delete.
 // Files older than 1 minute will be removed.
@@ -43,25 +35,33 @@ async function deleteOldAudioFiles(path) {
 }
 
 // Remove any refreshTokens from db if expired
-async function deleteExpiredRefreshTokens(path) {
+async function deleteExpiredRefreshTokens() {
   try {
-    const dir = await fs.promises.opendir(path);
-    for await (const dirent of dir) {
-      const fileDate = new Date(fs.statSync(path + '/' + dirent.name).birthtime);
-      const oneMinute = 1000 * 60 * 1;
-      const anHourAgo = Date.now() - oneMinute;
-
-      if (fileDate < anHourAgo) {
-        fs.unlink(path + '/' + dirent.name, (error) => {
-          if (error) {
-            console.log(error);
-          }
-        });
+    const tokens = await RefreshToken.find();
+    tokens.forEach(async (tokenObject) => {
+      const stillValid = verifyTokenCode(tokenObject.token);
+      if (!stillValid) {
+        await RefreshToken.findByIdAndDelete(tokenObject._id);
       }
-    }
+    });
   } catch (error) {
     console.log(error);
   }
 }
 
-module.exports = {deleteOldAudioFilesJob};
+// Remove any resetPasswordTokens from db if expired or user already used
+async function deleteExpiredResetPasswordTokens() {
+  try {
+    const tokens = await ResetPasswordToken.find();
+    tokens.forEach(async (tokenObject) => {
+      const stillValid = verifyTokenCode(tokenObject.token);
+      if (!stillValid || !tokenObject.valid) {
+        await ResetPasswordToken.findByIdAndDelete(tokenObject._id);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+module.exports = {hourlyScheduledJobs};
