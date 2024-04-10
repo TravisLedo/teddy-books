@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Voices = require('../Enums/Voices');
 
 const userSchema = mongoose.Schema({
   email: {type: String, required: true},
@@ -11,11 +10,10 @@ const userSchema = mongoose.Schema({
   settings: {
     autoNextPage: {type: Boolean, default: true},
     audioEnabled: {type: Boolean, default: true},
-    voiceSelection: {type: String, default: Voices.OLIVIA.voice},
+    voiceSelection: {type: String, required: true},
     icon: {type: String, required: true},
   }}, {timestamps: true},
 );
-
 
 
 module.exports = mongoose.model('User', userSchema);

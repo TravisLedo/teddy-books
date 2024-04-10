@@ -82,11 +82,7 @@ function Profile(props) {
   };
 
   const getVoiceName = () => {
-    for (const [key, value] of Object.entries(Voices)) {
-      if (value.voice === voiceSelection) {
-        return <span>{value.alt}</span>;
-      }
-    }
+    return Object.values(Voices).find((voice) => voice.alt.toLowerCase() === voiceSelection.toLowerCase()).alt;
   };
 
   const validateNameValue = async () => {
@@ -506,7 +502,6 @@ function Profile(props) {
         </Row>
 
         <Row className="setting-controls">
-          {' '}
           <Col>
             Voice
             <Dropdown className="standard-button">
@@ -516,54 +511,54 @@ function Profile(props) {
               <Dropdown.Menu>
                 <Dropdown.Item
                   style={
-                    voiceSelection === Voices.OLIVIA.voice ?
+                    voiceSelection === Voices.OLIVIA.alt ?
                       {fontWeight: 'bold'} :
                       {fontWeight: 'normal'}
                   }
                   onClick={() =>
-                    handleVoiceSelectionChange(Voices.OLIVIA.voice)
+                    handleVoiceSelectionChange(Voices.OLIVIA.alt)
                   }
                 >
                   {Voices.OLIVIA.alt}
                 </Dropdown.Item>
                 <Dropdown.Item
                   style={
-                    voiceSelection === Voices.JOE.voice ?
+                    voiceSelection === Voices.JOE.alt ?
                       {fontWeight: 'bold'} :
                       {fontWeight: 'normal'}
                   }
-                  onClick={() => handleVoiceSelectionChange(Voices.JOE.voice)}
+                  onClick={() => handleVoiceSelectionChange(Voices.JOE.alt)}
                 >
                   {Voices.JOE.alt}
                 </Dropdown.Item>
                 <Dropdown.Item
                   style={
-                    voiceSelection === Voices.EMILY.voice ?
+                    voiceSelection === Voices.EMILY.alt ?
                       {fontWeight: 'bold'} :
                       {fontWeight: 'normal'}
                   }
-                  onClick={() => handleVoiceSelectionChange(Voices.EMILY.voice)}
+                  onClick={() => handleVoiceSelectionChange(Voices.EMILY.alt)}
                 >
                   {Voices.EMILY.alt}
                 </Dropdown.Item>
                 <Dropdown.Item
                   style={
-                    voiceSelection === Voices.MARK.voice ?
+                    voiceSelection === Voices.MARK.alt ?
                       {fontWeight: 'bold'} :
                       {fontWeight: 'normal'}
                   }
-                  onClick={() => handleVoiceSelectionChange(Voices.MARK.voice)}
+                  onClick={() => handleVoiceSelectionChange(Voices.MARK.alt)}
                 >
                   {Voices.MARK.alt}
                 </Dropdown.Item>
                 <Dropdown.Item
                   style={
-                    voiceSelection === Voices.JESSICA.voice ?
+                    voiceSelection === Voices.JESSICA.alt ?
                       {fontWeight: 'bold'} :
                       {fontWeight: 'normal'}
                   }
                   onClick={() =>
-                    handleVoiceSelectionChange(Voices.JESSICA.voice)
+                    handleVoiceSelectionChange(Voices.JESSICA.alt)
                   }
                 >
                   {Voices.JESSICA.alt}

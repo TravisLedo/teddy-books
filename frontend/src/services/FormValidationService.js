@@ -1,3 +1,5 @@
+import {ProfileIcon} from '../Enums/ProfileIcon';
+import {Voices} from '../Enums/Voices';
 import {getBookByTitle, getUserByEmail} from './apiService';
 
 export const validateUsername = async (userName)=>{
@@ -59,7 +61,7 @@ export const validatePasswordFormat = async (password)=>{
 
 export const validateIsAdmin = async (value)=>{
   const errors = [];
-  if (isInputABoolean(value)) {
+  if (!isInputABoolean(value)) {
     errors.push('isAdmin must be true or false.');
   }
   return errors;
@@ -67,7 +69,7 @@ export const validateIsAdmin = async (value)=>{
 
 export const validateIsBlocked = async (value)=>{
   const errors = [];
-  if (isInputABoolean(value)) {
+  if (!isInputABoolean(value)) {
     errors.push('isBlocked must be true or false.');
   }
   return errors;
@@ -147,4 +149,39 @@ export const isInputABoolean = (input)=>{
   } else {
     false;
   }
+};
+
+export const validateIconName = async (input)=>{
+  const errors = [];
+
+  if (isInputBlank(input)) {
+    errors.push('Icon cannot be blank.');
+  } else {
+    const existsInEnum = (iconName)=>{
+      const exists = Object.values(ProfileIcon).find((icon)=> icon.name.toLocaleLowerCase() === iconName.trim().toLowerCase());
+      return exists;
+    };
+
+    if (!existsInEnum(input)) {
+      errors.push('Icon does not exist.');
+    }
+  }
+  return errors;
+};
+
+export const validateVoiceName = async (input)=>{
+  const errors = [];
+  if (isInputBlank(input)) {
+    errors.push('Voice cannot be blank.');
+  } else {
+    const existsInEnum = (voiceName)=>{
+      const exists = Object.values(Voices).find((voice)=> voice.alt.toLocaleLowerCase() === voiceName.trim().toLowerCase());
+      return exists;
+    };
+
+    if (!existsInEnum(input)) {
+      errors.push('Voice does not exist.');
+    }
+  }
+  return errors;
 };

@@ -1,13 +1,13 @@
 import {React, useState, useContext} from 'react';
 import {deleteUserById, updateUser} from '../../services/apiService';
-import {Button, Form, Image, Accordion} from 'react-bootstrap';
+import {Button, Form, Image, Accordion, Dropdown} from 'react-bootstrap';
 import {AuthContext} from '../../contexts/Contexts';
 import edit from '../../assets/images/edit.png';
 import check from '../../assets/images/check.png';
 import close from '../../assets/images/close.png';
 import trash from '../../assets/images/trash.png';
 import './UserInfoAccordion.css';
-import {validateEmail, validateIsAdmin, validateIsBlocked, validateUsername} from '../../services/FormValidationService';
+import {validateEmail, validateIconName, validateIsAdmin, validateIsBlocked, validateUsername, validateVoiceName} from '../../services/FormValidationService';
 import DeleteModal from '../DeleteModal/DeleteModal';
 import {AlertType} from '../../Enums/AlertType';
 import {DeleteType} from '../../Enums/DeleteType';
@@ -17,24 +17,50 @@ function UserInfoAccordion(props) {
   const [editing, setEditing] = useState(false);
   const [email, setEmail] = useState(props.user.email);
   const [userName, setUserName] = useState(props.user.name);
-  const [isAdmin, setIsAdmin] = useState(props.user.isAdmin);
-  const [isBlocked, setIsBlocked] = useState(props.user.isBlocked);
+  const [isAdmin, setIsAdmin] = useState(props.user.isAdmin.toString());
+  const [isBlocked, setIsBlocked] = useState(props.user.isBlocked.toString());
+  const [voiceSelection, setVoiceSelection] = useState(
+      props.user.settings.voiceSelection.toUpperCase(),
+  );
+  const [autoNextPage, setAutoNextPage] = useState(
+      props.user.settings.autoNextPage.toString(),
+  );
+  const [audioEnabled, setAudioEnabled] = useState(
+      props.user.settings.audioEnabled.toString(),
+  );
+  const [icon, setIcon] = useState(props.user.settings.icon.toUpperCase());
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const resetValues = () => {
     setEditing(false);
     setEmail(props.user.email);
     setUserName(props.user.name);
-    setIsAdmin(props.user.isAdmin);
-    setIsBlocked(props.user.isBlocked);
+    setIsAdmin(props.user.isAdmin.toString());
+    setIsBlocked(props.user.isBlocked.toString());
+    setAudioEnabled(props.user.settings.audioEnabled.toString());
+    setAutoNextPage(props.user.settings.autoNextPage.toString());
+    setIcon(props.user.settings.icon);
   };
 
   const updateUserValues = async () => {
     const newUserData = props.user;
     newUserData.email = email.trim();
     newUserData.name = userName.trim();
-    newUserData.isAdmin = isAdmin;
-    newUserData.isBlocked = isBlocked;
+    newUserData.isAdmin = (isAdmin.trim().toLowerCase() === 'true');
+    newUserData.isBlocked = (isBlocked.trim().toLowerCase() === 'true');
+    newUserData.settings.audioEnabled = (audioEnabled.trim().toLowerCase() === 'true');
+    newUserData.settings.autoNextPage = (autoNextPage.trim().toLowerCase() === 'true');
+    newUserData.settings.icon = icon.trim().toUpperCase();
+    newUserData.settings.voiceSelection = voiceSelection.trim().toUpperCase();
+
+    setAudioEnabled(audioEnabled.trim().toLowerCase());
+    setAutoNextPage(autoNextPage.trim().toLowerCase());
+    setIsAdmin(isAdmin.trim().toLowerCase());
+    setIsBlocked(isBlocked.trim().toLowerCase());
+    setVoiceSelection(voiceSelection.trim().toUpperCase());
+    setIcon(icon.trim().toUpperCase());
+
     try {
       const updatedUserData = await updateUser(newUserData);
       props.refreshData();
@@ -50,6 +76,8 @@ function UserInfoAccordion(props) {
     let emailErrorsList = [];
     let isAdminErrorsList = [];
     let isBlockedErrors = [];
+    let iconErrors = [];
+    let voiceSelectionErrors = [];
 
     if (userName.trim().toLowerCase() !== props.user.name.trim().toLowerCase()) {
       usernameErrorsList = await validateUsername(userName);
@@ -61,16 +89,24 @@ function UserInfoAccordion(props) {
       isAdminErrorsList = await validateIsAdmin(isAdmin);
     }
     if (isBlocked !== props.user.isBlocked) {
-      isBlockedErrors = await validateIsBlocked(isAdmin);
+      isBlockedErrors = await validateIsBlocked(isBlocked);
     }
-    const errorsList = usernameErrorsList.concat(emailErrorsList).concat(isAdminErrorsList).concat(isBlockedErrors);
+
+    if (icon !== props.user.settings.icon) {
+      iconErrors = await validateIconName(icon.trim());
+    }
+
+    if (voiceSelection !== props.user.settings.voiceSelection) {
+      voiceSelectionErrors = await validateVoiceName(voiceSelection.trim());
+    }
+
+    const errorsList = usernameErrorsList.concat(emailErrorsList).concat(isAdminErrorsList).concat(isBlockedErrors).concat(iconErrors).concat(voiceSelectionErrors);
     if (errorsList.length>0) {
       authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
       updateUserValues();
     }
   };
-
 
   const deleteItem = async () => {
     try {
@@ -83,6 +119,7 @@ function UserInfoAccordion(props) {
       }
     } catch (error) {}
   };
+
 
   return (
     <Accordion.Item eventKey={props.user._id}>
@@ -212,6 +249,46 @@ function UserInfoAccordion(props) {
                 disabled
               />
             </Form.Group>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='audioEnabled'>
+            <Form.Label>Audio Enabled</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Audio Enabled"
+              value={audioEnabled}
+              disabled={!editing}
+              onChange={(e) => setAudioEnabled(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='autoNextPage'>
+            <Form.Label>Auto Next Page</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Auto Next Page"
+              value={autoNextPage}
+              disabled={!editing}
+              onChange={(e) => setAutoNextPage(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='voiceSelection'>
+            <Form.Label>Voice Selection</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Voice Selection"
+              value={voiceSelection}
+              disabled={!editing}
+              onChange={(e) => setVoiceSelection(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId='icon'>
+            <Form.Label>Icon</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Icon"
+              value={icon}
+              disabled={!editing}
+              onChange={(e) => setIcon(e.target.value)}
+            />
           </Form.Group>
         </Form> : null}
       </Accordion.Body>

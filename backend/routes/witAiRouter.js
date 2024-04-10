@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const axios = require('axios');
-//const schedule = require('node-schedule');
+// const schedule = require('node-schedule');
 const {v4: uuidv4} = require('uuid');
 const fs = require('fs');
+const Voices = require('../Enums/Voices');
 
 router.post('/witai/speak', async (req, res) => {
   try {
@@ -22,12 +23,11 @@ router.post('/witai/speak', async (req, res) => {
       const DIR_PATH = './public/temp';
       const FILE_NAME = Date.now().toString() + '_' + uuidv4() + '.mp3';
       const FILE_PATH = DIR_PATH + '/' + FILE_NAME;
-
       const response = await axios.post(
           'https://api.wit.ai/synthesize',
           {
             q: finalText,
-            voice: req.body.voiceSelected,
+            voice: Object.values(Voices).find((voice)=> voice.alt.toLowerCase() === req.body.voiceSelected.toLowerCase()).voice,
             // style: "soft",
             // speed: 100,
             // pitch: 110,
@@ -55,7 +55,7 @@ router.post('/witai/speak', async (req, res) => {
 router.post('/witai/removeaudio', async (req, res) => {
   try {
     const DIR_PATH = './public';
-    if (req.body.file.contains('temp')) {
+    if (req.body.file.includes('temp')) {
       fs.unlink(DIR_PATH + '/' + req.body.file, (err) => {
         if (err) {
           // throw err;

@@ -44,7 +44,6 @@ export default function ReadControlArea(props) {
     }
   }, [likes]);
 
-
   useEffect(() => {
     if (offsetRef) {
       setOffsetSize(offsetRef.current.offsetWidth);
@@ -93,58 +92,58 @@ export default function ReadControlArea(props) {
           <Dropdown.Menu>
             <Dropdown.Item
               style={
-                props.voiceSelection === Voices.OLIVIA.voice ?
+                props.voiceSelection === Voices.OLIVIA.alt?
                   {fontWeight: 'bold'} :
                   {fontWeight: 'normal'}
               }
               onClick={() =>
-                props.handleVoiceSelectionChange(Voices.OLIVIA.voice)
+                props.handleVoiceSelectionChange(Voices.OLIVIA.alt)
               }
             >
               {Voices.OLIVIA.alt}
             </Dropdown.Item>
             <Dropdown.Item
               style={
-                props.voiceSelection === Voices.JOE.voice ?
+                props.voiceSelection === Voices.JOE.alt?
                   {fontWeight: 'bold'} :
                   {fontWeight: 'normal'}
               }
-              onClick={() => props.handleVoiceSelectionChange(Voices.JOE.voice)}
+              onClick={() => props.handleVoiceSelectionChange(Voices.JOE.alt)}
             >
               {Voices.JOE.alt}
             </Dropdown.Item>
             <Dropdown.Item
               style={
-                props.voiceSelection === Voices.EMILY.voice ?
+                props.voiceSelection === Voices.EMILY.alt?
                   {fontWeight: 'bold'} :
                   {fontWeight: 'normal'}
               }
               onClick={() =>
-                props.handleVoiceSelectionChange(Voices.EMILY.voice)
+                props.handleVoiceSelectionChange(Voices.EMILY.alt)
               }
             >
               {Voices.EMILY.alt}
             </Dropdown.Item>
             <Dropdown.Item
               style={
-                props.voiceSelection === Voices.MARK.voice ?
+                props.voiceSelection === Voices.MARK.alt?
                   {fontWeight: 'bold'} :
                   {fontWeight: 'normal'}
               }
               onClick={() =>
-                props.handleVoiceSelectionChange(Voices.MARK.voice)
+                props.handleVoiceSelectionChange(Voices.MARK.alt)
               }
             >
               {Voices.MARK.alt}
             </Dropdown.Item>
             <Dropdown.Item
               style={
-                props.voiceSelection === Voices.JESSICA.voice ?
+                props.voiceSelection === Voices.JESSICA.alt?
                   {fontWeight: 'bold'} :
                   {fontWeight: 'normal'}
               }
               onClick={() =>
-                props.handleVoiceSelectionChange(Voices.JESSICA.voice)
+                props.handleVoiceSelectionChange(Voices.JESSICA.alt)
               }
             >
               {Voices.JESSICA.alt}

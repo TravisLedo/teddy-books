@@ -8,6 +8,7 @@ const RefreshToken = require('../models/refreshToken');
 const {sendEmailCode: sendEmailLink} = require('../services/emailService');
 const DeactivatedUser = require('../models/deactivatedUser');
 const ProfileIcons = require('../Enums/ProfileIcons');
+const Voices = require('../Enums/Voices');
 
 router.post('/user/refreshtoken', async (req, res) => {
   try {
@@ -140,6 +141,7 @@ router.post('/user/add', async (req, res) => {
       password: hash,
       name: req.body.name,
       settings: {icon: randomDefaultIcon(),
+        voiceSelection: Voices.OLIVIA.alt,
       },
     });
     // For faster temp testing, remove later
