@@ -138,13 +138,13 @@ function LoginModal(props) {
 
   const updateUserPassword = async () => {
     try {
-      const data = {token: props.resetPasswordToken, email: email, newPassword: password}; // send email in case user modifies email from frontend
+      const data = {token: props.resetPasswordToken, email: email, newPassword: password};
       const response = await resetPassword(data);
       if (response.status === 200) {
         authContext.handleLoginModalClose();
         authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset successful please log in.']);
       } else if (response.status === 204) {
-        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset request expired or does not exist. Try requesting a new link.']);
+        authContext.handleAlertModalShow(AlertType.ERROR, ['Password reset request expired or does not exist. Try requesting a new link.']);
       }
     } catch (error) {
       console.log(error);
@@ -217,7 +217,7 @@ function LoginModal(props) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button
+                {props.loginModalType !== LoginModalType.EXPIRED ? <Button
                   className="link-text-button"
                   variant="outline-secondary"
                   onClick={() => {
@@ -225,7 +225,8 @@ function LoginModal(props) {
                   }}
                 >
                   Forgot Password
-                </Button>
+                </Button> : null}
+
               </Form.Group>
               <div className="button-container">
                 <Button

@@ -20,9 +20,12 @@ import {AlertType} from '../../Enums/AlertType';
 import DeleteModal from '../../components/DeleteModal/DeleteModal';
 import {DeleteType} from '../../Enums/DeleteType';
 import {ProfileIcon} from '../../Enums/ProfileIcon';
+import {useNavigate} from 'react-router-dom';
 
 function Profile(props) {
   const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [voiceSelection, setVoiceSelection] = useState(
       authContext.user.settings.voiceSelection,
   );
@@ -259,6 +262,12 @@ function Profile(props) {
   const deleteItem = async () => {
     validateDeletePasswordValues();
   };
+
+  useEffect(() => {
+    if (authContext.user.email !== defaultEmail) {
+      navigate('/');
+    }
+  }, [authContext.user]);
 
   const listIcons = Object.values(ProfileIcon).map((iconObj, i) => (
     <Col className="icon-window-col" key={i}>

@@ -151,7 +151,7 @@ router.post('/user/add', async (req, res) => {
     const newUser = await user.save();
     const userJwt = {_id: newUser._id, email: newUser.email};
     const accessToken = generateAccessToken(userJwt);
-    const refreshToken = new RefreshToken({userId: userJwt._id, token: generateRefreshToken(userJwt)});
+    const refreshToken = new ValidationToken({email: userJwt.email, token: generateRefreshToken(userJwt), type: TokenType.REFRESH, valid: true});
     await refreshToken.save();
     res.status(200).send(accessToken);
   } catch (error) {
@@ -163,6 +163,9 @@ router.post('/user/add', async (req, res) => {
 router.put('/user/update', authenthicateJwtToken, async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, req.body.userData, {new: true});
+    const userJwt = {_id: updatedUser._id, email: updatedUser.email};
+    const refreshToken = new ValidationToken({email: userJwt.email, token: generateRefreshToken(userJwt), type: TokenType.REFRESH, valid: true});
+    refreshToken.save();
     res.status(200).send(updatedUser);
   } catch (error) {
     res.status(500).send(error);
@@ -263,8 +266,12 @@ router.post('/user/reset/verify', authenthicateJwtToken, async (req, res) => {
       if (verificationResponse) {
         const invalidateResetPasswordToken = {email: resetPasswordToken.email, token: resetPasswordToken.token, valid: false, type: TokenType.RESET};
         await ValidationToken.findByIdAndUpdate(resetPasswordToken._id, invalidateResetPasswordToken);
-        await User.findOneAndUpdate({email: resetPasswordToken.email}, {password: await bycrypt.hash(req.body.newPassword, 10)});
-        res.status(200).send('Password reset successful.');
+        const userWithEmail = await User.findOneAndUpdate({email: resetPasswordToken.email}, {password: await bycrypt.hash(req.body.newPassword, 10)});
+        if (userWithEmail) {
+          res.status(200).send('Password reset successful.');
+        } else {
+          res.status(204).send('Password reset request expired or does not exist.');
+        }
       } else {
         res.status(204).send('Password reset request expired or does not exist.');
       }
