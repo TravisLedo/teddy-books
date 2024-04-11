@@ -10,7 +10,6 @@ import {useNavigate} from 'react-router-dom';
 import {
   decodeJwtToken,
 } from '../../services/localStorageService';
-import {jwtDecode} from 'jwt-decode';
 
 function LoginModal(props) {
   const authContext = useContext(AuthContext);
@@ -36,7 +35,6 @@ function LoginModal(props) {
       await authContext.login(user);
       cancelModal();
     } catch (error) {
-      console.log(error.status);
       if (!error.response) {
         authContext.handleAlertModalShow(AlertType.ERROR, ['Server Error']);
       } else if (error.response.status === 401 ) {
@@ -140,12 +138,13 @@ function LoginModal(props) {
 
   const updateUserPassword = async () => {
     try {
-      const data = {token: props.resetPasswordToken, email: email};
-      const success = await resetPassword(data);
-      if (success) {
+      const data = {token: props.resetPasswordToken, email: email, newPassword: password}; // send email in case user modifies email from frontend
+      const response = await resetPassword(data);
+      if (response.status === 200) {
         authContext.handleLoginModalClose();
-        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset successful and you are now logged in.']);
-        login();
+        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset successful please log in.']);
+      } else if (response.status === 204) {
+        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset request expired or does not exist. Try requesting a new link.']);
       }
     } catch (error) {
       console.log(error);
@@ -161,7 +160,7 @@ function LoginModal(props) {
 
   useEffect(() => {
     if (props.loginModalType === LoginModalType.RESET_PASSWORD) {
-      setEmail(jwtDecode(props.resetPasswordToken).email);
+      setEmail(decodeJwtToken(props.resetPasswordToken).email);
     }
   }, [props.loginModalType, props.resetPasswordToken]);
 
@@ -248,7 +247,7 @@ function LoginModal(props) {
                 </Button>
               </div>
 
-              <div className="button-container mt-2">
+              {props.loginModalType === LoginModalType.LOGIN ? <div className="button-container mt-2">
                 <Button
                   className="link-text-button"
                   variant="outline-secondary"
@@ -258,7 +257,8 @@ function LoginModal(props) {
                 >
                   New Account
                 </Button>
-              </div>
+              </div> :null}
+
             </Form>
           </div>
 

@@ -139,23 +139,12 @@ function App() {
 
   const updateUserDbData = async (userData) => {
     try {
-      const updatedUser = await updateUser(userData);
-      setUser(updatedUser);
-      setOfflineSettings(updatedUser.settings);
+      const response = await updateUser(userData);
+      setUser(response.data);
+      setOfflineSettings(response.data.settings);
     } catch (error) {
+      console.log('Error updating user data: ', error);
       throw error;
-    }
-  };
-
-  const updateUserDbPassword = async (userData) => {
-    try {
-      const updatedUser = await updatePassword(userData);
-      if (updatedUser) {
-        setUser(updatedUser);
-        setOfflineSettings(updatedUser.settings);
-      }
-      return updatedUser;
-    } catch (error) {
     }
   };
 
@@ -205,7 +194,6 @@ function App() {
           handleAlertModalShow,
           setLoginModalType,
           setResetPasswordToken,
-          updateUserDbPassword,
           updateIconSelection,
         }}
       >
@@ -255,13 +243,6 @@ function App() {
               path="/reset/:resetToken"
               element={
                 <Books/>
-                /*
-                  isResettingPassword? (
-                    <Books/>
-                  ) : (
-                   <Navigate to="/"/>
-                    )
-                    */
               }
             ></Route>
 

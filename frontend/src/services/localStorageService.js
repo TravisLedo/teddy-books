@@ -18,7 +18,12 @@ export const setOfflineSettings = (settings) => {
 };
 
 export const getOfflineSettings = () => {
-  return JSON.parse(localStorage.getItem('offlineSettings'));
+  try {
+    return JSON.parse(localStorage.getItem('offlineSettings'));
+  } catch (error) {
+    removeLocalUser();
+    return JSON.parse(localStorage.getItem('offlineSettings'));
+  }
 };
 
 

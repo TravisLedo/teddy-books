@@ -3,22 +3,22 @@ const User = require('../models/user');
 const bycrypt = require('bcrypt');
 const {jwtDecode} = require('jwt-decode');
 const {authenthicateJwtToken, generateRefreshToken, generateAccessToken, generatePasswordResetToken, verifyTokenCode} = require('../services/jwtService');
-const ResetPasswordToken = require('../models/resetPasswordToken');
-const RefreshToken = require('../models/refreshToken');
 const {sendEmailCode: sendEmailLink} = require('../services/emailService');
 const DeactivatedUser = require('../models/deactivatedUser');
 const ProfileIcons = require('../Enums/ProfileIcons');
 const Voices = require('../Enums/Voices');
+const TokenType = require('../Enums/TokenType');
+const ValidationToken = require('../models/ValidationToken');
 
 router.post('/user/refreshtoken', async (req, res) => {
   try {
     const currentAccessToken = req.body.token;
     const currentJwtUser = jwtDecode(currentAccessToken);
-    const refreshTokenReponse = await RefreshToken.findOne({userId: currentJwtUser
-        ._id});
+    const refreshTokenReponse = await ValidationToken.findOne({email: currentJwtUser
+        .email});
 
     jwt.verify(refreshTokenReponse.token, process.env.JWT_SECRET, async (err) => {
-      if (err) {
+      if (err || !refreshTokenReponse.valid) {
         res.sendStatus(401);
       } else {
         const userData = await User.findById(currentJwtUser._id);
@@ -41,7 +41,7 @@ router.post('/user/login', async (req, res) => {
       if (validPassword) {
         const userJwt = {_id: user._id, email: user.email};
         const accessToken = generateAccessToken(userJwt);
-        await RefreshToken.findOneAndUpdate({userId: user._id}, {userId: user._id, token: generateRefreshToken(userJwt)}, {upsert: true});
+        await ValidationToken.findOneAndUpdate({email: user.email}, {email: user.email, token: generateRefreshToken(userJwt), type: TokenType.REFRESH, valid: true}, {upsert: true});
         res.status(200).send(accessToken);
       } else {
         res.status(401).send('Invalid Credentials.');
@@ -182,7 +182,7 @@ router.put('/user/update-password', authenthicateJwtToken, async (req, res) => {
       const updatedUser = await User.findByIdAndUpdate(req.body.userData._id, newPasswordUser, {new: true});
       res.status(200).send(updatedUser);
     } else {
-      res.status(400).send('Invalid current password');
+      res.status(204).send('Invalid current password');
     }
   } catch (error) {
     console.log(error);
@@ -225,13 +225,13 @@ router.post('/user/reset/request', async (req, res) => {
   try {
     const user = await User.findOne({email: req.body.email});
     if (user) {
-      const userJwt = {_id: user._id, email: user.email, password: user.password};
-      const resetPasswordToken = new ResetPasswordToken({email: userJwt.email, token: generatePasswordResetToken(userJwt), valid: true});
+      const userJwt = {_id: user._id, email: user.email};
+      const resetPasswordToken = new ValidationToken({email: userJwt.email, token: generatePasswordResetToken(userJwt), valid: true, type: TokenType.RESET});
       await resetPasswordToken.save();
-      sendEmailLink(resetPasswordToken.token, req.body.siteBaseUrl);
+      sendEmailLink(req.body.email, resetPasswordToken.token, req.body.siteBaseUrl);
       res.status(200).send('Email sent if account exists.');
     } else {
-      res.status(200).send('Email sent if account exists.');
+      res.status(200).send('Email sent if account exists.');// Do i need this?
     }
   } catch (error) {
     console.log(error);
@@ -241,11 +241,11 @@ router.post('/user/reset/request', async (req, res) => {
 
 router.get('/user/reset/check/:resetToken', async (req, res) => {
   try {
-    const resetPasswordToken = await ResetPasswordToken.findOne({token: req.params.resetToken});
-    if (!resetPasswordToken || resetPasswordToken && !resetPasswordToken.valid) {
-      res.status(400).send('Reset password link does not exist, expired, or has already been used.');
+    const resetPasswordToken = await ValidationToken.findOne({token: req.params.resetToken, type: TokenType.RESET, valid: true});
+    if (resetPasswordToken) {
+      res.status(200).send(resetPasswordToken);
     } else {
-      res.status(200).send('Valid password reset link.');
+      res.status(204).send('Reset link expired or does not exist.');
     }
   } catch (error) {
     console.log(error);
@@ -253,20 +253,20 @@ router.get('/user/reset/check/:resetToken', async (req, res) => {
   }
 });
 
-router.post('/user/reset/verify', async (req, res) => {
+router.post('/user/reset/verify', authenthicateJwtToken, async (req, res) => {
   try {
-    const resetPasswordToken = await ResetPasswordToken.findOne({email: req.body.email}).sort({createdAt: -1});
-    if (!resetPasswordToken) {
-      res.status(400).send('Requested email and submitted email does not match.');
+    const resetPasswordToken = await ValidationToken.findOne({token: req.body.token});
+    if (!resetPasswordToken || resetPasswordToken.email !== req.body.email) {
+      res.status(500).send('Requested email and submitted email do not match.');
     } else {
-      const verificationResponse = verifyTokenCode(req.body.token);
+      const verificationResponse = verifyTokenCode(resetPasswordToken.token);
       if (verificationResponse) {
-        const invalidateResetPasswordToken = {email: resetPasswordToken.email, token: resetPasswordToken.token, valid: false};
-        const updated = await ResetPasswordToken.findByIdAndUpdate(resetPasswordToken._id, invalidateResetPasswordToken);
-        res.status(200).send('Password reset success.' + updated);
+        const invalidateResetPasswordToken = {email: resetPasswordToken.email, token: resetPasswordToken.token, valid: false, type: TokenType.RESET};
+        await ValidationToken.findByIdAndUpdate(resetPasswordToken._id, invalidateResetPasswordToken);
+        await User.findOneAndUpdate({email: resetPasswordToken.email}, {password: await bycrypt.hash(req.body.newPassword, 10)});
+        res.status(200).send('Password reset successful.');
       } else {
-        res.status(400).send('Email request expired or does not exist');
-        console.log('Email request expired or does not exist');
+        res.status(204).send('Password reset request expired or does not exist.');
       }
     }
   } catch (error) {
@@ -274,6 +274,5 @@ router.post('/user/reset/verify', async (req, res) => {
     console.log(error);
   }
 });
-
 
 module.exports = router;

@@ -2,12 +2,12 @@ const jwt = require('jsonwebtoken');
 
 
 function generateAccessToken(userJwt) {
-  return jwt.sign(userJwt, process.env.JWT_SECRET, {expiresIn: '10d'});
+  return jwt.sign(userJwt, process.env.JWT_SECRET, {expiresIn: '10s'});
 }
 
 
 function generateRefreshToken(jwtValues) {
-  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '30d'});
+  return jwt.sign(jwtValues, process.env.JWT_SECRET, {expiresIn: '20s'});
 }
 
 function generatePasswordResetToken(jwtValues) {

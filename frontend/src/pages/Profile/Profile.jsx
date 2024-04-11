@@ -9,8 +9,7 @@ import close from '../../assets/images/close.png';
 import './Profile.css';
 import {
   deactivateUser,
-  deleteUserById,
-  updateUser,
+  updatePassword,
 } from '../../services/apiService';
 import {
   validateEmail,
@@ -21,7 +20,6 @@ import {AlertType} from '../../Enums/AlertType';
 import DeleteModal from '../../components/DeleteModal/DeleteModal';
 import {DeleteType} from '../../Enums/DeleteType';
 import {ProfileIcon} from '../../Enums/ProfileIcon';
-import frame from '../../assets/images/profile-icons/frame.png';
 
 function Profile(props) {
   const authContext = useContext(AuthContext);
@@ -34,7 +32,7 @@ function Profile(props) {
   const [audioEnabled, setAudioEnabled] = useState(
       authContext.user.settings.audioEnabled,
   );
-  const [icon, setIcon] = useState(authContext.user.settings.icon);
+  const [iconSelected, setIconSelected] = useState(authContext.user.settings.icon);
   const [editingIcon, setEditingIcon] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
@@ -47,38 +45,57 @@ function Profile(props) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
 
+  // Need to store these in case user session expires while editing, revert changes on screen
+  const [defaultUserName, setDefaultUserName] = useState(authContext.user.name);
+  const [defaultEmail, setDefaultEmail] = useState(authContext.user.email);
+  const [icon, setIcon] = useState(authContext.user.settings.icon);
+
   const handleAutoNextPageToggle = async () => {
-    await authContext.updateAutoNextPage(autoNextPage, true);
-    if (autoNextPage) {
-      setAutoNextPage(false);
-    } else {
-      setAutoNextPage(true);
+    try {
+      await authContext.updateAutoNextPage(autoNextPage, true);
+      if (autoNextPage) {
+        setAutoNextPage(false);
+      } else {
+        setAutoNextPage(true);
+      }
+    } catch (error) {
     }
   };
 
   const handleAudioEnabledToggle = async () => {
-    await authContext.updateAudioEnabled(audioEnabled, true);
-    if (audioEnabled) {
-      setAudioEnabled(false);
-    } else {
-      setAudioEnabled(true);
+    try {
+      await authContext.updateAudioEnabled(audioEnabled, true);
+      if (audioEnabled) {
+        setAudioEnabled(false);
+      } else {
+        setAudioEnabled(true);
+      }
+    } catch (error) {
     }
   };
 
   const handleVoiceSelectionChange = async (voice) => {
-    await authContext.updateVoiceSelection(voice, true);
-    setVoiceSelection(voice);
+    try {
+      await authContext.updateVoiceSelection(voice, true);
+      setVoiceSelection(voice);
+    } catch (error) {
+    }
   };
 
   const handleIconChange = async () => {
-    if (icon !== authContext.user.settings.icon) {
-      await authContext.updateIconSelection(icon);
-      setIcon(icon);
-      authContext.handleAlertModalShow(AlertType.SUCCESS, [
-        'Avatar updated.',
-      ]);
+    if (icon !== iconSelected) {
+      try {
+        await authContext.updateIconSelection(iconSelected);
+        setIcon(iconSelected);
+        authContext.handleAlertModalShow(AlertType.SUCCESS, [
+          'Avatar updated.',
+        ]);
+        setEditingIcon(false);
+      } catch (error) {
+      }
+    } else {
+      setEditingIcon(false);
     }
-    setEditingIcon(false);
   };
 
   const getVoiceName = () => {
@@ -89,16 +106,13 @@ function Profile(props) {
     let usernameErrorsList = [];
     if (
       userName.trim().toLowerCase() !==
-      authContext.user.name.trim().toLowerCase()
+      defaultUserName.trim().toLowerCase()
     ) {
       usernameErrorsList = await validateUsername(userName);
       if (usernameErrorsList.length > 0) {
         authContext.handleAlertModalShow(AlertType.ERROR, usernameErrorsList);
       } else {
         await updateNameValue();
-        authContext.handleAlertModalShow(AlertType.SUCCESS, [
-          'Username updated.',
-        ]);
       }
     } else {
       resetNameValue();
@@ -108,14 +122,13 @@ function Profile(props) {
   const validateEmailValue = async () => {
     let emailErrorsList = [];
     if (
-      email.trim().toLowerCase() !== authContext.user.email.trim().toLowerCase()
+      email.trim().toLowerCase() !== defaultEmail.trim().toLowerCase()
     ) {
       emailErrorsList = await validateEmail(email, true);
       if (emailErrorsList.length > 0) {
         authContext.handleAlertModalShow(AlertType.ERROR, emailErrorsList);
       } else {
         await updateEmailValue();
-        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Email updated.']);
       }
     } else {
       resetEmailValue();
@@ -176,17 +189,24 @@ function Profile(props) {
     const newUserData = authContext.user;
     newUserData.name = userName;
     try {
-      await updateUser(newUserData);
+      await authContext.updateUserDbData(newUserData);
       setEditingName(false);
-    } catch (error) {}
+      setDefaultUserName(authContext.user.name);
+      authContext.handleAlertModalShow(AlertType.SUCCESS, [
+        'Username updated.',
+      ]);
+    } catch (error) {
+    }
   };
 
   const updateEmailValue = async () => {
     const newUserData = authContext.user;
     newUserData.email = email;
     try {
-      await updateUser(newUserData);
+      await authContext.updateUserDbData(newUserData);
       setEditingEmail(false);
+      setDefaultEmail(authContext.user.email);
+      authContext.handleAlertModalShow(AlertType.SUCCESS, ['Email updated.']);
     } catch (error) {}
   };
 
@@ -195,34 +215,34 @@ function Profile(props) {
     newUserData.currentPassword = currentPassword;
     newUserData.newPassword = newPassword;
     try {
-      const successUpdate = await authContext.updateUserDbPassword(newUserData);
-
-      if (successUpdate) {
+      const response = await updatePassword(newUserData);
+      if (response && response.status === 200) {
         authContext.handleAlertModalShow(AlertType.SUCCESS, [
           'Password updated.',
         ]);
         resetPasswordValues();
-      } else {
+      } else if (response && response.status === 204) {
         authContext.handleAlertModalShow(AlertType.ERROR, [
           'Current Password is not correct.',
         ]);
       }
-    } catch (error) {}
+    } catch (error) {
+    }
   };
 
-  const resetIconValue = () => {
+  const resetIconSelectionValue = () => {
     setEditingIcon(false);
-    setIcon(authContext.user.settings.icon);
+    setIconSelected(authContext.user.settings.icon);
   };
 
   const resetNameValue = () => {
     setEditingName(false);
-    setUserName(authContext.user.name);
+    setUserName(defaultUserName);
   };
 
   const resetEmailValue = () => {
     setEditingEmail(false);
-    setEmail(authContext.user.email);
+    setEmail(defaultEmail);
   };
 
   const resetPasswordValues = () => {
@@ -243,20 +263,12 @@ function Profile(props) {
   const listIcons = Object.values(ProfileIcon).map((iconObj, i) => (
     <Col className="icon-window-col" key={i}>
       <Image
-        className={'icon ' + (iconObj.name === icon ? 'icon-selected' : null)}
+        className={'icon ' + (iconObj.name === iconSelected ? 'icon-selected' : null)}
         src={iconObj.image}
-        onClick={() => setIcon(iconObj.name)}
+        onClick={() => setIconSelected(iconObj.name)}
       ></Image>
     </Col>
   ));
-
-  useEffect(() => {
-    setAudioEnabled(authContext.user.settings.audioEnabled);
-    setAutoNextPage(authContext.user.settings.autoNextPage);
-    setVoiceSelection(authContext.user.settings.voiceSelection);
-    setUserName(authContext.user.name);
-    setEmail(authContext.user.email);
-  }, [authContext.user]);
 
   return (
     <div
@@ -300,7 +312,7 @@ function Profile(props) {
                 className="edit-button"
                 variant="outline-secondary"
                 onClick={() => {
-                  resetIconValue();
+                  resetIconSelectionValue();
                 }}
               >
                 <Image className="edit-button-image" src={close}></Image>

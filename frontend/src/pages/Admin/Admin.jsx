@@ -293,6 +293,7 @@ function Admin(props) {
         showAddBookModal={showAddBookModal}
         setShowAddBookModal={setShowAddBookModal}
         addBook={addBook}
+        refreshData={refreshData}
       ></AddBookModal>
 
       <div className="title-label">
@@ -329,7 +330,7 @@ function Admin(props) {
               <Accordion defaultActiveKey="0" key={book._id}>
                 <BookAccordion
                   book={book}
-                  refreshBookData={refreshData}
+                  refreshData={refreshData}
                 ></BookAccordion>
               </Accordion>
             ))}

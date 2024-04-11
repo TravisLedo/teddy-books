@@ -2,8 +2,6 @@ import {React, useState, useEffect, useContext} from 'react';
 import BookCard from '../../components/bookCard/bookCard';
 import Row from 'react-bootstrap/Row';
 import {checkPasswordResetTokenLink, getAllBooks} from '../../services/apiService';
-import OverlayScreen from '../../components/OverlayScreen/OverlayScreen';
-import {OverlayStatus} from '../../Enums/OverlayStatus';
 import {useParams} from 'react-router-dom';
 import './Books.css';
 import {AuthContext} from '../../contexts/Contexts';
@@ -30,15 +28,18 @@ function Books() {
   useEffect(() => {
     const handlePasswordResetDirectLink= async ()=>{
       if (resetToken) { // user landed on this page from an password reset link
+        navigate('/');
         try {
-          const linkValid = await checkPasswordResetTokenLink(resetToken);
-          if (linkValid) {
+          const linkValidToken = await checkPasswordResetTokenLink(resetToken);
+          if (linkValidToken.status === 200) {
             authContext.logout();
+            authContext.setResetPasswordToken(linkValidToken.data.token);
             authContext.handleLoginModalShow(LoginModalType.RESET_PASSWORD, false);
-            authContext.setResetPasswordToken(resetToken);
+          } else {
+            authContext.handleAlertModalShow(AlertType.ERROR, ['Password reset request expired or does not exist. Try requesting a new link.']);
+            navigate('/');
           }
         } catch (error) {
-          authContext.handleAlertModalShow(AlertType.ERROR, ['Your password reset link is expired or does not exist.']);
           navigate('/');
         }
       } else {
@@ -51,15 +52,11 @@ function Books() {
 
   return (
     <div className="books-content">
-      {booksData.length > 0 ? (
-        <Row className="g-5 align-self-center pt-3 pb-3 content-row">
-          {booksData.map((book) => (
-            <BookCard book={book} key={book._id}></BookCard>
-          ))}
-        </Row>
-      ) : (
-        <OverlayScreen status={OverlayStatus.LOADING}></OverlayScreen>
-      )}
+      <Row className="g-5 align-self-center pt-3 pb-3 content-row">
+        {booksData.map((book) => (
+          <BookCard book={book} key={book._id}></BookCard>
+        ))}
+      </Row>
     </div>
   );
 }

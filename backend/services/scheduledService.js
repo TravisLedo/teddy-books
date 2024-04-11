@@ -1,13 +1,11 @@
 const schedule = require('node-schedule');
 const fs = require('fs');
-const ResetPasswordToken = require('../models/resetPasswordToken');
-const RefreshToken = require('../models/refreshToken');
+const ValidationToken = require('../models/ValidationToken');
 const {verifyTokenCode} = require('./jwtService');
 
 const hourlyScheduledJobs = schedule.scheduleJob('0 * * * *', function() {
   deleteOldAudioFiles('./public/temp');
-  deleteExpiredRefreshTokens();
-  deleteExpiredResetPasswordTokens();
+  deleteExpiredValidationTokens();
 });
 
 
@@ -35,28 +33,13 @@ async function deleteOldAudioFiles(path) {
 }
 
 // Remove any refreshTokens from db if expired
-async function deleteExpiredRefreshTokens() {
+async function deleteExpiredValidationTokens() {
   try {
-    const tokens = await RefreshToken.find();
-    tokens.forEach(async (tokenObject) => {
-      const stillValid = verifyTokenCode(tokenObject.token);
-      if (!stillValid) {
-        await RefreshToken.findByIdAndDelete(tokenObject._id);
-      }
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// Remove any resetPasswordTokens from db if expired or user already used
-async function deleteExpiredResetPasswordTokens() {
-  try {
-    const tokens = await ResetPasswordToken.find();
+    const tokens = await ValidationToken.find();
     tokens.forEach(async (tokenObject) => {
       const stillValid = verifyTokenCode(tokenObject.token);
       if (!stillValid || !tokenObject.valid) {
-        await ResetPasswordToken.findByIdAndDelete(tokenObject._id);
+        await ValidationToken.findByIdAndDelete(tokenObject._id);
       }
     });
   } catch (error) {

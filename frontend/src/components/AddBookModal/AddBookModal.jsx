@@ -29,8 +29,10 @@ function AddBookModal(props) {
       pages: pages,
       text: text,
     };
-    await props.addBook(newBookData);
-    resetForms();
+    const addedBook = await props.addBook(newBookData);
+    if (addedBook) {
+      resetForms();
+    }
   };
 
   const validateFields = async () => {
@@ -56,9 +58,6 @@ function AddBookModal(props) {
     <Modal
       show={props.showAddBookModal}
       onHide={()=>props.setShowAddBookModal(false)}
-      onShow={() => {
-        resetForms();
-      }}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered

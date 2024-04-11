@@ -157,7 +157,7 @@ export const getAllBooks = async () => {
 export const updateUser = async (userData) => {
   try {
     const response = await apiServiceSecure.put('/user/update', {userData});
-    return response.data;
+    return response;
   } catch (error) {
     throw error;
   }
@@ -166,7 +166,7 @@ export const updateUser = async (userData) => {
 export const updatePassword = async (userData) => {
   try {
     const response = await apiServiceSecure.put('/user/update-password', {userData});
-    return response.data;
+    return response;
   } catch (error) {
     throw error;
   }
@@ -266,8 +266,18 @@ export const checkPasswordResetTokenLink = async (resetToken) => {
 };
 
 export const resetPassword = async (data) => {
+  const tempApiServiceSecure = axios.create(
+      {
+        baseURL: process.env.REACT_APP_BACKEND_URL,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + data.token,
+        },
+      },
+  );
+
   try {
-    const response = await apiServiceUnsecure.post('/user/reset/verify', data);
+    const response = await tempApiServiceSecure.post('/user/reset/verify', data);
     return response;
   } catch (error) {
     throw error;
