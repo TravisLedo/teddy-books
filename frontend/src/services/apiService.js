@@ -235,6 +235,15 @@ export const deleteBookById = async (bookId) => {
   }
 };
 
+export const getTextsForBook= async (title) => {
+  try {
+    const response = await apiServiceSecure.get('/book/generate/'+ title);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const generateImageLink = (book, pageNumber) => {
   return (
     process.env.REACT_APP_IMAGE_BASE_URL +

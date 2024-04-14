@@ -1,7 +1,21 @@
-import {React} from 'react';
-import Form from 'react-bootstrap/Form';
+import {React, useContext} from 'react';
+import {Form, Button} from 'react-bootstrap';
+import {getTextsForBook} from '../../services/apiService';
+import {AuthContext} from '../../contexts/Contexts';
 
 function BookBody(props) {
+  const authContext = useContext(AuthContext);
+
+
+  const generateStarterTextFromPDF= async ()=>{
+    try {
+      const response = await getTextsForBook(props.title);
+      props.setText(response.data);
+    } catch (error) {
+      authContext.handleAlertModalShow(AlertType.ERROR, 'Could not generate texts for this book title.');
+    }
+  };
+
   return (
     <Form className="form-container">
       <Form.Group className="mb-3">
@@ -39,11 +53,21 @@ function BookBody(props) {
         <Form.Control
           as="textarea"
           placeholder="Book text content..."
-          rows={5}
+          rows={20}
           disabled={!props.editing}
           value={props.text}
           onChange={(e) => props.setText(e.target.value)}
         />
+        <Button
+          className="mt-2"
+          variant="outline-secondary"
+          disabled={!props.editing}
+          onClick={() => {
+            generateStarterTextFromPDF();
+          }}
+        >
+         Generate
+        </Button>
       </Form.Group>
 
       {!props.adding ? <div>

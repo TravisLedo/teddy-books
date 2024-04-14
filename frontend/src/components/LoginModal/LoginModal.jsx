@@ -142,7 +142,7 @@ function LoginModal(props) {
       const response = await resetPassword(data);
       if (response.status === 200) {
         authContext.handleLoginModalClose();
-        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset successful please log in.']);
+        authContext.handleAlertModalShow(AlertType.SUCCESS, ['Password reset successful. Please log in.']);
       } else if (response.status === 204) {
         authContext.handleAlertModalShow(AlertType.ERROR, ['Password reset request expired or does not exist. Try requesting a new link.']);
       }
