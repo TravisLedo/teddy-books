@@ -11,14 +11,8 @@
   height: 250px;
   max-width: 95%;
   border-style: solid;
-  border-width: 1;
+  border-width: .25px;
   margin-bottom: 10px;
   margin-top: 10px;
-}
-
-.book-image {
-  max-width: 99%;
-  max-height: 99%;
-  object-fit: contain;
-  margin: auto;
+  padding: 1px;
 }

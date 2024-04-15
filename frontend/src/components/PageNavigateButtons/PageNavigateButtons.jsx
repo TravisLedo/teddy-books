@@ -30,7 +30,7 @@ export default function PageNavigateButtons(props) {
       <div
         className="navigation-button"
         style={
-          props.currentCarouselPage < props.bookImageSources.length - 1 ?
+          props.currentCarouselPage*2+1 < props.numberOfPages - 1 ?
             {cursor: 'pointer'} :
             null
         }
@@ -39,11 +39,10 @@ export default function PageNavigateButtons(props) {
         onMouseLeave={() => setShowRightArrow(false)}
       >
         <div className="arrow-container-right">
-          {' '}
           <Image
             hidden={
               !showRightArrow ||
-              props.currentCarouselPage >= props.bookImageSources.length - 1
+              props.currentCarouselPage*2+1 >= props.numberOfPages - 1
             }
             className="arrow-image"
             rounded

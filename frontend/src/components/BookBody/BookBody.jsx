@@ -39,16 +39,6 @@ function BookBody(props) {
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Pages</Form.Label>
-        <Form.Control
-          type="number"
-          placeholder="Number of pages in book..."
-          value={props.pages}
-          disabled={!props.editing}
-          onChange={(e) => props.setPages(e.target.value)}
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
         <Form.Label>Text</Form.Label>
         <Form.Control
           as="textarea"

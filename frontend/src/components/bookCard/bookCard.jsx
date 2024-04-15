@@ -1,20 +1,19 @@
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import {React, useContext, useState, useEffect} from 'react';
-import {generateImageLink, updateBook} from '../../services/apiService';
+import {generatePDFLink, updateBook} from '../../services/apiService';
 import './bookCard.css';
-import blank from '../../assets/images/blank.png';
 import heart1 from '../../assets/images/heart1.png';
 import heart2 from '../../assets/images/heart2.png';
 import {AuthContext} from '../../contexts/Contexts';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
+import {Document, Page} from 'react-pdf';
 
 function BookCard(props) {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [image, setImage] = useState(generateImageLink(props.book, 1));
   const [likes, setLikes] = useState(props.book.likes);
   const [likeImage, setLikeImage] = useState(heart1);
 
@@ -39,7 +38,6 @@ function BookCard(props) {
     }
   }, [likes]);
 
-
   return (
     <Col className="d-flex justify-content-center px-0">
       <div
@@ -48,15 +46,18 @@ function BookCard(props) {
         }}
         className="card-clickable"
       >
-        <Image
-          className='card-image'
-          rounded
-          src={image}
-          onError={(e) => {
-            e.onError = null;
-            setImage(blank);
-          }}
-        />
+
+
+        <div className= 'card-image'>
+          <Document file={generatePDFLink(props.book)} loading=''>
+            <Page
+              loading=''
+              pageNumber={1} renderTextLayer={false}
+              renderAnnotationLayer={false}
+            />
+          </Document>
+        </div>
+
 
         <div className="corner-stats-container">
           <OverlayTrigger

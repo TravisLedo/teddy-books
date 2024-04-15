@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: row;
     position: absolute;
+    z-index: 2;
 }
 
 .navigation-button{

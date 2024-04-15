@@ -29,6 +29,7 @@ import {
 } from './services/apiService';
 import './App.css';
 import AlertModal from './components/AlertModal/AlertModal';
+import {pdfjs} from 'react-pdf';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -44,6 +45,11 @@ function App() {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.js',
+      import.meta.url,
+  ).toString();
 
   const handleLoginModalClose = () => setShowLoginModal(false);
   const handleLoginModalShow = (loginModalType, allowRegistering) => {

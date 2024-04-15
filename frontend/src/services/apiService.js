@@ -244,14 +244,13 @@ export const getTextsForBook= async (title) => {
   }
 };
 
-export const generateImageLink = (book, pageNumber) => {
+export const generatePDFLink = (book) => {
   return (
     process.env.REACT_APP_IMAGE_BASE_URL +
     '%2F' +
     book.folder +
-    '%2Fpages%2F' +
-    pageNumber +
-    '.png?alt=media&token=' +
+    '%2Foriginal' +
+    '.pdf?alt=media&token=' +
     process.env.REACT_APP_STORAGE_TOKEN
   );
 };

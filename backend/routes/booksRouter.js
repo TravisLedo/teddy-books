@@ -55,7 +55,6 @@ router.post('/book/add', authenthicateJwtToken, async (req, res) => {
       title: req.body.title,
       folder: generateFolderNameFromTitle(req.body.title), // generate this
       author: req.body.author,
-      pages: req.body.pages,
       text: req.body.text,
     });
     await book.save();
@@ -72,7 +71,6 @@ router.put('/book/update', authenthicateJwtToken, async (req, res) => {
       title: req.body.bookData.title,
       folder: generateFolderNameFromTitle(req.body.bookData.title),
       author: req.body.bookData.author,
-      pages: req.body.bookData.pages,
       text: req.body.bookData.text,
       likes: req.body.bookData.likes,
       views: req.body.bookData.views,

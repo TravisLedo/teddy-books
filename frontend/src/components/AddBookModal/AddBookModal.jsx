@@ -12,13 +12,11 @@ function AddBookModal(props) {
 
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
-  const [pages, setPages] = useState(2);
   const [text, setText] = useState('');
 
   const resetForms = async () => {
     setTitle('');
     setAuthor('');
-    setPages(2);
     setText('');
   };
 
@@ -26,7 +24,6 @@ function AddBookModal(props) {
     const newBookData = {
       title: title,
       author: author,
-      pages: pages,
       text: text,
     };
     const addedBook = await props.addBook(newBookData);
@@ -38,15 +35,13 @@ function AddBookModal(props) {
   const validateFields = async () => {
     let titleErrorsList = [];
     let authorErrorsList = [];
-    let pagesErrorsList = [];
     let textErrorList = [];
 
     titleErrorsList = await validateBookTitle(title);
     authorErrorsList = await validateBookAuthor(author);
-    pagesErrorsList = await validatePagesNumber(pages);
     textErrorList = await validateBookText(text);
 
-    const errorsList = titleErrorsList.concat(authorErrorsList).concat(pagesErrorsList).concat(textErrorList);
+    const errorsList = titleErrorsList.concat(authorErrorsList).concat(textErrorList);
     if (errorsList.length>0) {
       authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
@@ -70,12 +65,10 @@ function AddBookModal(props) {
         <BookBody
           editing={true}
           title={title}
-          pages={pages}
           author={author}
           text={text}
           setTitle={setTitle}
           setAuthor={setAuthor}
-          setPages={setPages}
           setText={setText}
           adding={true}
         ></BookBody>

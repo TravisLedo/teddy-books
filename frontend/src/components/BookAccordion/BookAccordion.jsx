@@ -1,9 +1,9 @@
 import {React, useContext, useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
-import {Button, Image, Card, Form} from 'react-bootstrap';
+import {Button, Image} from 'react-bootstrap';
 import {
   deleteBookById,
-  generateImageLink,
+  generatePDFLink,
   updateBook,
 } from '../../services/apiService';
 import BookBody from '../BookBody/BookBody';
@@ -16,7 +16,8 @@ import DeleteModal from '../DeleteModal/DeleteModal';
 import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
 import {AuthContext} from '../../contexts/Contexts';
 import {AlertType} from '../../Enums/AlertType';
-import { DeleteType } from '../../Enums/DeleteType';
+import {DeleteType} from '../../Enums/DeleteType';
+import {Document, Page} from 'react-pdf';
 
 function BookAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -24,7 +25,6 @@ function BookAccordion(props) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(props.book.title);
   const [author, setAuthor] = useState(props.book.author);
-  const [pages, setPages] = useState(props.book.pages);
   const [text, setText] = useState(props.book.text);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -32,7 +32,6 @@ function BookAccordion(props) {
     setEditing(false);
     setTitle(props.book.title);
     setAuthor(props.book.author);
-    setPages(props.book.pages);
     setText(props.book.text);
   };
 
@@ -54,17 +53,15 @@ function BookAccordion(props) {
   const validateFields = async () => {
     let titleErrorsList = [];
     let authorErrorsList = [];
-    let pagesErrorsList = [];
     let textErrorList = [];
 
     if (title.trim().toLowerCase() !== props.book.title.trim().toLowerCase()) {
       titleErrorsList = await validateBookTitle(title);
     }
     authorErrorsList = await validateBookAuthor(author);
-    pagesErrorsList = await validatePagesNumber(pages);
     textErrorList = await validateBookText(text);
 
-    const errorsList = titleErrorsList.concat(authorErrorsList).concat(pagesErrorsList).concat(textErrorList);
+    const errorsList = titleErrorsList.concat(authorErrorsList).concat(textErrorList);
     if (errorsList.length>0) {
       authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
@@ -134,22 +131,22 @@ function BookAccordion(props) {
             </Button>
           </div>
         )}
-        <Card className="book-card">
-          <Image
-            className="book-image"
-            rounded
-            src={generateImageLink(props.book, 1)}
-          />
-        </Card>
+        <div className= 'book-card'>
+          <Document file={generatePDFLink(props.book)} loading=''>
+            <Page
+              loading=''
+              pageNumber={1} renderTextLayer={false}
+              renderAnnotationLayer={false}
+            />
+          </Document>
+        </div>
         <BookBody
           title={title}
-          pages={pages}
           author={author}
           text={text}
           editing={editing}
           setTitle={setTitle}
           setAuthor={setAuthor}
-          setPages={setPages}
           setText={setText}
           setEditing={setEditing}
           createdAt={props.book.createdAt}

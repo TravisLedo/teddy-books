@@ -1,6 +1,6 @@
 import {React, useState, useEffect, useRef, useContext} from 'react';
 import {useParams} from 'react-router-dom';
-import {Image, Row} from 'react-bootstrap';
+import {Row} from 'react-bootstrap';
 import ProgressBar from '@ramonak/react-progress-bar';
 import {Carousel} from 'react-responsive-carousel';
 import PagePairs from '../../components/PagePairs/PagePairs';
@@ -16,10 +16,11 @@ import {
 } from '../../services/localStorageService';
 import {
   getBookById,
-  generateImageLink,
   getAudioForPage,
   removeTempAudioFromServer,
+  generatePDFLink,
 } from '../../services/apiService';
+import {Document} from 'react-pdf';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import './Read.css';
 
@@ -29,7 +30,11 @@ function Read(props) {
   const carouselRef = useRef();
   const {bookId} = useParams();
   const [book, setBook] = useState();
-  const [bookImageSources, setBookImageSources] = useState([]);
+  const [pdf, setPdf] = useState();
+  const [pdfLoaded, setPdfLoaded] = useState(false);
+  const [dummyArray, setDummyArray] = useState([]);
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
+  const [numberOfPages, setNumberOfPages] = useState(0);
   const [currentCarouselPage, setCurrentCarouselPage] = useState(0);
   const [audioSource, setAudioSource] = useState();
   const [started, setStarted] = useState(false);
@@ -42,6 +47,15 @@ function Read(props) {
   const delayTime = 1000;
   const [delay, setDelay] = useState(delayTime);
 
+  let pagesLoaded = 0;
+
+  const pageLoaded = () => {
+    pagesLoaded ++;
+    if (pagesLoaded === numberOfPages) {
+      setAllImagesLoaded(true);
+    }
+  };
+
   const handlePageChanged = async (page) => {
     audioPlayerRef.current.pause();
     setAudioSource(null);
@@ -52,22 +66,6 @@ function Read(props) {
     if (autoNextPage) {
       next(currentCarouselPage + 1);
     }
-  };
-
-  const generateImageSources = () => {
-    const images = [];
-    const pairedImages = [];
-    for (let index = 1; index <= book.pages; index++) {
-      images.push(generateImageLink(book, index));
-    }
-
-    for (let index = 0; index < images.length; index = index + 2) {
-      pairedImages.push({
-        leftImage: images[index],
-        rightImage: images[index + 1],
-      });
-    }
-    setBookImageSources(pairedImages);
   };
 
   async function fetchData() {
@@ -86,7 +84,7 @@ function Read(props) {
   };
 
   const next = () => {
-    if (currentCarouselPage < book.pages / 2 - 1) {
+    if (currentCarouselPage < numberOfPages / 2 - 1) {
       setCurrentCarouselPage(currentCarouselPage + 1);
     }
   };
@@ -116,7 +114,6 @@ function Read(props) {
     }
   };
 
-
   const handleVoiceSelectionChange = (voice) => {
     authContext.updateVoiceSelection(voice);
     setVoiceSelection(voice);
@@ -127,8 +124,8 @@ function Read(props) {
   }, [bookId]);
 
   useEffect(() => {
-    if (book && book.pages && book.folder) {
-      generateImageSources();
+    if (book && book.folder) {
+      setPdf(generatePDFLink(book));
       handlePageChanged(currentCarouselPage);
     }
   }, [book]);
@@ -136,6 +133,11 @@ function Read(props) {
   useEffect(() => {
     setDelay(delayTime);
   }, [currentCarouselPage]);
+
+  useEffect(() => {
+    setDummyArray(dummyArray);
+  }, [numberOfPages]);
+
 
   useEffect(() => {
     if (
@@ -197,19 +199,6 @@ function Read(props) {
     }
   }, [authContext.user]);
 
-  const generatePages = bookImageSources.map((book, index) => (
-    <PagePairs
-      key={book._id + props.index}
-      book={book}
-      index={index}
-      bookImageSources={bookImageSources}
-      currentWindowSize={props.currentWindowSize}
-      currentCarouselPage={currentCarouselPage}
-      next={next}
-      back={back}
-    ></PagePairs>
-  ));
-
   return (
     <div className="read-container">
       <audio
@@ -229,33 +218,52 @@ function Read(props) {
         }}
         ref={audioPlayerRef}
       />
-      {!started ? (
+      {!started? (
         <OverlayScreen
           setStarted={setStarted}
           status={
-            bookImageSources.length > 0 ?
+            allImagesLoaded ?
               OverlayStatus.READY_CLICK :
               OverlayStatus.LOADING
           }
         ></OverlayScreen>
       ) : null}
 
-      {book && bookImageSources.length > 0 ? (
+      {book ? (
         <div className="justify-content-center align-items-center pages-container">
           <Row>
-            <Carousel
-              selectedItem={currentCarouselPage}
-              useRef={carouselRef}
-              showThumbs={false}
-              showArrows={false}
-              showStatus={false}
-              emulateTouch={false /* behaves strangely*/}
-              showIndicators={false}
-              autoPlay={false}
-              onChange={(e) => handlePageChanged(e)}
-            >
-              {generatePages}
-            </Carousel>
+            <Document file={pdf} loading='' error='' onLoadSuccess={(pdf)=>{
+              setNumberOfPages(pdf.numPages);
+              setPdfLoaded(true);
+            }}>
+              <Carousel
+                selectedItem={currentCarouselPage}
+                useRef={carouselRef}
+                showThumbs={false}
+                showArrows={false}
+                showStatus={false}
+                emulateTouch={false /* behaves strangely*/}
+                showIndicators={false}
+                autoPlay={false}
+                onChange={(e) => handlePageChanged(e)}
+              >
+                { pdfLoaded && numberOfPages> 0? Array.from({length: numberOfPages}, (_, i) =>
+                  <PagePairs
+                    key={i}
+                    currentWindowSize={props.currentWindowSize}
+                    next={next}
+                    back={back}
+                    numberOfPages={numberOfPages}
+                    leftIndex={i * 2 + 1}
+                    rightIndex={i * 2 + 2}
+                    currentCarouselPage={currentCarouselPage}
+                    pageLoaded={pageLoaded}
+                  ></PagePairs>): null}
+
+
+              </Carousel>
+            </Document>
+
           </Row>
 
           <Row className="progress-bar-container">
@@ -264,7 +272,7 @@ function Read(props) {
               bgColor="#7237C5"
               customLabel=" "
               completed={
-                ((currentCarouselPage + 1) / bookImageSources.length) * 100
+                ((currentCarouselPage + 1) / numberOfPages * 2) * 100
               }
               visuallyHidden
             />

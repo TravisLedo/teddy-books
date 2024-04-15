@@ -29,13 +29,16 @@
     "nodemailer": "^6.9.13",
     "nodemon": "^3.0.3",
     "pdf-parse": "^1.1.1",
+    "pdf-to-img": "^2.1.2",
     "pdf2json": "^3.0.5",
+    "pdf2pic": "^3.1.1",
     "pdfreader": "^3.0.2",
     "sound-play": "^1.1.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "pdf-to-png-converter": "^3.2.0"
   }
 }

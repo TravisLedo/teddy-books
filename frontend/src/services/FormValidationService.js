@@ -108,23 +108,6 @@ export const validateBookAuthor = async (author)=>{
   return errors;
 };
 
-export const validatePagesNumber = async (value)=>{
-  const errors = [];
-  if (isInputBlank(value)) {
-    errors.push('Pages cannot be blank.');
-  } else {
-    try {
-      const numbervalue = parseInt(value);
-      if (numbervalue % 2 != 0) {
-        errors.push('Pages must be even');
-      }
-    } catch (error) {
-      errors.push('Pages value is an invalid format.');
-    }
-  }
-  return errors;
-};
-
 export const validateBookText = async (value)=>{
   const errors = [];
 
