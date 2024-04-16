@@ -101,7 +101,7 @@ const getPDFText= async (book)=>{
     let formatedString = '';
     const FILE_NAME = Date.now().toString() + '_' + uuidv4() + '.pdf';
     const file = fs.createWriteStream('./public/temp/' + FILE_NAME);
-    https.get(process.env.BOOKS_BASE_URL + '%2F' + book + '%2Foriginal.pdf?alt=media&token=' + process.env.FIREBASE_TOKEN, function(response) {
+    https.get(process.env.BOOKS_BASE_URL + '%2F' + book + '.pdf?alt=media&token=' + process.env.FIREBASE_TOKEN, function(response) {
       response.pipe(file);
 
       file.on('finish', async () => {

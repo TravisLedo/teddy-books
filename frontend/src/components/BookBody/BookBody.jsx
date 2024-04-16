@@ -2,6 +2,7 @@ import {React, useContext} from 'react';
 import {Form, Button} from 'react-bootstrap';
 import {getTextsForBook} from '../../services/apiService';
 import {AuthContext} from '../../contexts/Contexts';
+import {AlertType} from '../../Enums/AlertType';
 
 function BookBody(props) {
   const authContext = useContext(AuthContext);
@@ -12,7 +13,7 @@ function BookBody(props) {
       const response = await getTextsForBook(props.title);
       props.setText(response.data);
     } catch (error) {
-      authContext.handleAlertModalShow(AlertType.ERROR, 'Could not generate texts for this book title.');
+      authContext.handleAlertModalShow(AlertType.ERROR, ['Could not generate texts for this book title.']);
     }
   };
 

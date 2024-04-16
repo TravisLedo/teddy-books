@@ -16,10 +16,9 @@ router.post('/witai/speak', async (req, res) => {
     };
 
     const finalText =
-        parsePageText(req.body.leftPage, req.body.book.text) +
-        parsePageText(req.body.rightPage, req.body.book.text);
+        parsePageText(req.body.leftPage, req.body.book.text) + '...' + parsePageText(req.body.rightPage, req.body.book.text);
 
-    if (finalText) {
+    if (finalText && finalText !== '...') {
       const DIR_PATH = './public/temp';
       const FILE_NAME = Date.now().toString() + '_' + uuidv4() + '.mp3';
       const FILE_PATH = DIR_PATH + '/' + FILE_NAME;

@@ -130,7 +130,9 @@ function BookAccordion(props) {
             </Button>
           </div>
         )}
-        <div className= 'book-card'>
+        <div className= 'book-card' onClick={()=>{
+          window.open(generatePDFLink(props.book), '_blank', 'noreferrer');
+        }}>
           <Document file={generatePDFLink(props.book)} loading=''>
             <Page
               loading=''

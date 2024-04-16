@@ -46,8 +46,6 @@ function BookCard(props) {
         }}
         className="card-clickable"
       >
-
-
         <div className= 'card-image'>
           <Document file={generatePDFLink(props.book)} loading=''>
             <Page
