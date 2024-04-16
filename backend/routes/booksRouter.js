@@ -86,7 +86,6 @@ router.put('/book/update', authenthicateJwtToken, async (req, res) => {
 router.get('/book/generate/:title', authenthicateJwtToken, async (req, res) => {
   try {
     const formattedText = await getPDFText(generateFolderNameFromTitle(req.params.title));
-    console.log(formattedText);
     res.status(200).send(formattedText);
   } catch (error) {
     res.status(500).send('Could not generate texts');

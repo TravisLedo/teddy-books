@@ -13,7 +13,7 @@ import close from '../../assets/images/close.png';
 import trash from '../../assets/images/trash.png';
 import './BookAccordion.css';
 import DeleteModal from '../DeleteModal/DeleteModal';
-import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
+import {validateBookAuthor, validateBookText, validateBookTitle} from '../../services/FormValidationService';
 import {AuthContext} from '../../contexts/Contexts';
 import {AlertType} from '../../Enums/AlertType';
 import {DeleteType} from '../../Enums/DeleteType';
@@ -40,7 +40,6 @@ function BookAccordion(props) {
       _id: props.book._id,
       title: title,
       author: author,
-      pages: pages,
       text: text,
     };
 

@@ -7,6 +7,14 @@ import {Document, Page} from 'react-pdf';
 import './PagePairs.css';
 
 export default function PagePairs(props) {
+  const [leftIndex, setLeftIndex] = useState();
+  const [rightIndex, setRightIndex] = useState();
+
+  useEffect(() => {
+    setLeftIndex(props.index * 2 + 1);
+    setRightIndex(props.index * 2 + 2);
+  }, [props.index]);
+
   return (
     <div className="page-pairs-container">
       <PageNavigateButtons
@@ -23,7 +31,7 @@ export default function PagePairs(props) {
                 className="page-image"
                 loading=''
                 error=''
-                pageNumber={props.leftIndex}
+                pageNumber={leftIndex}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
                 onRenderSuccess={()=>{
@@ -36,7 +44,7 @@ export default function PagePairs(props) {
                 className="page-image"
                 loading=''
                 error=''
-                pageNumber={props.rightIndex}
+                pageNumber={rightIndex}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
                 onRenderSuccess={()=>{

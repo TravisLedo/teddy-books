@@ -254,8 +254,7 @@ function Read(props) {
                     next={next}
                     back={back}
                     numberOfPages={numberOfPages}
-                    leftIndex={i * 2 + 1}
-                    rightIndex={i * 2 + 2}
+                    index={i}
                     currentCarouselPage={currentCarouselPage}
                     pageLoaded={pageLoaded}
                   ></PagePairs>): null}
