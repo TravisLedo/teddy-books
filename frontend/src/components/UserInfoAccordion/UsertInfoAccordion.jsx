@@ -111,7 +111,6 @@ function UserInfoAccordion(props) {
   const deleteItem = async () => {
     try {
       const response = await deleteUserById(props.user._id);
-      console.log(response.status);
       setShowDeleteModal(false);
       props.refreshData();
       if (response.status === 200 && authContext.user._id === props.user._id) {

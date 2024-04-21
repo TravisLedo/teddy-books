@@ -14,35 +14,41 @@ import heart2 from '../../assets/images/heart2.png';
 import {Voices} from '../../Enums/Voices';
 import './ReadControlArea.css';
 import {AuthContext} from '../../contexts/Contexts';
-import {updateBook} from '../../services/apiService';
 
 export default function ReadControlArea(props) {
   const authContext = useContext(AuthContext);
   const offsetRef = useRef();
   const [offsetSize, setOffsetSize] = useState(0);
-  const [likes, setLikes] = useState(props.book.likes);
-  const [likeImage, setLikeImage] = useState(heart1);
+  const [userLiked, setUserLiked] = useState();
+  const [book, setBook] = useState(props.book);
 
   const handleLike = async ()=>{
     if (authContext.user) {
-      const newBookData = props.book;
-      if (likes.includes(authContext.user._id)) {
-        newBookData.likes = newBookData.likes.filter((id) => id === authContext.user.id);
-      } else {
-        newBookData.likes.push(authContext.user._id);
+      try {
+        const newBookData = book;
+        if (book.likes.includes(authContext.user._id)) {
+          newBookData.likes = newBookData.likes.filter((id) => id === authContext.user.id);
+        } else {
+          newBookData.likes.push(authContext.user._id);
+        }
+        const response = await authContext.updateBookDbData(newBookData);
+        if (response.likes) {
+          setBook(response);
+        }
+      } catch (error) {
+        authContext.logout();
+        setBook(props.book);
       }
-      const response = await updateBook(newBookData);
-      setLikes(response.likes);
     }
   };
 
   useEffect(() => {
-    if (authContext.user && likes.includes(authContext.user._id)) {
-      setLikeImage(heart2);
+    if (authContext.user && book.likes.includes(authContext.user._id)) {
+      setUserLiked(true);
     } else {
-      setLikeImage(heart1);
+      setUserLiked(false);
     }
-  }, [likes]);
+  }, [book, authContext.user]);
 
   useEffect(() => {
     if (offsetRef) {
@@ -196,14 +202,19 @@ export default function ReadControlArea(props) {
         }}
         ref={offsetRef}
         >
-          <Image
+          {userLiked ? <Image
             className="like-button"
             rounded
-            src={likeImage}
-          />
+            src={heart2}
+          /> : <Image
+            className="like-button"
+            rounded
+            src={heart1}
+          />}
+
         </div>
       </OverlayTrigger>
-      <b>{props.book.likes.length}</b>
+      <b>{book.likes.length}</b>
     </div>
   );
 }

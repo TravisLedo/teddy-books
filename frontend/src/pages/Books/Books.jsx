@@ -8,13 +8,25 @@ import {AuthContext} from '../../contexts/Contexts';
 import {LoginModalType} from '../../Enums/LoginModalType';
 import {useNavigate} from 'react-router-dom';
 import {AlertType} from '../../Enums/AlertType';
+import OverlayScreen from '../../components/OverlayScreen/OverlayScreen';
+import {OverlayStatus} from '../../Enums/OverlayStatus';
 
 function Books() {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [booksData, setBooksData] = useState([]);
+  const [booksLoaded, setBooksLoaded] = useState(false);
   const {resetToken} = useParams();
+
+  let imagesLoaded = 0;
+
+  const imageLoaded = () => {
+    imagesLoaded ++;
+    if (imagesLoaded === booksData.length) {
+      setBooksLoaded(true);
+    }
+  };
 
   async function fetchData() {
     try {
@@ -24,6 +36,11 @@ function Books() {
       console.error('Error fetching data:', error);
     }
   }
+
+  useEffect(() => {
+    console.log('loggedin');
+    fetchData();
+  }, [authContext.user]);
 
   useEffect(() => {
     const handlePasswordResetDirectLink= async ()=>{
@@ -52,11 +69,13 @@ function Books() {
 
   return (
     <div className="books-content">
-      <Row className="g-5 align-self-center pt-3 pb-3 content-row">
+      <Row className="g-5 align-self-center pt-3 pb-3 content-row" style={{display: booksLoaded ? 'flex': 'none'}}>
         {booksData.map((book) => (
-          <BookCard book={book} key={book._id}></BookCard>
+          <BookCard book={book} key={book._id} imageLoaded={imageLoaded}></BookCard>
         ))}
       </Row>
+      {!booksLoaded ? <OverlayScreen status={OverlayStatus.LOADING} progress={imagesLoaded}></OverlayScreen> : null}
+
     </div>
   );
 }

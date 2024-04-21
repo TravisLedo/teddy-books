@@ -9,51 +9,70 @@ import {AuthContext} from '../../contexts/Contexts';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {Document, Page} from 'react-pdf';
+import backupPdf from '../../assets/images/blank.pdf';
+import {LoginModalType} from '../../Enums/LoginModalType';
 
 function BookCard(props) {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [likes, setLikes] = useState(props.book.likes);
-  const [likeImage, setLikeImage] = useState(heart1);
+  const [book, setBook] = useState(props.book);
+  const [pdfError, setPdfError] = useState(false);
+  const [userLiked, setUserLiked] = useState();
 
   const handleLike = async ()=>{
     if (authContext.user) {
-      const newBookData = props.book;
-      if (likes.includes(authContext.user._id)) {
-        newBookData.likes = newBookData.likes.filter((id) => id === authContext.user.id);
-      } else {
-        newBookData.likes.push(authContext.user._id);
+      try {
+        const newBookData = book;
+        if (book.likes.includes(authContext.user._id)) {
+          newBookData.likes = newBookData.likes.filter((id) => id === authContext.user.id);
+        } else {
+          newBookData.likes.push(authContext.user._id);
+        }
+        const response = await authContext.updateBookDbData(newBookData);
+        if (response.likes) {
+          setBook(response);
+        }
+      } catch (error) {
+        authContext.logout();
+        setBook(props.book);
       }
-      const response = await updateBook(newBookData);
-      setLikes(response.likes);
     }
   };
 
   useEffect(() => {
-    if (authContext.user && likes.includes(authContext.user._id)) {
-      setLikeImage(heart2);
+    if (authContext.user && book.likes.includes(authContext.user._id)) {
+      setUserLiked(true);
     } else {
-      setLikeImage(heart1);
+      setUserLiked(false);
     }
-  }, [likes]);
+  }, [book, authContext.user]);
 
   return (
     <Col className="d-flex justify-content-center px-0">
       <div
         onClick={()=>{
-          navigate(`read/${props.book._id}`);
+          navigate(`read/${book._id}`);
         }}
         className="card-clickable"
       >
         <div className= 'card-image'>
-          <Document file={generatePDFLink(props.book)} loading=''>
+          {pdfError ? <Document file={backupPdf} loading=''>
             <Page
               loading=''
               pageNumber={1} renderTextLayer={false}
               renderAnnotationLayer={false}
+              onRenderSuccess={()=>props.imageLoaded()}
             />
-          </Document>
+          </Document> :
+          <Document file={generatePDFLink(book)} loading='' onLoadError={()=>setPdfError(true)}>
+            <Page
+              loading=''
+              pageNumber={1} renderTextLayer={false}
+              renderAnnotationLayer={false}
+              onRenderSuccess={()=>props.imageLoaded()}
+            />
+          </Document>}
         </div>
 
 
@@ -61,9 +80,9 @@ function BookCard(props) {
           <OverlayTrigger
             overlay={(e) => (
               <Tooltip {...e}>
-                {authContext.user && props.book.likes.includes(authContext.user._id)? (
+                {authContext.user && book.likes.includes(authContext.user._id)? (
               <div>Unlike</div>
-            ) : authContext.user && !props.book.likes.includes(authContext.user._id)? (
+            ) : authContext.user && !book.likes.includes(authContext.user._id)? (
               <div>Like</div>
             ) : <div>Log in to like.</div>
                 }
@@ -77,18 +96,22 @@ function BookCard(props) {
               handleLike();
             }}
             >
-              <Image
+              {userLiked ? <Image
                 className="like-button"
                 rounded
-                src={likeImage}
-              />
+                src={heart2}
+              /> : <Image
+                className="like-button"
+                rounded
+                src={heart1}
+              />}
             </div>
           </OverlayTrigger>
-          <b>{props.book.likes.length}</b>
+          <b>{book.likes.length}</b>
         </div>
         <div className="corner-label">
           <b className="corner-label-text">
-            {' ' + props.book.title + ' '}
+            {' ' + book.title + ' '}
           </b>
         </div>
       </div>

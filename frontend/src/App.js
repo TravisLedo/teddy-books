@@ -20,10 +20,10 @@ import {
   setOfflineSettings,
 } from './services/localStorageService';
 import {
-  activateApiServiceSecureInterceptors,
   autoLoginUser,
   getUserById,
   loginUser,
+  updateBook,
   updatePassword,
   updateUser,
 } from './services/apiService';
@@ -150,6 +150,21 @@ function App() {
       setOfflineSettings(response.data.settings);
     } catch (error) {
       console.log('Error updating user data: ', error);
+      if (error.message === 'Session expired.') {
+        handleLoginModalShow(LoginModalType.EXPIRED, false);
+      }
+      throw error;
+    }
+  };
+
+  const updateBookDbData = async (bookData) => {
+    try {
+      return await updateBook(bookData);
+    } catch (error) {
+      console.log('Error updating book data: ', error);
+      if (error.message === 'Session expired.') {
+        handleLoginModalShow(LoginModalType.EXPIRED, false);
+      }
       throw error;
     }
   };
@@ -167,7 +182,6 @@ function App() {
       await autoLogin(localJwtToken);
       setIsLoading(false);
     };
-    activateApiServiceSecureInterceptors(handleLoginModalShow);
     window.addEventListener('resize', handleResize);
     if (localJwtToken) {
       attemptAutoLogin();
@@ -201,6 +215,7 @@ function App() {
           setLoginModalType,
           setResetPasswordToken,
           updateIconSelection,
+          updateBookDbData,
         }}
       >
         <div className="App">

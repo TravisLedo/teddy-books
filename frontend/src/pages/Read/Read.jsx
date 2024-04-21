@@ -115,8 +115,12 @@ function Read(props) {
   };
 
   const handleVoiceSelectionChange = (voice) => {
-    authContext.updateVoiceSelection(voice);
-    setVoiceSelection(voice);
+    try {
+      authContext.updateVoiceSelection(voice);
+      setVoiceSelection(voice);
+    } catch (error) {
+
+    }
   };
 
   useEffect(() => {
@@ -230,8 +234,8 @@ function Read(props) {
       ) : null}
 
       {book ? (
-        <div className="justify-content-center align-items-center pages-container">
-          <Row>
+        <div className="justify-content-center align-items-center pages-container" style={{display: allImagesLoaded ? 'flex': 'none'}}>
+          <Row >
             <Document file={pdf} loading='' error='' onLoadSuccess={(pdf)=>{
               setNumberOfPages(pdf.numPages);
               setPdfLoaded(true);
@@ -258,8 +262,6 @@ function Read(props) {
                     currentCarouselPage={currentCarouselPage}
                     pageLoaded={pageLoaded}
                   ></PagePairs>): null}
-
-
               </Carousel>
             </Document>
 
@@ -276,7 +278,6 @@ function Read(props) {
               visuallyHidden
             />
           </Row>
-
           <Row className="control-area-container">
             <ReadControlArea
               currentWindowSize={props.currentWindowSize}
