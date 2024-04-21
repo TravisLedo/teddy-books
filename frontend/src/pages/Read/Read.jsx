@@ -90,7 +90,7 @@ function Read(props) {
   };
 
   const handleAutoNextPageToggle = async () => {
-    authContext.updateAutoNextPage(autoNextPage);
+    await authContext.updateAutoNextPage(autoNextPage);
 
     if (autoNextPage) {
       setAutoNextPage(false);
@@ -102,8 +102,8 @@ function Read(props) {
     }
   };
 
-  const handleAudioEnabledToggle = ()=>{
-    authContext.updateAudioEnabled(audioEnabled);
+  const handleAudioEnabledToggle = async ()=>{
+    await authContext.updateAudioEnabled(audioEnabled);
 
     if (audioEnabled) {
       audioPlayerRef.current.pause();
@@ -114,12 +114,11 @@ function Read(props) {
     }
   };
 
-  const handleVoiceSelectionChange = (voice) => {
+  const handleVoiceSelectionChange = async (voice) => {
     try {
-      authContext.updateVoiceSelection(voice);
+      await authContext.updateVoiceSelection(voice, true);
       setVoiceSelection(voice);
     } catch (error) {
-
     }
   };
 

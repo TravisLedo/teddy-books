@@ -34,7 +34,6 @@ function BookCard(props) {
           setBook(response);
         }
       } catch (error) {
-        authContext.logout();
         setBook(props.book);
       }
     }

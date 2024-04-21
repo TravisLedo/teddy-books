@@ -21,6 +21,7 @@ import DeleteModal from '../../components/DeleteModal/DeleteModal';
 import {DeleteType} from '../../Enums/DeleteType';
 import {ProfileIcon} from '../../Enums/ProfileIcon';
 import {useNavigate} from 'react-router-dom';
+import { LoginModalType } from '../../Enums/LoginModalType';
 
 function Profile(props) {
   const authContext = useContext(AuthContext);
@@ -184,7 +185,11 @@ function Profile(props) {
             'Something went wrong.',
           ]);
         }
-      } catch (error) {}
+      } catch (error) {
+        if (error.message === 'Session expired.') {
+          authContext.handleLoginModalShow(LoginModalType.EXPIRED, false);
+        }
+      }
     }
   };
 

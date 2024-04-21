@@ -36,7 +36,6 @@ export default function ReadControlArea(props) {
           setBook(response);
         }
       } catch (error) {
-        authContext.logout();
         setBook(props.book);
       }
     }

@@ -21,6 +21,7 @@ import './Admin.css';
 import UserInfoAccordion from '../../components/UserInfoAccordion/UsertInfoAccordion';
 import {isInputBlank, validateEmail, validatePasswordFormat, validateUsername} from '../../services/FormValidationService';
 import {AlertType} from '../../Enums/AlertType';
+import {LoginModalType} from '../../Enums/LoginModalType';
 
 function Admin(props) {
   const authContext = useContext(AuthContext);
@@ -68,6 +69,9 @@ function Admin(props) {
       refreshData();
     } catch (error) {
       console.log('Error saving new book: ', error);
+      if (error.message === 'Session expired.') {
+        authContext.handleLoginModalShow(LoginModalType.EXPIRED, false);
+      }
     }
   };
 
@@ -123,6 +127,9 @@ function Admin(props) {
       }
     } catch (error) {
       console.log('Error creating new user: ', error);
+      if (error.message === 'Session expired.') {
+        authContext.handleLoginModalShow(LoginModalType.EXPIRED, false);
+      }
     }
   };
 

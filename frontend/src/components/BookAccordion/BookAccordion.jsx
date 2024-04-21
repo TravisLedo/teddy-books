@@ -44,9 +44,11 @@ function BookAccordion(props) {
     };
 
     try {
-      await updateBook(newBookData);
+      await authContext.updateBookDbData(newBookData);
       setEditing(false);
-    } catch (error) {}
+    } catch (error) {
+      console.log('Error updating book: ', error);
+    }
   };
 
   const validateFields = async () => {
