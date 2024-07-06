@@ -43,8 +43,10 @@ function Read(props) {
   const [voiceSelectionAllowed, setVoiceSelectionAllowed] = useState(false);
   const [autoNextPage, setAutoNextPage] = useState();
   const [audioEnabled, setAudioEnabled] = useState();
+  const [showAudioLoading, setShowAudioLoading] = useState(false);
 
   const delayTime = 1000;
+
   const [delay, setDelay] = useState(delayTime);
 
   let pagesLoaded = 0;
@@ -128,7 +130,7 @@ function Read(props) {
 
   useEffect(() => {
     if (book && book.folder) {
-      setPdf(generatePDFLink(book));
+      setPdf(generatePDFLink(book.folder));
       handlePageChanged(currentCarouselPage);
     }
   }, [book]);
@@ -148,6 +150,7 @@ function Read(props) {
       audioEnabled &&
       !audioPlayerRef.current.isPlaying
     ) {
+      setShowAudioLoading(true);
       const handleAudio = async () => {
         let leftPage = 0;
         let rightPage = 0;
@@ -166,6 +169,7 @@ function Read(props) {
               rightPage,
               voiceSelection,
           );
+          setShowAudioLoading(false);
           if (audio.data === 'empty.mp3') {
             setAudioSource(emptyAudio);
           } else {
@@ -288,6 +292,7 @@ function Read(props) {
               handleAudioEnabledToggle={handleAudioEnabledToggle}
               handleAutoNextPageToggle={handleAutoNextPageToggle}
               book={book}
+              showAudioLoading={showAudioLoading}
             ></ReadControlArea>
           </Row>
 

@@ -1,5 +1,4 @@
 .navigation-buttons{
-    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: row;
@@ -17,19 +16,16 @@
     width: 100px;
     height: 100px;
     position: absolute;
-    left: 5%;
-    top: 2.5%;
 }
 
 .arrow-container-right{
     width: 100px;
-    height: 100%;
+    height: 100px;
     position: absolute;
-    right: 5%;
-    top: 2.5%;
 }
 .arrow-image{
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    opacity: 0.5;
 }

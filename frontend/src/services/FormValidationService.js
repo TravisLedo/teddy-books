@@ -117,7 +117,6 @@ export const validateBookText = async (value)=>{
   return errors;
 };
 
-
 export const isInputBlank = (input)=>{
   if (!input || input.length < 1) {
     return true;

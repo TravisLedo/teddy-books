@@ -67,9 +67,10 @@ function App() {
   const autoLogin = async (localJwtToken) => {
     try {
       const decodedJwtToken = decodeJwtToken(localJwtToken);
-      const userResult = await autoLoginUser(decodedJwtToken);
-      setUser(userResult);
-      setOfflineSettings(userResult.settings);
+      const user = await autoLoginUser(decodedJwtToken);
+      setUser(user);
+      const newOfflineSettings = {audioEnabled: user.settings.audioEnabled, autoNextPage: user.settings.autoNextPage, voiceSelection: user.settings.voiceSelection}
+      setOfflineSettings(newOfflineSettings);
     } catch (error) {}
   };
 
@@ -79,7 +80,8 @@ function App() {
       const decodedJwtToken = decodeJwtToken(jwtToken);
       const user = await getUserById(decodedJwtToken._id);
       setUser(user);
-      setOfflineSettings(user.settings);
+      const newOfflineSettings = {audioEnabled: user.settings.audioEnabled, autoNextPage: user.settings.autoNextPage, voiceSelection: user.settings.voiceSelection}
+      setOfflineSettings(newOfflineSettings);
       localStorage.setItem('jwtToken', jwtToken);
     } catch (error) {
       throw error;
@@ -188,7 +190,7 @@ function App() {
     } else {
       if (!getOfflineSettings()) {
         setOfflineSettings({
-          voiceSelection: Voices.JOE.voice,
+          voiceSelection: Voices.OLIVIA.alt,
           autoNextPage: true,
           audioEnabled: true,
         });

@@ -17,14 +17,15 @@ export default function PagePairs(props) {
 
   return (
     <div className="page-pairs-container">
-      <PageNavigateButtons
+      {props.currentWindowSize.width > props.currentWindowSize.height ? (
+        <div className="landscape-container">
+                <PageNavigateButtons
         next={props.next}
         back={props.back}
         numberOfPages={props.numberOfPages}
         currentCarouselPage={props.currentCarouselPage}
+        currentWindowSize={props.currentWindowSize}
       ></PageNavigateButtons>
-      {props.currentWindowSize.width > props.currentWindowSize.height ? (
-        <div className="landscape-container">
           <Row className="landscape-container-row">
             <Col className="landscape-container-page">
               <Page
@@ -56,13 +57,24 @@ export default function PagePairs(props) {
         </div>
       ) : (
         <div className="portrait-container">
+        <PageNavigateButtons
+        next={props.next}
+        back={props.back}
+        numberOfPages={props.numberOfPages}
+        currentCarouselPage={props.currentCarouselPage}
+        currentWindowSize={props.currentWindowSize}
+      ></PageNavigateButtons>
           <Row className="portrait-container-row-top">
             <Col className="portrait-container-col ">
               <Page
                 className="page-image"
                 loading=''
-                pageNumber={props.leftIndex} renderTextLayer={false}
+                pageNumber={leftIndex} 
+                renderTextLayer={false}
                 renderAnnotationLayer={false}
+                onRenderSuccess={()=>{
+                  props.pageLoaded();
+                }}
               />
             </Col>
           </Row>
@@ -71,8 +83,12 @@ export default function PagePairs(props) {
               <Page
                 className="page-image"
                 loading=''
-                pageNumber={props.rightIndex} renderTextLayer={false}
+                pageNumber={rightIndex} 
+                renderTextLayer={false}
                 renderAnnotationLayer={false}
+                onRenderSuccess={()=>{
+                  props.pageLoaded();
+                }}
               />
             </Col>
           </Row>

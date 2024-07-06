@@ -64,7 +64,7 @@ function BookCard(props) {
               onRenderSuccess={()=>props.imageLoaded()}
             />
           </Document> :
-          <Document file={generatePDFLink(book)} loading='' onLoadError={()=>setPdfError(true)}>
+          <Document file={generatePDFLink(book.folder)} loading='' onLoadError={()=>setPdfError(true)}>
             <Page
               loading=''
               pageNumber={1} renderTextLayer={false}

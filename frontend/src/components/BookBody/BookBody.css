@@ -1,0 +1,28 @@
+.book-body{
+display: flex;
+flex-direction: column;
+width: 100%;
+}
+
+
+.book-body-form {
+    width: 100%;
+  }
+
+
+.upload-pdf-button{
+    margin: auto;
+    justify-self: center;
+    align-self: center;
+    }
+
+.reset-pdf-button{
+        margin: auto;
+        justify-self: center;
+        align-self: center;
+        width: 50px;
+}
+.reset-pdf-image{
+    width: 100%;
+    
+}

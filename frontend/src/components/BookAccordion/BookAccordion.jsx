@@ -17,7 +17,6 @@ import {validateBookAuthor, validateBookText, validateBookTitle} from '../../ser
 import {AuthContext} from '../../contexts/Contexts';
 import {AlertType} from '../../Enums/AlertType';
 import {DeleteType} from '../../Enums/DeleteType';
-import {Document, Page} from 'react-pdf';
 
 function BookAccordion(props) {
   const authContext = useContext(AuthContext);
@@ -63,6 +62,7 @@ function BookAccordion(props) {
     textErrorList = await validateBookText(text);
 
     const errorsList = titleErrorsList.concat(authorErrorsList).concat(textErrorList);
+
     if (errorsList.length>0) {
       authContext.handleAlertModalShow(AlertType.ERROR, errorsList);
     } else {
@@ -132,19 +132,9 @@ function BookAccordion(props) {
             </Button>
           </div>
         )}
-        <div className= 'book-card' onClick={()=>{
-          window.open(generatePDFLink(props.book), '_blank', 'noreferrer');
-        }}>
-          <Document file={generatePDFLink(props.book)} loading=''>
-            <Page
-              loading=''
-              pageNumber={1} renderTextLayer={false}
-              renderAnnotationLayer={false}
-            />
-          </Document>
-        </div>
         <BookBody
           title={title}
+          folder={props.book.folder}
           author={author}
           text={text}
           editing={editing}

@@ -3,7 +3,7 @@ import {Button} from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import BookBody from '../../components/BookBody/BookBody';
 import './AddBookModal.css';
-import {validateBookAuthor, validateBookText, validateBookTitle, validatePagesNumber} from '../../services/FormValidationService';
+import {validateBookAuthor, validateBookFile, validateBookText, validateBookTitle} from '../../services/FormValidationService';
 import {AuthContext} from '../../contexts/Contexts';
 import {AlertType} from '../../Enums/AlertType';
 
@@ -26,6 +26,7 @@ function AddBookModal(props) {
       author: author,
       text: text,
     };
+
     const addedBook = await props.addBook(newBookData);
     if (addedBook) {
       resetForms();

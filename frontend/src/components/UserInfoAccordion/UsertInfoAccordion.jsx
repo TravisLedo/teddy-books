@@ -176,7 +176,7 @@ function UserInfoAccordion(props) {
         )}
         {props.user ? <Form className="form-container">
           <Form.Group className="mb-3" controlId='userId'>
-            <Form.Label>ID:</Form.Label>
+            <Form.Label>ID</Form.Label>
             <Form.Control
               type="text"
               value={props.user._id}

@@ -59,6 +59,7 @@ export default function ReadControlArea(props) {
     <div className="read-control-area-container">
       <div style={{width: offsetSize}} >
       </div>
+
       <OverlayTrigger
         overlay={(props) => <Tooltip {...props}>Toggle Voice</Tooltip>}
         placement="top"
@@ -68,6 +69,8 @@ export default function ReadControlArea(props) {
           onClick={() => props.handleAudioEnabledToggle()}
           className="control-button"
         >
+                <div className='audio-loading' style={{margin: 0}}>{props.showAudioLoading ? <div class="spinner-grow" style={{width: 50, height: 50}} role="status">
+                </div> : null}</div>
           <Image
             className="control-button-image"
             src={props.audioEnabled ? audio : mute}
