@@ -134,7 +134,7 @@ function BookAccordion(props) {
         )}
         <BookBody
           title={title}
-          folder={props.book.folder}
+          file={props.book.file}
           author={author}
           text={text}
           editing={editing}

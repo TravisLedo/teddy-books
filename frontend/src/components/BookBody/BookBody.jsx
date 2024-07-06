@@ -1,6 +1,6 @@
 import {React, useContext, useState, useEffect} from 'react';
 import {Form, Button, Image} from 'react-bootstrap';
-import {generatePDFLink, getTextsForBook, generateFolderNameFromTitle} from '../../services/apiService';
+import {generatePDFLink, getTextsForBook} from '../../services/apiService';
 import {AuthContext} from '../../contexts/Contexts';
 import {AlertType} from '../../Enums/AlertType';
 import {Document, Page} from 'react-pdf';
@@ -11,10 +11,10 @@ function BookBody(props) {
   const [pdfLink, setPdfLink] = useState(null);
 
   useEffect(() => {
-    if (props.folder) {
-      setPdfLink(generatePDFLink(props.folder));
+    if (props.file) {
+      setPdfLink(generatePDFLink(props.file));
     }
-  }, [props.folder]);
+  }, [props.file]);
 
   const generateStarterTextFromPDF= async ()=>{
     try {

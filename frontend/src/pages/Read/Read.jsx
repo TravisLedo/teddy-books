@@ -129,8 +129,8 @@ function Read(props) {
   }, [bookId]);
 
   useEffect(() => {
-    if (book && book.folder) {
-      setPdf(generatePDFLink(book.folder));
+    if (book && book.file) {
+      setPdf(generatePDFLink(book.file));
       handlePageChanged(currentCarouselPage);
     }
   }, [book]);

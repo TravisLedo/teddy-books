@@ -50,7 +50,7 @@ router.post("/book/add", authenthicateJwtToken, async (req, res) => {
   try {
     const book = new Book({
       title: req.body.title,
-      folder: generateFolderNameFromTitle(req.body.title), // generate this
+      file: generateFileNameFromTitle(req.body.title), // generate this
       author: req.body.author,
       text: req.body.text,
     });
@@ -66,7 +66,7 @@ router.put("/book/update", authenthicateJwtToken, async (req, res) => {
   try {
     const newBookValues = {
       title: req.body.bookData.title,
-      folder: generateFolderNameFromTitle(req.body.bookData.title),
+      file: generateFileNameFromTitle(req.body.bookData.title),
       author: req.body.bookData.author,
       text: req.body.bookData.text,
       likes: req.body.bookData.likes,
@@ -87,7 +87,7 @@ router.put("/book/update", authenthicateJwtToken, async (req, res) => {
 router.get("/book/generate/:title", authenthicateJwtToken, async (req, res) => {
   try {
     const formattedText = await getPDFText(
-      generateFolderNameFromTitle(req.params.title)
+      generateFileNameFromTitle(req.params.title)
     );
     res.status(200).send(formattedText);
   } catch (error) {
@@ -95,7 +95,7 @@ router.get("/book/generate/:title", authenthicateJwtToken, async (req, res) => {
   }
 });
 
-const generateFolderNameFromTitle = (title) => {
+const generateFileNameFromTitle = (title) => {
   return title.trim().replaceAll(" ", "_").toLowerCase();
 };
 

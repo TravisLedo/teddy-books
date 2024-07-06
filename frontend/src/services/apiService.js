@@ -242,11 +242,11 @@ export const getTextsForBook= async (title) => {
   }
 };
 
-export const generatePDFLink = (folder) => {
+export const generatePDFLink = (file) => {
   return (
     process.env.REACT_APP_IMAGE_BASE_URL +
     '%2F' +
-    folder +
+    file +
     '.pdf?alt=media&token=' +
     process.env.REACT_APP_STORAGE_TOKEN
   );
@@ -320,6 +320,6 @@ export const removeTempAudioFromServer = async (audioSource) => {
   }
 };
 
-export const generateFolderNameFromTitle = (title) => {
+export const generateFileNameFromTitle = (title) => {
   return title.trim().replaceAll(' ', '_').toLowerCase();
 };
