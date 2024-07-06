@@ -69,7 +69,7 @@ export default function ReadControlArea(props) {
           onClick={() => props.handleAudioEnabledToggle()}
           className="control-button"
         >
-                <div className='audio-loading' style={{margin: 0}}>{props.showAudioLoading ? <div class="spinner-grow" style={{width: 50, height: 50}} role="status">
+                <div className='audio-loading' style={{margin: 0}}>{props.showAudioLoading ? <div class="spinner-border" style={{width: 50, height: 50, color: '#0accb9', opacity: .4}} role="status">
                 </div> : null}</div>
           <Image
             className="control-button-image"
