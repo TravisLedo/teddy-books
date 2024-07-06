@@ -4,7 +4,6 @@ import {generatePDFLink, getTextsForBook, generateFolderNameFromTitle} from '../
 import {AuthContext} from '../../contexts/Contexts';
 import {AlertType} from '../../Enums/AlertType';
 import {Document, Page} from 'react-pdf';
-import undo from '../../assets/images/undo.png';
 import './BookBody.css';
 
 function BookBody(props) {

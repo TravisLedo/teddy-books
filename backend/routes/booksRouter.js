@@ -4,7 +4,6 @@ const { authenthicateJwtToken } = require("../services/jwtService");
 const https = require("https");
 const fs = require("fs");
 const PDFParser = require("pdf2json");
-const pdfParser = new PDFParser();
 const { v4: uuidv4 } = require("uuid");
 
 router.get("/books/all", async (req, res) => {
@@ -100,7 +99,10 @@ const generateFolderNameFromTitle = (title) => {
   return title.trim().replaceAll(" ", "_").toLowerCase();
 };
 
-const getPDFText = async (book) => {
+const getPDFText = async (bookName) => {
+  const pdfParser = new PDFParser();
+
+  console.log("getting texts for " + bookName)
   return new Promise((resolve, reject) => {
     let formatedString = "";
     const FILE_NAME = Date.now().toString() + "_" + uuidv4() + ".pdf";
@@ -109,7 +111,7 @@ const getPDFText = async (book) => {
       .get(
         process.env.BOOKS_BASE_URL +
           "%2F" +
-          book +
+          bookName +
           ".pdf?alt=media&token=" +
           process.env.FIREBASE_TOKEN,
         function (response) {
@@ -158,6 +160,7 @@ const getPDFText = async (book) => {
                 formatedString += "{{" + pageNumber + "}}" + " " + value + "\n";
               }
               fs.unlink("./public/temp/" + FILE_NAME, (err) => {});
+              console.log(formatedString)
 
               resolve(formatedString);
             });
