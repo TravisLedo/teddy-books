@@ -31,6 +31,8 @@ import './App.css';
 import AlertModal from './components/AlertModal/AlertModal';
 import {pdfjs} from 'react-pdf';
 
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`; 
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);

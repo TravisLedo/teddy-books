@@ -1,7 +1,7 @@
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import {React, useContext, useState, useEffect} from 'react';
-import {generatePDFLink, updateBook} from '../../services/apiService';
+import {generatePDFLink} from '../../services/apiService';
 import './bookCard.css';
 import heart1 from '../../assets/images/heart1.png';
 import heart2 from '../../assets/images/heart2.png';
@@ -10,7 +10,6 @@ import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {Document, Page} from 'react-pdf';
 import backupPdf from '../../assets/images/blank.pdf';
-import {LoginModalType} from '../../Enums/LoginModalType';
 
 function BookCard(props) {
   const authContext = useContext(AuthContext);
@@ -19,6 +18,7 @@ function BookCard(props) {
   const [book, setBook] = useState(props.book);
   const [pdfError, setPdfError] = useState(false);
   const [userLiked, setUserLiked] = useState();
+
 
   const handleLike = async ()=>{
     if (authContext.user) {
