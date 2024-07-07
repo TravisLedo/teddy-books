@@ -280,7 +280,7 @@ function LoginModal(props) {
                   validateEmailForResetLink();
                 }}
               >
-                Send Code
+                Send Link
               </Button>
             </Form.Group>
             <div className="button-container">
