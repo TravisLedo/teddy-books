@@ -27,7 +27,7 @@ export default function ReadControlArea(props) {
       try {
         const newBookData = book;
         if (book.likes.includes(authContext.user._id)) {
-          newBookData.likes = newBookData.likes.filter((id) => id === authContext.user.id);
+          newBookData.likes = newBookData.likes.filter((id) => id !== authContext.user._id);
         } else {
           newBookData.likes.push(authContext.user._id);
         }
