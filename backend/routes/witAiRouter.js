@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const axios = require('axios');
-// const schedule = require('node-schedule');
 const {v4: uuidv4} = require('uuid');
 const fs = require('fs');
 const Voices = require('../Enums/Voices');

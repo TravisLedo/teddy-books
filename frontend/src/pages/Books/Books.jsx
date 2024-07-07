@@ -38,7 +38,6 @@ function Books() {
   }
 
   useEffect(() => {
-    console.log('loggedin');
     fetchData();
   }, [authContext.user]);
 
