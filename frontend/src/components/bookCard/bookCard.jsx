@@ -25,7 +25,6 @@ function BookCard(props) {
       try {
         const newBookData = book;
         if (book.likes.includes(authContext.user._id)) {
-          console.log('test ' + authContext.user._id)
           newBookData.likes = newBookData.likes.filter((id) => id !== authContext.user._id);
         } else {
           newBookData.likes.push(authContext.user._id);

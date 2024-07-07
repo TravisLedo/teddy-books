@@ -160,8 +160,6 @@ const getPDFText = async (bookName) => {
                 formatedString += "{{" + pageNumber + "}}" + " " + value + "\n";
               }
               fs.unlink("./public/temp/" + FILE_NAME, (err) => {});
-              console.log(formatedString)
-
               resolve(formatedString);
             });
           });
