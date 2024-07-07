@@ -1,1 +1,1 @@
-An childrens audio book full stack MERN application.
+A full stack MERN application childrens audio book.
