@@ -1,6 +1,6 @@
 require('dotenv').config();
 require('./services/scheduledService');
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');

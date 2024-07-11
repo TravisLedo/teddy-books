@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/static/css/main.2d7d5303.css",
+    "main.js": "/static/js/main.265c65e0.js",
+    "static/js/453.d855a71b.chunk.js": "/static/js/453.d855a71b.chunk.js",
+    "static/media/page-turn-right.png": "/static/media/page-turn-right.310ce8dbb0d3fcf00faa.png",
+    "static/media/page-turn-left.png": "/static/media/page-turn-left.0f54e433f1d15709c2df.png",
+    "static/media/logo.png": "/static/media/logo.bf4129ce33964e2bcd3e.png",
+    "static/media/Gwibble.ttf": "/static/media/Gwibble.f1501d4892d3b85ea352.ttf",
+    "static/media/LapsusPro-Bold.otf": "/static/media/LapsusPro-Bold.53a781dd56219606d0b4.otf",
+    "static/media/blank.png": "/static/media/blank.4a27fb5541d60db670f0.png",
+    "static/media/play-disabled.png": "/static/media/play-disabled.3b46281441e62d8b494e.png",
+    "static/media/mute.png": "/static/media/mute.f977efd4751016987787.png",
+    "static/media/pause-disabled.png": "/static/media/pause-disabled.093b4286972c1d3089e5.png",
+    "static/media/empty.mp3": "/static/media/empty.469b41b4dee517bcdd0a.mp3",
+    "static/media/dolphin.png": "/static/media/dolphin.ae42aeb7e5766c8a6857.png",
+    "static/media/blank.pdf": "/static/media/blank.78c85101ccac0f6da627.pdf",
+    "index.html": "/index.html",
+    "main.2d7d5303.css.map": "/static/css/main.2d7d5303.css.map",
+    "main.265c65e0.js.map": "/static/js/main.265c65e0.js.map",
+    "453.d855a71b.chunk.js.map": "/static/js/453.d855a71b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2d7d5303.css",
+    "static/js/main.265c65e0.js"
+  ]
+}
